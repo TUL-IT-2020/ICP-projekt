@@ -131,6 +131,7 @@ bool App::init()
 		init_assets();
 
 		// When all is loaded, show the window.
+
 		glfwShowWindow(window);
 
 		// Initialize ImGUI (see https://github.com/ocornut/imgui/wiki/Getting-Started)
@@ -328,9 +329,6 @@ int App::run(void)
 		}
 	*/
 
-	GLfloat r,g,b,a;
-    r=g=b=a=1.0f;
-
     // Activate shader program. There is only one program, so activation can be out of the loop. 
     // In more realistic scenarios, you will activate different shaders for different 3D objects.
     glUseProgram(shader_prog_ID);
@@ -369,6 +367,8 @@ int App::run(void)
 				ImGui::Begin("Info", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 				ImGui::Text("V-Sync: %s", is_vsync_on ? "ON" : "OFF");
 				ImGui::Text("FPS: %.1f", FPS);
+				ImGui::Text("Triangle color: (%.2f, %.2f, %.2f)", triangle_color.r, triangle_color.g, triangle_color.b);
+				ImGui::Text("(press W/S to change color)");
 				ImGui::Text("(press RMB to release mouse)");
 				ImGui::Text("(hit D to show/hide info)");
 				ImGui::End();
@@ -395,7 +395,7 @@ int App::run(void)
 
 			//set uniform parameter for shader
 			// (try to change the color in key callback)          
-			glUniform4f(uniform_color_location, r, g, b, a);
+			glUniform4f(uniform_color_location, triangle_color.r, triangle_color.g, triangle_color.b, triangle_color.a);
 			
 			//bind 3d object data
 			glBindVertexArray(VAO_ID);
@@ -463,4 +463,19 @@ App::~App()
 	destroy();
 
 	std::cout << "Bye...\n";
+}
+
+/* Change the color of the triangle
+ * clamps the color values to [0, 1], does not change the alpha value.
+ * @param delta: the amount to change the color by
+ */
+void App::update_triangle_color(float delta) {
+    triangle_color.r += delta;
+    triangle_color.g += delta;
+    triangle_color.b += delta;
+
+    // clamp the color values to [0, 1]
+    triangle_color.r = glm::clamp(triangle_color.r, 0.0f, 1.0f);
+    triangle_color.g = glm::clamp(triangle_color.g, 0.0f, 1.0f);
+    triangle_color.b = glm::clamp(triangle_color.b, 0.0f, 1.0f);
 }

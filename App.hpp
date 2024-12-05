@@ -19,6 +19,9 @@ public:
     int run(void);
     void destroy(void);
 
+    color triangle_color{ 1.0f, 0.0f, 0.0f, 1.0f };
+    void update_triangle_color(float delta);
+
     ~App(); //default destructor, called on app instance destruction
 private:
     // GL
@@ -30,8 +33,6 @@ private:
     GLuint shader_prog_ID{ 0 };
     GLuint VBO_ID{ 0 };
     GLuint VAO_ID{ 0 };
-
-    GLfloat r{ 1.0f }, g{ 0.0f }, b{ 0.0f }, a{ 1.0f };
 
     std::vector<vertex> triangle_vertices = {
         {{0.0f,  0.5f,  0.0f}},
@@ -59,7 +60,5 @@ private:
     static void glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
     static void glfw_scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
     static void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
-  
+
 };
-
-

@@ -12,3 +12,8 @@
 struct vertex {
     glm::vec3 position;
 };
+
+// color description
+struct color {
+    GLfloat r, g, b, a;
+};
