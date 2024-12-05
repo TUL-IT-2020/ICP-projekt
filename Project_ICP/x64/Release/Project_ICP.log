@@ -1,0 +1,31 @@
+﻿  main.cpp
+  gl_err_callback.cpp
+  ICP.cpp
+  app.cpp
+  Project_ICP.cpp
+app.obj : error LNK2001: Nerozpoznaný externí symbol "bool __cdecl ImGui_ImplGlfw_InitForOpenGL(struct GLFWwindow *,bool)" (?ImGui_ImplGlfw_InitForOpenGL@@YA_NPEAUGLFWwindow@@_N@Z)
+app.obj : error LNK2001: Nerozpoznaný externí symbol "void __cdecl ImGui_ImplOpenGL3_NewFrame(void)" (?ImGui_ImplOpenGL3_NewFrame@@YAXXZ)
+app.obj : error LNK2001: Nerozpoznaný externí symbol "void __cdecl ImGui_ImplGlfw_NewFrame(void)" (?ImGui_ImplGlfw_NewFrame@@YAXXZ)
+app.obj : error LNK2001: Nerozpoznaný externí symbol "private: static void __cdecl App::MessageCallback(unsigned int,unsigned int,unsigned int,unsigned int,int,char const *,void const *)" (?MessageCallback@App@@CAXIIIIHPEBDPEBX@Z)
+app.obj : error LNK2001: Nerozpoznaný externí symbol "private: static void __cdecl App::glfw_scroll_callback(struct GLFWwindow *,double,double)" (?glfw_scroll_callback@App@@CAXPEAUGLFWwindow@@NN@Z)
+app.obj : error LNK2001: Nerozpoznaný externí symbol "private: static void __cdecl App::glfw_key_callback(struct GLFWwindow *,int,int,int,int)" (?glfw_key_callback@App@@CAXPEAUGLFWwindow@@HHHH@Z)
+app.obj : error LNK2001: Nerozpoznaný externí symbol "private: static void __cdecl App::glfw_mouse_button_callback(struct GLFWwindow *,int,int,int)" (?glfw_mouse_button_callback@App@@CAXPEAUGLFWwindow@@HHH@Z)
+app.obj : error LNK2001: Nerozpoznaný externí symbol "private: static void __cdecl App::glfw_framebuffer_size_callback(struct GLFWwindow *,int,int)" (?glfw_framebuffer_size_callback@App@@CAXPEAUGLFWwindow@@HH@Z)
+app.obj : error LNK2001: Nerozpoznaný externí symbol "private: static void __cdecl App::glfw_error_callback(int,char const *)" (?glfw_error_callback@App@@CAXHPEBD@Z)
+app.obj : error LNK2001: Nerozpoznaný externí symbol "void __cdecl ImGui_ImplOpenGL3_Shutdown(void)" (?ImGui_ImplOpenGL3_Shutdown@@YAXXZ)
+app.obj : error LNK2001: Nerozpoznaný externí symbol "bool __cdecl ImGui_ImplOpenGL3_Init(char const *)" (?ImGui_ImplOpenGL3_Init@@YA_NPEBD@Z)
+app.obj : error LNK2001: Nerozpoznaný externí symbol "void __cdecl ImGui_ImplOpenGL3_RenderDrawData(struct ImDrawData *)" (?ImGui_ImplOpenGL3_RenderDrawData@@YAXPEAUImDrawData@@@Z)
+app.obj : error LNK2001: Nerozpoznaný externí symbol "void __cdecl ImGui_ImplGlfw_Shutdown(void)" (?ImGui_ImplGlfw_Shutdown@@YAXXZ)
+app.obj : error LNK2001: Nerozpoznaný externí symbol "void __cdecl ImGui::End(void)" (?End@ImGui@@YAXXZ)
+app.obj : error LNK2001: Nerozpoznaný externí symbol "bool __cdecl ImGui::DebugCheckVersionAndDataLayout(char const *,unsigned __int64,unsigned __int64,unsigned __int64,unsigned __int64,unsigned __int64,unsigned __int64)" (?DebugCheckVersionAndDataLayout@ImGui@@YA_NPEBD_K11111@Z)
+app.obj : error LNK2001: Nerozpoznaný externí symbol "struct ImDrawData * __cdecl ImGui::GetDrawData(void)" (?GetDrawData@ImGui@@YAPEAUImDrawData@@XZ)
+app.obj : error LNK2001: Nerozpoznaný externí symbol "void __cdecl ImGui::SetNextWindowPos(struct ImVec2 const &,int,struct ImVec2 const &)" (?SetNextWindowPos@ImGui@@YAXAEBUImVec2@@H0@Z)
+app.obj : error LNK2001: Nerozpoznaný externí symbol "struct ImGuiContext * __cdecl ImGui::CreateContext(struct ImFontAtlas *)" (?CreateContext@ImGui@@YAPEAUImGuiContext@@PEAUImFontAtlas@@@Z)
+app.obj : error LNK2001: Nerozpoznaný externí symbol "char const * __cdecl ImGui::GetVersion(void)" (?GetVersion@ImGui@@YAPEBDXZ)
+app.obj : error LNK2001: Nerozpoznaný externí symbol "void __cdecl ImGui::NewFrame(void)" (?NewFrame@ImGui@@YAXXZ)
+app.obj : error LNK2001: Nerozpoznaný externí symbol "void __cdecl ImGui::Render(void)" (?Render@ImGui@@YAXXZ)
+app.obj : error LNK2001: Nerozpoznaný externí symbol "bool __cdecl ImGui::Begin(char const *,bool *,int)" (?Begin@ImGui@@YA_NPEBDPEA_NH@Z)
+app.obj : error LNK2001: Nerozpoznaný externí symbol "void __cdecl ImGui::DestroyContext(struct ImGuiContext *)" (?DestroyContext@ImGui@@YAXPEAUImGuiContext@@@Z)
+app.obj : error LNK2001: Nerozpoznaný externí symbol "void __cdecl ImGui::Text(char const *,...)" (?Text@ImGui@@YAXPEBDZZ)
+app.obj : error LNK2001: Nerozpoznaný externí symbol "void __cdecl ImGui::SetNextWindowSize(struct ImVec2 const &,int)" (?SetNextWindowSize@ImGui@@YAXAEBUImVec2@@H@Z)
+C:\Users\podav\source\repos\Project_ICP\x64\Release\Project_ICP.exe : fatal error LNK1120: Počet nerozpoznaných externích typů: 25
