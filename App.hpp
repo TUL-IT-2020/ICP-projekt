@@ -6,6 +6,7 @@
 #endif
 #include <GLFW/glfw3.h>
 
+#include "assets.hpp"
 
 // our application class 
 class App {
@@ -24,6 +25,19 @@ private:
     GLFWwindow* window = nullptr;
     bool is_vsync_on = true;
     bool show_imgui = true;
+
+    //new GL stuff
+    GLuint shader_prog_ID{ 0 };
+    GLuint VBO_ID{ 0 };
+    GLuint VAO_ID{ 0 };
+
+    GLfloat r{ 1.0f }, g{ 0.0f }, b{ 0.0f }, a{ 1.0f };
+
+    std::vector<vertex> triangle_vertices = {
+        {{0.0f,  0.5f,  0.0f}},
+        {{0.5f, -0.5f,  0.0f}},
+        {{-0.5f, -0.5f,  0.0f}}
+    };
 
     void thread_code(void);
 

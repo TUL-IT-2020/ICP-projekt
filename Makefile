@@ -1,6 +1,7 @@
 # Soubor s programem:
 FILE_NAME = ICP
-# c soubory v imgui:
+PROJECT_FILES = callbacks.cpp app.cpp
+# Imgui soubory:
 IMGUI_FILES = ./imgui-master/imgui.cpp ./imgui-master/imgui_draw.cpp ./imgui-master/imgui_widgets.cpp ./imgui-master/imgui_tables.cpp ./imgui-master/backends/imgui_impl_opengl3.cpp ./imgui-master/backends/imgui_impl_glfw.cpp
 
 # Nastaveni pro kompilator
@@ -14,7 +15,7 @@ GLEW_LIBS = -lGLEW
 # Set the LIBS variable to the sum of the OPENCV_LIBS and GLFW_LIBS variables
 LIBS = $(OPENCV_LIBS) $(GLFW_LIBS) $(GLEW_LIBS)
 TARGET = $(FILE_NAME).out
-SRC = $(FILE_NAME).cpp $(IMGUI_FILES) callbacks.cpp app.cpp
+SRC = $(FILE_NAME).cpp $(IMGUI_FILES) $(PROJECT_FILES)
 
 # Výchozí cíl
 all: clean $(TARGET)
@@ -31,6 +32,4 @@ clean:
 run: $(TARGET)
 	./$(TARGET)
 
-# Pravidlo pro sestavení programu v režimu ladění
-debug: CFLAGS += -g
-debug: clean $(TARGET)
+phony: clean all run

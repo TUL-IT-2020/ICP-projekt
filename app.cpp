@@ -1,3 +1,4 @@
+// C++
 #include <thread>
 #include <chrono>
 #include <string>
@@ -6,14 +7,17 @@
 #include <algorithm>
 #include <random>
 
-#include <glm/glm.hpp>
-#include <glm/ext.hpp>
 
 #include <opencv2/opencv.hpp>
 #include <GL/glew.h>
 #ifdef _WIN32
 #include <GL/wglew.h>
 #endif
+
+// OpenGL math
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -24,6 +28,7 @@
 #include <backends/imgui_impl_opengl3.h>
 
 #include "App.hpp"
+#include "assets.hpp"
 
 App::App() {
 	// default constructor
@@ -120,6 +125,9 @@ bool App::init()
 
 		// For future implementation: init assets (models, sounds, textures, level map, ...)
 		// (this may take a while, app window is hidden in the meantime)...
+		if (!GLEW_ARB_direct_state_access) {
+			throw std::runtime_error("No DSA :-(");
+		}
 		init_assets();
 
 		// When all is loaded, show the window.
@@ -160,8 +168,65 @@ void App::init_gl_debug()
 	}
 }
 
+
 void App::init_assets(void) {
-	// load and initialize all objects and resources (including initial positions)
+    //
+    // Initialize pipeline: compile, link and use shaders
+    //
+    
+    //SHADERS - define & compile & link
+    const char* vertex_shader =
+        "#version 460 core\n"
+        "in vec3 attribute_Position;"
+        "void main() {"
+        "  gl_Position = vec4(attribute_Position, 1.0);"
+        "}";
+
+    const char* fragment_shader =
+        "#version 460 core\n"
+        "uniform vec4 uniform_Color;"
+        "out vec4 FragColor;"
+        "void main() {"
+        "  FragColor = uniform_Color;"
+        "}";
+    
+    GLuint vs = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vs, 1, &vertex_shader, NULL);
+    glCompileShader(vs);
+    
+    GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fs, 1, &fragment_shader, NULL);
+    glCompileShader(fs);
+    
+    shader_prog_ID = glCreateProgram();
+    glAttachShader(shader_prog_ID, fs);
+    glAttachShader(shader_prog_ID, vs);
+    glLinkProgram(shader_prog_ID);
+    
+    //now we can delete shader parts (they can be reused, if you have more shaders)
+    //the final shader program already linked and stored separately
+    glDeleteShader(vs);
+    glDeleteShader(fs);
+
+    // 
+    // Create and load data into GPU using OpenGL DSA (Direct State Access)
+    //
+    
+    // Create VAO + data description (just envelope, or container...)
+    glCreateVertexArrays(1, &VAO_ID);
+
+    GLint position_attrib_location = glGetAttribLocation(shader_prog_ID, "attribute_Position");
+
+    glEnableVertexArrayAttrib(VAO_ID, position_attrib_location);
+    glVertexArrayAttribFormat(VAO_ID, position_attrib_location, 3, GL_FLOAT, GL_FALSE, offsetof(vertex, position));
+    glVertexArrayAttribBinding(VAO_ID, position_attrib_location, 0); // (GLuint vaobj, GLuint attribindex, GLuint bindingindex)
+
+    // Create and fill data
+    glCreateBuffers(1, &VBO_ID);
+    glNamedBufferData(VBO_ID, triangle_vertices.size()*sizeof(vertex), triangle_vertices.data(), GL_STATIC_DRAW);
+
+    // Connect together
+    glVertexArrayVertexBuffer(VAO_ID, 0, VBO_ID, 0, sizeof(vertex)); // (GLuint vaobj, GLuint bindingindex, GLuint buffer, GLintptr offset, GLsizei stride)
 }
 
 void App::print_opencv_info()
@@ -262,6 +327,20 @@ int App::run(void)
 			// POLL: Poll events, dispatch
 		}
 	*/
+
+	GLfloat r,g,b,a;
+    r=g=b=a=1.0f;
+
+    // Activate shader program. There is only one program, so activation can be out of the loop. 
+    // In more realistic scenarios, you will activate different shaders for different 3D objects.
+    glUseProgram(shader_prog_ID);
+    
+    // Get uniform location in GPU program. This will not change, so it can be moved out of the game loop.
+    GLint uniform_color_location = glGetUniformLocation(shader_prog_ID, "uniform_Color");
+    if (uniform_color_location == -1) {
+        std::cerr << "Uniform location is not found in active shader program. Did you forget to activate it?\n";
+    }
+
 	try {
 		double now = glfwGetTime();
 		// FPS related
@@ -277,8 +356,7 @@ int App::run(void)
 		// Clear color saved to OpenGL state machine: no need to set repeatedly in game loop
 		glClearColor(0, 0, 0, 0);
 
-		while (!glfwWindowShouldClose(window))
-		{
+		while (!glfwWindowShouldClose(window)) {
 			// ImGui prepare render (only if required)
 			if (show_imgui) {
 				ImGui_ImplOpenGL3_NewFrame();
@@ -312,10 +390,18 @@ int App::run(void)
 			// RENDER: GL drawCalls
 			// 
 
-			// Clear OpenGL canvas, both color buffer and Z-buffer
+			// clear canvas
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			// drawCalls to render object, scene, ...
 
+			//set uniform parameter for shader
+			// (try to change the color in key callback)          
+			glUniform4f(uniform_color_location, r, g, b, a);
+			
+			//bind 3d object data
+			glBindVertexArray(VAO_ID);
+
+			// draw all VAO data
+			glDrawArrays(GL_TRIANGLES, 0, triangle_vertices.size());
 
 			// ImGui display
 			if (show_imgui) {
@@ -323,14 +409,10 @@ int App::run(void)
 				ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 			}
 
-			//
 			// SWAP + VSYNC
-			//
 			glfwSwapBuffers(window);
 
-			//
 			// POLL
-			//
 			glfwPollEvents();
 
 			// Time/FPS measurement
@@ -375,6 +457,9 @@ void App::destroy(void)
 
 App::~App()
 {
+    glDeleteProgram(shader_prog_ID);
+    glDeleteBuffers(1, &VBO_ID);
+    glDeleteVertexArrays(1, &VAO_ID);
 	destroy();
 
 	std::cout << "Bye...\n";
