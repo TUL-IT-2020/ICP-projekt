@@ -29,6 +29,7 @@
 
 #include "App.hpp"
 #include "assets.hpp"
+#include "ShaderProgram.hpp"
 
 App::App() {
 	// default constructor
@@ -60,8 +61,7 @@ void App::init_glew(void) {
 	}
 }
 
-void App::init_glfw(void)
-{
+void App::init_glfw(void) {
 
 	/* Initialize the library */
 	glfwSetErrorCallback(glfw_error_callback);
@@ -174,40 +174,16 @@ void App::init_assets(void) {
     //
     // Initialize pipeline: compile, link and use shaders
     //
-    
-    //SHADERS - define & compile & link
-    const char* vertex_shader =
-        "#version 460 core\n"
-        "in vec3 attribute_Position;"
-        "void main() {"
-        "  gl_Position = vec4(attribute_Position, 1.0);"
-        "}";
 
-    const char* fragment_shader =
-        "#version 460 core\n"
-        "uniform vec4 uniform_Color;"
-        "out vec4 FragColor;"
-        "void main() {"
-        "  FragColor = uniform_Color;"
-        "}";
+	std::filesystem::path vertex_shader_path = "resources/shaders/defoult.vert";
+	std::filesystem::path fragment_shader_path = "resources/shaders/defoult.frag";
     
-    GLuint vs = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vs, 1, &vertex_shader, NULL);
-    glCompileShader(vs);
-    
-    GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fs, 1, &fragment_shader, NULL);
-    glCompileShader(fs);
-    
-    shader_prog_ID = glCreateProgram();
-    glAttachShader(shader_prog_ID, fs);
-    glAttachShader(shader_prog_ID, vs);
-    glLinkProgram(shader_prog_ID);
-    
-    //now we can delete shader parts (they can be reused, if you have more shaders)
-    //the final shader program already linked and stored separately
-    glDeleteShader(vs);
-    glDeleteShader(fs);
+    ShaderProgram shader(vertex_shader_path, fragment_shader_path);
+    shader_prog_ID = shader.getID();
+
+	// print shader ID
+	std::cout << "Shader program ID: " << shader_prog_ID << " ready for use." << std::endl;
+
 
     // 
     // Create and load data into GPU using OpenGL DSA (Direct State Access)
@@ -230,8 +206,7 @@ void App::init_assets(void) {
     glVertexArrayVertexBuffer(VAO_ID, 0, VBO_ID, 0, sizeof(vertex)); // (GLuint vaobj, GLuint bindingindex, GLuint buffer, GLintptr offset, GLsizei stride)
 }
 
-void App::print_opencv_info()
-{
+void App::print_opencv_info() {
 	std::cout << "Capture source: "
 		//<<  ": width=" << capture.get(cv::CAP_PROP_FRAME_WIDTH)
 		//<<  ", height=" << capture.get(cv::CAP_PROP_FRAME_HEIGHT)

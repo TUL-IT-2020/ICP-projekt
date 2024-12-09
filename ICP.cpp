@@ -1,5 +1,5 @@
-// icp.cpp 
-// author: JJ
+// icp.cpp
+// author: JK
 
 // our awesome headers
 #include "App.hpp"
@@ -8,10 +8,12 @@
 App app;
 
 // MAIN program function
-int main()
-{
-	if (app.init())
-		return app.run();
+int main() {
+    if (app.init()) {
+        return app.run();
+    } else {
+		return EXIT_FAILURE;
+	}
 }
 
 /* */
