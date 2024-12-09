@@ -12,8 +12,18 @@ public:
 	ShaderProgram(void) = default; //does nothing
 	ShaderProgram(const std::filesystem::path & VS_file, const std::filesystem::path & FS_file);
 
-	void activate(void) { glUseProgram(ID); };    // activate shader
-	void deactivate(void) { glUseProgram(0); };   // deactivate current shader program (i.e. activate shader no. 0)
+	void activate(void) {
+        if (ID==currently_used)
+            return;
+        else {     
+            glUseProgram(ID);
+            currently_used = ID;
+        }
+	};
+	void deactivate(void) { 
+		glUseProgram(0); 
+        currently_used = 0; 
+	};   // deactivate current shader program (i.e. activate shader no. 0)
 
 	/* deallocate shader program */
 	void clear(void) {
@@ -35,6 +45,7 @@ public:
     
 private:
 	GLuint ID{0}; // default = 0, empty shader
+	static GLuint currently_used;
 	GLuint getUniformLocation(const std::string& name);
 	std::string getShaderInfoLog(const GLuint obj);   // TODO: check for shader compilation error; if any, print compiler output  
 	std::string getProgramInfoLog(const GLuint obj);  // TODO: check for linker error; if any, print linker output

@@ -184,7 +184,6 @@ void App::init_assets(void) {
 	// print shader ID
 	std::cout << "Shader program ID: " << shader_prog_ID << " ready for use." << std::endl;
 
-
     // 
     // Create and load data into GPU using OpenGL DSA (Direct State Access)
     //
