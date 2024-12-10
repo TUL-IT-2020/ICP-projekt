@@ -15,6 +15,9 @@
 *.obj
 *.elf
 
+# neingoruj nic co je ve slozce resources, je to grafika
+!resources/obj/*
+
 # Linker output
 *.ilk
 *.map

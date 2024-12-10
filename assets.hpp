@@ -8,6 +8,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Model.h"
+#include "Mesh.h"
+
 //vertex description
 struct vertex {
     glm::vec3 position;

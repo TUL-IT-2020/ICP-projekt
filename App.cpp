@@ -6,13 +6,11 @@
 
 #include "App.hpp"
 
-void App::glfw_error_callback(int error, const char* description)
-{
+void App::glfw_error_callback(int error, const char* description) {
 	std::cerr << "GLFW error: " << description << std::endl;
 }
 
-void App::glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
+void App::glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	auto this_inst = static_cast<App*>(glfwGetWindowUserPointer(window));
 	if ((action == GLFW_PRESS) || (action == GLFW_REPEAT)) {
 		switch (key) {

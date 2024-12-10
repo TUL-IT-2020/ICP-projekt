@@ -59,13 +59,19 @@ inline void ShaderProgram::setUniform(const std::string& name, const glm::mat4 v
 }
 
 std::string ShaderProgram::getShaderInfoLog(const GLuint obj) {
-    // TODO: implement
-	return std::string();
+    GLint log_length = 0;
+    glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &log_length);
+    std::string log(log_length, ' ');
+    glGetShaderInfoLog(obj, log_length, &log_length, &log[0]);
+    return log;
 }
 
 std::string ShaderProgram::getProgramInfoLog(const GLuint obj) {
-    // TODO: implement, check for result, print info & throw error (if any)
-	return std::string();
+    GLint log_length = 0;
+    glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &log_length);
+    std::string log(log_length, ' ');
+    glGetProgramInfoLog(obj, log_length, &log_length, &log[0]);
+    return log;
 }
 
 GLuint ShaderProgram::compile_shader(const std::filesystem::path& source_file, const GLenum type) {
@@ -83,6 +89,8 @@ GLuint ShaderProgram::compile_shader(const std::filesystem::path& source_file, c
         std::cerr << getShaderInfoLog(shader_h) << std::endl;
         glDeleteShader(shader_h);
         throw std::runtime_error("Shader compilation failed.");
+    } else {
+        std::cout << "Shader compiled successfully." << std::endl;
     }
 
     return shader_h;
@@ -123,3 +131,5 @@ std::string ShaderProgram::textFileRead(const std::filesystem::path& filename) {
     ss << file.rdbuf();
     return ss.str();
 }
+
+GLuint ShaderProgram::currently_used = 0;

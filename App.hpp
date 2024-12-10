@@ -7,6 +7,7 @@
 #include <GLFW/glfw3.h>
 
 #include "assets.hpp"
+#include "Model.h"
 
 // our application class 
 class App {
@@ -34,11 +35,18 @@ private:
     GLuint VBO_ID{ 0 };
     GLuint VAO_ID{ 0 };
 
+    // triangle vertices
     std::vector<vertex> triangle_vertices = {
         {{0.0f,  0.5f,  0.0f}},
         {{0.5f, -0.5f,  0.0f}},
         {{-0.5f, -0.5f,  0.0f}}
     };
+
+    // triangle mesh
+    std::unique_ptr<Mesh> triangleMesh;
+
+    // list of Models
+    std::vector<Model> models;
 
     void thread_code(void);
 

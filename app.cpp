@@ -31,7 +31,7 @@
 #include "assets.hpp"
 #include "ShaderProgram.hpp"
 
-App::App() {
+App::App() : triangleMesh(nullptr) {
 	// default constructor
 }
 
@@ -99,8 +99,7 @@ void App::init_glfw(void) {
 	glfwSetScrollCallback(window, glfw_scroll_callback);
 }
 
-bool App::init()
-{
+bool App::init() {
 	try {
 		std::cout << "Current working directory: " << std::filesystem::current_path().generic_string() << '\n';
 
@@ -145,8 +144,7 @@ bool App::init()
 	return true;
 }
 
-void App::init_imgui()
-{
+void App::init_imgui() {
 	// see https://github.com/ocornut/imgui/wiki/Getting-Started
 
 	IMGUI_CHECKVERSION();
@@ -156,8 +154,7 @@ void App::init_imgui()
 	std::cout << "ImGUI version: " << ImGui::GetVersion() << "\n";
 }
 
-void App::init_gl_debug()
-{
+void App::init_gl_debug() {
 	if (GLEW_ARB_debug_output)
 	{
 		glDebugMessageCallback(MessageCallback, 0);
@@ -203,6 +200,21 @@ void App::init_assets(void) {
 
     // Connect together
     glVertexArrayVertexBuffer(VAO_ID, 0, VBO_ID, 0, sizeof(vertex)); // (GLuint vaobj, GLuint bindingindex, GLuint buffer, GLintptr offset, GLsizei stride)
+
+    //Model model("path/to/your/model.obj", shader);
+    //model.loadModel("path/to/your/model.obj");
+	//models.push_back(model);
+
+    // Convert triangle to mesh
+    std::vector<Vertex> triangleVertices = {
+        {{0.0f,  0.5f,  0.0f}, {0.0f, 0.0f, 1.0f}, {0.5f, 1.0f}},
+        {{0.5f, -0.5f,  0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},
+        {{-0.5f, -0.5f,  0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}}
+    };
+    std::vector<GLuint> triangleIndices = {0, 1, 2};
+
+    // create mesh
+    triangleMesh = std::make_unique<Mesh>(GL_TRIANGLES, shader, triangleVertices, triangleIndices, glm::vec3(0.0f), glm::vec3(0.0f));
 }
 
 void App::print_opencv_info() {
@@ -212,8 +224,7 @@ void App::print_opencv_info() {
 		<< '\n';
 }
 
-void App::print_glfw_info(void)
-{
+void App::print_glfw_info(void) {
 	int major, minor, revision;
 	glfwGetVersion(&major, &minor, &revision);
 	std::cout << "Running GLFW DLL " << major << '.' << minor << '.' << revision << '\n';
@@ -222,14 +233,12 @@ void App::print_glfw_info(void)
 		<< '\n';
 }
 
-void App::print_glm_info()
-{
+void App::print_glm_info() {
 	// GLM library
 	std::cout << "GLM version: " << GLM_VERSION_MAJOR << '.' << GLM_VERSION_MINOR << '.' << GLM_VERSION_PATCH << "rev" << GLM_VERSION_REVISION << std::endl;
 }
 
-void App::print_gl_info()
-{
+void App::print_gl_info() {
 	// get OpenGL info
 	auto vendor_s = reinterpret_cast<const char*>(glGetString(GL_VENDOR));
 	std::cout << "OpenGL driver vendor: " << (vendor_s ? vendor_s : "UNKNOWN") << '\n';
@@ -288,8 +297,7 @@ void App::init_opencv()
 	// ...
 }
 
-int App::run(void)
-{
+int App::run(void) {
 	/*
 	* Typical game loop:
 		// INIT: Initial positions and state
@@ -371,11 +379,10 @@ int App::run(void)
 			// (try to change the color in key callback)          
 			glUniform4f(uniform_color_location, triangle_color.r, triangle_color.g, triangle_color.b, triangle_color.a);
 			
-			//bind 3d object data
-			glBindVertexArray(VAO_ID);
-
-			// draw all VAO data
-			glDrawArrays(GL_TRIANGLES, 0, triangle_vertices.size());
+			// draw the triangle mesh
+            if (triangleMesh) {
+                triangleMesh->draw();
+            }
 
 			// ImGui display
 			if (show_imgui) {
@@ -411,8 +418,7 @@ int App::run(void)
 	return EXIT_SUCCESS;
 }
 
-void App::destroy(void)
-{
+void App::destroy(void) {
 	// clean up ImGUI
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
@@ -429,8 +435,7 @@ void App::destroy(void)
 	glfwTerminate();
 }
 
-App::~App()
-{
+App::~App() {
     glDeleteProgram(shader_prog_ID);
     glDeleteBuffers(1, &VBO_ID);
     glDeleteVertexArrays(1, &VAO_ID);
