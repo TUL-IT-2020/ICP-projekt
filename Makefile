@@ -16,20 +16,25 @@ GLEW_LIBS = -lGLEW
 LIBS = $(OPENCV_LIBS) $(GLFW_LIBS) $(GLEW_LIBS)
 TARGET = $(FILE_NAME).out
 SRC = $(FILE_NAME).cpp $(IMGUI_FILES) $(PROJECT_FILES)
+OBJ = $(SRC:.cpp=.o)
 
 # Výchozí cíl
-all: clean $(TARGET)
+all: $(TARGET)
 
 # Pravidlo pro sestavení programu
-$(TARGET): $(SRC)
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(TARGET) $(SRC) $(LIBS)
+$(TARGET): $(OBJ)
+	$(CC) $(CFLAGS) $(INCLUDES) -o $(TARGET) $(OBJ) $(LIBS)
+
+# Pravidlo pro sestavení objektových souborů
+%.o: %.cpp
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 # Pravidlo pro vyčištění sestavení
 clean:
-	rm -f $(TARGET) *.o
+	rm -f $(TARGET) $(OBJ)
 
 # Pravidlo pro spuštění programu
 run: $(TARGET)
 	./$(TARGET)
 
-phony: clean all run
+.PHONY: clean all run
