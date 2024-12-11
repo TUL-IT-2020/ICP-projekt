@@ -43,9 +43,9 @@ inline void ShaderProgram::setUniform(const std::string& name, const glm::vec3 v
     glUniform3fv(loc, 1, glm::value_ptr(val));
 }
 
-inline void ShaderProgram::setUniform(const std::string& name, const glm::vec4 in_vec4) {
+inline void ShaderProgram::setUniform(const std::string& name, const glm::vec4 val) {
     auto loc = glGetUniformLocation(ID, name.c_str());
-	glUniform4fv(loc, 1, glm::value_ptr(in_vec4));
+    glUniform4fv(loc, 1, glm::value_ptr(val));
 }
 
 inline void ShaderProgram::setUniform(const std::string& name, const glm::mat3 val) {
@@ -59,19 +59,27 @@ inline void ShaderProgram::setUniform(const std::string& name, const glm::mat4 v
 }
 
 std::string ShaderProgram::getShaderInfoLog(const GLuint obj) {
-    GLint log_length = 0;
-    glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &log_length);
-    std::string log(log_length, ' ');
-    glGetShaderInfoLog(obj, log_length, &log_length, &log[0]);
-    return log;
+    int infologLength = 0;
+    std::string s;
+    glGetShaderiv(obj, GL_INFO_LOG_LENGTH, &infologLength);
+    if (infologLength > 0) {
+        std::vector<char> v(infologLength);
+        glGetShaderInfoLog(obj, infologLength, NULL, v.data());
+        s.assign(begin(v), end(v));
+    }
+    return s;
 }
 
 std::string ShaderProgram::getProgramInfoLog(const GLuint obj) {
-    GLint log_length = 0;
-    glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &log_length);
-    std::string log(log_length, ' ');
-    glGetProgramInfoLog(obj, log_length, &log_length, &log[0]);
-    return log;
+    int infologLength = 0;
+    std::string s;
+    glGetProgramiv(obj, GL_INFO_LOG_LENGTH, &infologLength);
+    if (infologLength > 0) {
+        std::vector<char> v(infologLength);
+        glGetProgramInfoLog(obj, infologLength, NULL, v.data());
+        s.assign(begin(v), end(v));
+    }
+    return s;
 }
 
 GLuint ShaderProgram::compile_shader(const std::filesystem::path& source_file, const GLenum type) {
@@ -82,9 +90,9 @@ GLuint ShaderProgram::compile_shader(const std::filesystem::path& source_file, c
     glShaderSource(shader_h, 1, &shader_code_cstr, nullptr);
     glCompileShader(shader_h);
 
-    GLint success;
-    glGetShaderiv(shader_h, GL_COMPILE_STATUS, &success);
-    if (!success) {
+    GLint status;
+    glGetShaderiv(shader_h, GL_COMPILE_STATUS, &status);
+    if (status == GL_FALSE) {
         std::cerr << "Error compiling shader: " << source_file << std::endl;
         std::cerr << getShaderInfoLog(shader_h) << std::endl;
         glDeleteShader(shader_h);
@@ -104,9 +112,9 @@ GLuint ShaderProgram::link_shader(const std::vector<GLuint> shader_ids) {
 
     glLinkProgram(prog_h);
 
-    GLint success;
-    glGetProgramiv(prog_h, GL_LINK_STATUS, &success);
-    if (!success) {
+    GLint status;
+    glGetProgramiv(prog_h, GL_LINK_STATUS, &status);
+    if (status == GL_FALSE) {
         std::cerr << "Error linking shader program." << std::endl;
         std::cerr << getProgramInfoLog(prog_h) << std::endl;
         glDeleteProgram(prog_h);
