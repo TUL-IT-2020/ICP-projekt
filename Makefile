@@ -1,6 +1,7 @@
 # Soubor s programem:
 FILE_NAME = ICP
-PROJECT_FILES = callbacks.cpp app.cpp ShaderProgram.cpp
+PROJECT_FILES = callbacks.cpp app.cpp ShaderProgram.cpp 
+PROJECT_HEADERS = Model.hpp Mesh.hpp Vertex.hpp
 # Imgui soubory:
 IMGUI_FILES = ./imgui-master/imgui.cpp ./imgui-master/imgui_draw.cpp ./imgui-master/imgui_widgets.cpp ./imgui-master/imgui_tables.cpp ./imgui-master/backends/imgui_impl_opengl3.cpp ./imgui-master/backends/imgui_impl_glfw.cpp
 
@@ -22,7 +23,7 @@ OBJ = $(SRC:.cpp=.o)
 all: $(TARGET)
 
 # Pravidlo pro sestavení programu
-$(TARGET): $(OBJ)
+$(TARGET): $(OBJ) $(PROJECT_HEADERS)
 	$(CC) $(CFLAGS) $(INCLUDES) -o $(TARGET) $(OBJ) $(LIBS)
 
 # Pravidlo pro sestavení objektových souborů
