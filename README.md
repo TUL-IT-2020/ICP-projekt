@@ -28,3 +28,11 @@ To add ImGUI to your project:
 	- add existing items to imgui filter
 3. add `$(ProjectDir)/imgui-master` to your Project properties -> VC++ directories -> Include directories
 4. see: [imgui_manual](https://pthom.github.io/imgui_manual_online/manual/imgui_manual.html)
+
+## Spuštění programu
+
+Pro spuštění programu je potřeba zdrojoý kód zkompilovat a spustit.
+
+```bash
+make run
+```
