@@ -31,7 +31,7 @@
 #include "assets.hpp"
 #include "ShaderProgram.hpp"
 
-App::App() : triangleMesh(nullptr) {
+App::App() {
 	// default constructor
 }
 
@@ -175,31 +175,14 @@ void App::init_assets(void) {
 	std::filesystem::path vertex_shader_path = "resources/shaders/defoult.vert";
 	std::filesystem::path fragment_shader_path = "resources/shaders/defoult.frag";
     
-    ShaderProgram shader(vertex_shader_path, fragment_shader_path);
-    shader_prog_ID = shader.getID();
+    shader = ShaderProgram(vertex_shader_path, fragment_shader_path);
 
 	// print shader ID
-	std::cout << "Shader program ID: " << shader_prog_ID << " ready for use." << std::endl;
+	std::cout << "Shader program ID: " << shader.getID() << " ready for use." << std::endl;
 
     // 
     // Create and load data into GPU using OpenGL DSA (Direct State Access)
     //
-    
-    // Create VAO + data description (just envelope, or container...)
-    glCreateVertexArrays(1, &VAO_ID);
-
-    GLint position_attrib_location = glGetAttribLocation(shader_prog_ID, "attribute_Position");
-
-    glEnableVertexArrayAttrib(VAO_ID, position_attrib_location);
-    glVertexArrayAttribFormat(VAO_ID, position_attrib_location, 3, GL_FLOAT, GL_FALSE, offsetof(vertex, position));
-    glVertexArrayAttribBinding(VAO_ID, position_attrib_location, 0); // (GLuint vaobj, GLuint attribindex, GLuint bindingindex)
-
-    // Create and fill data
-    glCreateBuffers(1, &VBO_ID);
-    glNamedBufferData(VBO_ID, triangle_vertices.size()*sizeof(vertex), triangle_vertices.data(), GL_STATIC_DRAW);
-
-    // Connect together
-    glVertexArrayVertexBuffer(VAO_ID, 0, VBO_ID, 0, sizeof(vertex)); // (GLuint vaobj, GLuint bindingindex, GLuint buffer, GLintptr offset, GLsizei stride)
 
     //Model model("path/to/your/model.obj", shader);
     //model.loadModel("path/to/your/model.obj");
@@ -213,8 +196,14 @@ void App::init_assets(void) {
     };
     std::vector<GLuint> triangleIndices = {0, 1, 2};
 
-    // create mesh
-    triangleMesh = std::make_unique<Mesh>(GL_TRIANGLES, shader, triangleVertices, triangleIndices, glm::vec3(0.0f), glm::vec3(0.0f));
+    // create mesh and put it into model
+	std::shared_ptr<Mesh> triangleMesh;
+
+	triangleMesh = std::make_shared<Mesh>(GL_TRIANGLES, shader, triangleVertices, triangleIndices, glm::vec3(0.0f), glm::vec3(0.0f), 0);
+
+	Model triangle(triangleMesh);
+	triangle.name = "triangle";
+	models.push_back(triangle);
 }
 
 void App::print_opencv_info() {
@@ -311,16 +300,6 @@ int App::run(void) {
 		}
 	*/
 
-    // Activate shader program. There is only one program, so activation can be out of the loop. 
-    // In more realistic scenarios, you will activate different shaders for different 3D objects.
-    glUseProgram(shader_prog_ID);
-    
-    // Get uniform location in GPU program. This will not change, so it can be moved out of the game loop.
-    GLint uniform_color_location = glGetUniformLocation(shader_prog_ID, "uniform_Color");
-    if (uniform_color_location == -1) {
-        std::cerr << "Uniform location is not found in active shader program. Did you forget to activate it?\n";
-    }
-
 	try {
 		double now = glfwGetTime();
 		// FPS related
@@ -375,14 +354,19 @@ int App::run(void) {
 			// clear canvas
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			//set uniform parameter for shader
-			// (try to change the color in key callback)          
-			glUniform4f(uniform_color_location, triangle_color.r, triangle_color.g, triangle_color.b, triangle_color.a);
-			
-			// draw the triangle mesh
-            if (triangleMesh) {
-                triangleMesh->draw();
-            }
+			// draw all models
+			for (auto & model : models) {
+				if (model.name == "triangle") {
+					// update triangle color
+					for (auto & mesh : model.meshes) {
+						const glm::vec4 triangle_color_vec(triangle_color.r, triangle_color.g, triangle_color.b, 1.0f);
+						std::string uniform_name = "uniform_Color";
+						//mesh.shader.setUniform(uniform_name, triangle_color_vec);
+					}
+				}
+				model.draw();
+				
+			}
 
 			// ImGui display
 			if (show_imgui) {
@@ -436,12 +420,11 @@ void App::destroy(void) {
 }
 
 App::~App() {
-    glDeleteProgram(shader_prog_ID);
-    glDeleteBuffers(1, &VBO_ID);
-    glDeleteVertexArrays(1, &VAO_ID);
-	destroy();
+    models.clear(); // Clear the vector to release the memory
 
-	std::cout << "Bye...\n";
+    destroy();
+
+    std::cout << "Bye...\n";
 }
 
 /* Change the color of the triangle
