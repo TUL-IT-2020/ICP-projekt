@@ -15,7 +15,7 @@ public:
 	void activate(void) {
         if (ID==currently_used)
             return;
-        else {     
+        else {
             glUseProgram(ID);
             currently_used = ID;
         }

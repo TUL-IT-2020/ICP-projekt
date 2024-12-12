@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ASSETS_HPP
+#define ASSETS_HPP
 
 #include <vector>
 #include <GL/glew.h> 
@@ -7,9 +8,6 @@
 #endif
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
-#include "Model.h"
-#include "Mesh.h"
 
 //vertex description
 struct vertex {
@@ -20,3 +18,5 @@ struct vertex {
 struct color {
     GLfloat r, g, b, a;
 };
+
+#endif // ASSETS_HPP
