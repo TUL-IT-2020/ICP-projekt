@@ -1,4 +1,5 @@
-#pragma once
+#ifndef VERTEX_HPP
+#define VERTEX_HPP
 
 #include <glm/glm.hpp> 
 
@@ -8,3 +9,4 @@ struct Vertex {
     glm::vec2 TexCoords;
 };
 
+#endif // VERTEX_HPP

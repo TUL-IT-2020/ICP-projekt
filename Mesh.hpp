@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MESH_HPP
+#define MESH_HPP
 
 #include <string>
 #include <vector>
@@ -7,9 +8,8 @@
 #include <glm/ext.hpp>
 #include <iostream>
 
-#include "Vertex.h"
-#include "ShaderProgram.hpp"
 #include "assets.hpp"
+#include "ShaderProgram.hpp"
 
 class Mesh {
 public:
@@ -39,6 +39,22 @@ public:
         orientation(orientation),
         texture_id(texture_id)
     {
+        /*
+        GLuint position_attribute_location = glGetAttribLocation(shader.getID(), "atrribute_position");
+        glEnableVertexArrayAttrib(VAO, position_attribute_location);
+        glVertexArrayAttribFormat(VAO, position_attribute_location, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, position));
+        // (GLuint vaobj, GLuint attribindex, GLuint bindingindex)
+        glVertexArrayAttribBinding(VAO, position_attribute_location, 0);
+
+        // Create and fill data
+        glCreateBuffers(1, &VBO);
+        glNamedBufferData(VBO, vertices.size()*sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+
+        // Connect together
+        glVertexArrayVertexBuffer(VAO, 0, VBO, 0, sizeof(Vertex));
+        */
+        
+        ///*
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
         glGenBuffers(1, &EBO);
@@ -61,28 +77,23 @@ public:
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
 
         glBindVertexArray(0);
+        //*/
     }
 
-    Mesh(const Mesh&) = default;
-    Mesh(Mesh&&) = default;
-    Mesh& operator=(const Mesh&) = delete;
-    Mesh& operator=(Mesh&&) = delete;
-
-    void draw(glm::vec3 const & offset, glm::vec3 const & rotation ) {
+    void draw(glm::vec3 const & offset = glm::vec3(0.0), glm::vec3 const & rotation = glm::vec3(0.0f)) {
         if (VAO == 0) {
             std::cerr << "VAO not initialized!\n";
             return;
         }
-
+        std::cout << "Using shader: " << shader.getID() << std::endl;
+        
         shader.activate();
-
+        std::cout << "VAO: " << VAO << std::endl;
         glBindVertexArray(VAO);
+        std::cout << "Indices size: " << indices.size() << std::endl;
+
         glDrawElements(primitive_type, indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
-    }
-
-    void draw() {
-        draw(glm::vec3(0.0f), glm::vec3(0.0f));
     }
 
     void clear(void) {
@@ -110,10 +121,12 @@ public:
 private:
     // OpenGL buffer IDs
     // ID = 0 is reserved (i.e. uninitalized)
-    unsigned int VAO{0}, VBO{0}, EBO{0};
+    
+    GLuint VBO{ 0 };
+    GLuint VAO{ 0 };
+    GLuint EBO{ 0 };
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
 };
 
-
-
+#endif // MESH_HPP

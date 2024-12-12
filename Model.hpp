@@ -1,13 +1,16 @@
-#pragma once
+#ifndef MODEL_HPP
+#define MODEL_HPP
 
 #include <filesystem>
 #include <string>
 #include <vector> 
 #include <glm/glm.hpp> 
 #include <bits/stl_numeric.h>
+#include <iterator> // Include this header for std::begin and std::end
 
-#include "Vertex.h"
-#include "Mesh.h"
+#include "Vertex.hpp"
+#include "Mesh.hpp"
+#include "assets.hpp"
 #include "ShaderProgram.hpp"
 #include "OBJloader.hpp"
 
@@ -46,16 +49,29 @@ public:
         meshes.emplace_back(GL_TRIANGLES, shader, vertexData, indices, origin, orientation);
     }
 
+    Model(std::shared_ptr<Mesh> mesh) {
+        meshes.push_back(*mesh);
+    }
+
+    ~Model() {
+        // clear all meshes
+        for (auto & mesh : meshes) {
+            mesh.clear();
+        }
+    }
+
     // update position etc. based on running time
     void update(const float delta_t) {
         // origin += glm::vec3(3,0,0) * delta_t; s=s0+v*dt
     }
     
+    // call draw() on mesh (all meshes)
     void draw(glm::vec3 const & offset = glm::vec3(0.0), glm::vec3 const & rotation = glm::vec3(0.0f)) {
-        // call draw() on mesh (all meshes)
         for (auto & mesh : meshes) {
             mesh.draw(origin+offset, orientation+rotation);
         }
     }
 };
+
+#endif // MODEL_HPP
 
