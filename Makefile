@@ -7,7 +7,7 @@ IMGUI_FILES = ./imgui-master/imgui.cpp ./imgui-master/imgui_draw.cpp ./imgui-mas
 
 # Nastaveni pro kompilator
 CC = g++
-CFLAGS = -pthread -std=c++17 -g -O2
+CFLAGS = -pthread -std=c++17 -g -O2 -MMD -MP
 INCLUDES = -I/usr/include -I/usr/include/opencv4 -I./imgui-master 
 OPENCV_LIBS = -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_videoio -lopencv_objdetect -lopencv_imgcodecs
 GLFW_LIBS = -lglfw -lGL -lXrandr -lXi -lXinerama -lX11 -lrt -ldl
@@ -30,9 +30,12 @@ $(TARGET): $(OBJ) $(PROJECT_HEADERS)
 %.o: %.cpp
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
+# Include dependency files
+-include $(OBJ:.o=.d)
+
 # Pravidlo pro vyčištění sestavení
 clean:
-	rm -f $(TARGET) $(OBJ)
+	rm -f $(TARGET) $(OBJ) $(OBJ:.o=.d)
 
 # Pravidlo pro spuštění programu
 run: $(TARGET)
