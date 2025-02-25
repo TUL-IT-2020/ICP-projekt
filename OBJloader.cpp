@@ -36,17 +36,33 @@ bool loadOBJ(const char * path, std::vector < glm::vec3 > & out_vertices, std::v
 		if (lineHeaderStr == "v") {
 			glm::vec3 vertex;
 			fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
-			temp_vertices.push_back(vertex);
+			if (fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z) == 3) {
+				temp_vertices.push_back(vertex);
+			} else {
+				printf("Error reading vertex data\n");
+				fclose(file);
+				return false;
+			}
 		}
 		else if (lineHeaderStr == "vt") {
 			glm::vec2 uv;
-			fscanf(file, "%f %f\n", &uv.y, &uv.x);
-			temp_uvs.push_back(uv);
+			if (fscanf(file, "%f %f\n", &uv.x, &uv.y) == 2) {
+				temp_uvs.push_back(uv);
+			} else {
+				printf("Error reading uv data\n");
+				fclose(file);
+				return false;
+			}
 		}
 		else if (lineHeaderStr == "vn") {
 			glm::vec3 normal;
-			fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
-			temp_normals.push_back(normal);
+			if (fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z) == 3) {
+				temp_normals.push_back(normal);
+			} else {
+				printf("Error reading normal data\n");
+				fclose(file);
+				return false;
+			}
 		}
 		else if (lineHeaderStr == "f") {
 			std::string vertex1, vertex2, vertex3;

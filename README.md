@@ -63,3 +63,6 @@ Pro spuštění programu je potřeba zdrojoý kód zkompilovat a spustit.
 ```bash
 make run
 ```
+
+## TODO:
+- [ ] Shader program hpp - přidat inline k metodám setUniform
