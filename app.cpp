@@ -79,7 +79,7 @@ void App::init_glfw(void) {
 	glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
 	/* Create a windowed mode window and its OpenGL context */
-	window = glfwCreateWindow(800, 600, "ICP", nullptr, nullptr);
+	window = glfwCreateWindow(1000, 800, "ICP", nullptr, nullptr);
 	if (!window) {
 		throw std::runtime_error("GLFW window can not be created.");
 	}

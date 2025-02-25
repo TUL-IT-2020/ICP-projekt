@@ -24,6 +24,9 @@ Pro instalaci závislostí spusťte následující příkaz:
 
 Vzhledem k tomu, že `./install.sh` skript pravděpodobně vybouchne, tak prověďte instalaci závislostí ručně.
 
+## Změna grafiky na NVIDIA
+
+export MESA_D3D12_DEFAULT_ADAPTER_NAME=NVIDIA
 
 #### GLEW
 ```bash
