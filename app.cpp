@@ -320,7 +320,7 @@ int App::run(void) {
 				ImGui::NewFrame();
 				//ImGui::ShowDemoWindow(); // Enable mouse when using Demo!
 				ImGui::SetNextWindowPos(ImVec2(10, 10));
-				ImGui::SetNextWindowSize(ImVec2(250, 100));
+				ImGui::SetNextWindowSize(ImVec2(350, 150));
 
 				ImGui::Begin("Info", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 				ImGui::Text("V-Sync: %s", is_vsync_on ? "ON" : "OFF");
@@ -357,10 +357,7 @@ int App::run(void) {
 					// update triangle color
 					for (auto & mesh : model.meshes) {
 						const glm::vec4 triangle_color_vec(triangle_color.r, triangle_color.g, triangle_color.b, 1.0f);
-						const std::string uniform_name = "uniform_Color";
-						//TODO:
-						//mesh.shader.setUniform(uniform_name, triangle_color_vec);
-						//mesh.shader.setUniform("uniform_Color", triangle_color_vec);
+						mesh.shader.setUniform("uniform_Color", triangle_color_vec);
 					}
 				}
 				model.draw();

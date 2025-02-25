@@ -12,8 +12,8 @@ App app;
 
 // MAIN program function
 int main() {
-    app.fragment_shader_path = fragment_shader_path;
-    app.vertex_shader_path = vertex_shader_path;
+    //app.fragment_shader_path = fragment_shader_path;
+    //app.vertex_shader_path = vertex_shader_path;
 
     if (app.init()) {
         return app.run();

@@ -6,9 +6,6 @@
 #include <iostream>
 #include <sstream>
 
-// set uniform according to name
-// https://docs.gl/gl4/glUniform
-
 ShaderProgram::ShaderProgram(const std::filesystem::path& VS_file,
                              const std::filesystem::path& FS_file) {
     std::vector<GLuint> shader_ids;
@@ -21,42 +18,44 @@ ShaderProgram::ShaderProgram(const std::filesystem::path& VS_file,
 
 /* Get location and write error to console */
 GLuint ShaderProgram::getUniformLocation(const std::string& name) {
-	auto loc = glGetUniformLocation(ID, name.c_str());
-	if (loc == -1) {
-		std::cerr << "no uniform with name:" << name << '\n';
-	}
-	return loc;
+    auto loc = glGetUniformLocation(ID, name.c_str());
+    if (loc == -1) {
+        std::cerr << "no uniform with name: " << name << '\n';
+    }
+    return loc;
 }
 
-inline void ShaderProgram::setUniform(const std::string& name, const float val) {
-    auto loc = glGetUniformLocation(ID, name.c_str());
+// Define the setUniform methods here
+void ShaderProgram::setUniform(const std::string& name, const float val) {
+    auto loc = getUniformLocation(name);
     glUniform1f(loc, val);
 }
 
-inline void ShaderProgram::setUniform(const std::string& name, const int val) {
-	auto loc = glGetUniformLocation(ID, name.c_str());
-	glUniform1i(loc, val);
+void ShaderProgram::setUniform(const std::string& name, const int val) {
+    auto loc = getUniformLocation(name);
+    glUniform1i(loc, val);
 }
 
-inline void ShaderProgram::setUniform(const std::string& name, const glm::vec3 val) {
-    auto loc = glGetUniformLocation(ID, name.c_str());
+void ShaderProgram::setUniform(const std::string& name, const glm::vec3 val) {
+    auto loc = getUniformLocation(name);
     glUniform3fv(loc, 1, glm::value_ptr(val));
 }
 
-inline void ShaderProgram::setUniform(const std::string& name, const glm::vec4 val) {
-    auto loc = glGetUniformLocation(ID, name.c_str());
+void ShaderProgram::setUniform(const std::string& name, const glm::vec4 val) {
+    auto loc = getUniformLocation(name);
     glUniform4fv(loc, 1, glm::value_ptr(val));
 }
 
-inline void ShaderProgram::setUniform(const std::string& name, const glm::mat3 val) {
-    auto loc = glGetUniformLocation(ID, name.c_str());
+void ShaderProgram::setUniform(const std::string& name, const glm::mat3 val) {
+    auto loc = getUniformLocation(name);
     glUniformMatrix3fv(loc, 1, GL_FALSE, glm::value_ptr(val));
 }
 
-inline void ShaderProgram::setUniform(const std::string& name, const glm::mat4 val) {
-    auto loc = glGetUniformLocation(ID, name.c_str());
-	glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(val));
+void ShaderProgram::setUniform(const std::string& name, const glm::mat4 val) {
+    auto loc = getUniformLocation(name);
+    glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(val));
 }
+
 
 std::string ShaderProgram::getShaderInfoLog(const GLuint obj) {
     int infologLength = 0;
