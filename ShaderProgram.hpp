@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SHADERPROGRAM_HPP
+#define SHADERPROGRAM_HPP
 
 #include <string>
 #include <vector>
@@ -36,11 +37,11 @@ public:
     
     // set uniform according to name 
     // https://docs.gl/gl4/glUniform
-    void setUniform(const std::string & name, const float val);      
+    void setUniform(const std::string & name, const float val);
     void setUniform(const std::string & name, const int val);
-    void setUniform(const std::string & name, const glm::vec3 val);  
+    void setUniform(const std::string & name, const glm::vec3 val);
     void setUniform(const std::string & name, const glm::vec4 val);
-    void setUniform(const std::string & name, const glm::mat3 val);   
+    void setUniform(const std::string & name, const glm::mat3 val);
     void setUniform(const std::string & name, const glm::mat4 val);
     
 private:
@@ -55,3 +56,4 @@ private:
     std::string textFileRead(const std::filesystem::path & filename);
 };
 
+#endif // SHADERPROGRAM_HPP

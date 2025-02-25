@@ -20,6 +20,9 @@ public:
     int run(void);
     void destroy(void);
 
+	std::filesystem::path vertex_shader_path = "resources/shaders/defoult.vert";
+	std::filesystem::path fragment_shader_path = "resources/shaders/defoult.frag";
+
     color triangle_color{ 1.0f, 0.0f, 0.0f, 1.0f };
     void update_triangle_color(float delta);
 

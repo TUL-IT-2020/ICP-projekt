@@ -22,13 +22,22 @@ Pro instalaci závislostí spusťte následující příkaz:
 
 ### WSL
 
-Vzhledem k tomu, že `./install.sh` skript pravděpodobně vybouchne, tak prověďte instalaci závislostí ručně.
+Vzhledem k tomu, že `./install.sh` skript pravděpodobně vybouchne, tak prověďte instalaci závislostí ručně. 
 
+> [!note] 
+> Celý seznam závislostí najdete v `apt-dependencies.txt`.
 
 #### GLEW
 ```bash
-sudo apt install -y libopencv-dev libglfw3-dev libglm-dev libglew-dev
+sudo apt install -y libopencv-dev libglfw3-dev libglm-dev libglew-dev 
+mesa-utils
 ```
+
+```bash
+glxinfo | grep "OpenGL version"
+```
+
+`OpenGL version string: 4.6 (Compatibility Profile) Mesa 24.2.8-1ubuntu1~24.04.1`
 
 #### X11
 ```bash

@@ -171,9 +171,6 @@ void App::init_assets(void) {
     //
     // Initialize pipeline: compile, link and use shaders
     //
-
-	std::filesystem::path vertex_shader_path = "resources/shaders/defoult.vert";
-	std::filesystem::path fragment_shader_path = "resources/shaders/defoult.frag";
     
     shader = ShaderProgram(vertex_shader_path, fragment_shader_path);
 
@@ -360,8 +357,10 @@ int App::run(void) {
 					// update triangle color
 					for (auto & mesh : model.meshes) {
 						const glm::vec4 triangle_color_vec(triangle_color.r, triangle_color.g, triangle_color.b, 1.0f);
-						std::string uniform_name = "uniform_Color";
+						const std::string uniform_name = "uniform_Color";
+						//TODO:
 						//mesh.shader.setUniform(uniform_name, triangle_color_vec);
+						//mesh.shader.setUniform("uniform_Color", triangle_color_vec);
 					}
 				}
 				model.draw();
