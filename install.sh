@@ -1,18 +1,20 @@
 #!/bin/bash
 # By Pytel
 
-python_dependencies="pip-dependencies.txt"
 apt_dependencies="apt-dependencies.txt"
 
-# Install apt dependencies
+# Update package list
 sudo apt-get update
-if [ -f $apt_dependencies ]; then
-    xargs sudo apt-get -y install < $apt_dependencies
-fi
 
-# Install python dependencies
-if [ -f $python_dependencies ]; then 
-    pip install -r $python_dependencies
+# Install apt dependencies
+if [ -f $apt_dependencies ]; then
+    while IFS= read -r package; do
+        if ! sudo apt-get install -y $package; then
+            echo "Error: Unable to locate package $package"
+        fi
+    done < $apt_dependencies
+else
+    echo "Error: $apt_dependencies file not found."
 fi
 
 echo -e "Done!"

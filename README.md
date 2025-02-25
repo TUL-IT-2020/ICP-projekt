@@ -2,8 +2,9 @@
 
 ## Instalace závislostí
 
-### GLEW na Linux
+### Linux
 
+#### GLEW
 `apt-dependencies.txt` obsahuje seznam balíčků, které je potřeba nainstalovat pro správný chod programu. 
 
 ```
@@ -19,7 +20,23 @@ Pro instalaci závislostí spusťte následující příkaz:
 ./install.sh
 ```
 
-### ImGUI
+### WSL
+
+Vzhledem k tomu, že `./install.sh` skript pravděpodobně vybouchne, tak prověďte instalaci závislostí ručně.
+
+
+#### GLEW
+```bash
+sudo apt install -y libopencv-dev libglfw3-dev libglm-dev libglew-dev
+```
+
+#### X11
+```bash
+sudo apt-get install libxi-dev libxinerama-dev
+```
+
+### Win
+#### ImGUI
 
 To add ImGUI to your project:
 1. Create new filter view: RMB on Solution explorer - project -> Add -> New filter

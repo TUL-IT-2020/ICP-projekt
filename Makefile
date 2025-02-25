@@ -39,6 +39,7 @@ clean:
 
 # Pravidlo pro spuštění programu
 run: $(TARGET)
+	@mkdir -p bin
 	./$(TARGET)
 
 .PHONY: clean all run
