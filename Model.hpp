@@ -1,31 +1,33 @@
 #ifndef MODEL_HPP
 #define MODEL_HPP
 
-#include <filesystem>
-#include <string>
-#include <vector> 
-#include <glm/glm.hpp> 
 #include <bits/stl_numeric.h>
-#include <iterator> // Include this header for std::begin and std::end
 
-#include "Vertex.hpp"
+#include <filesystem>
+#include <glm/glm.hpp>
+#include <iterator>  // Include this header for std::begin and std::end
+#include <string>
+#include <vector>
+
 #include "Mesh.hpp"
-#include "assets.hpp"
-#include "ShaderProgram.hpp"
 #include "OBJloader.hpp"
+#include "ShaderProgram.hpp"
+#include "Vertex.hpp"
+#include "assets.hpp"
 
 class Model {
-public:
+   public:
     std::vector<Mesh> meshes;
     std::string name;
     glm::vec3 origin{};
     glm::vec3 orientation{};
 
-    Model(const std::filesystem::path & filename, ShaderProgram & shader) {
+    Model(const std::filesystem::path& filename, ShaderProgram& shader) {
         // load mesh (all meshes) of the model, load material of each mesh, load textures...
-        // TODO: call LoadOBJFile, LoadMTLFile (if exist), process data, create mesh and set its properties
-        //    notice: you can load multiple meshes and place them to proper positions, 
-        //            multiple textures (with reusing) etc. to construct single complicated Model  
+        // TODO: call LoadOBJFile, LoadMTLFile (if exist), process data, create mesh and set its
+        // properties
+        //    notice: you can load multiple meshes and place them to proper positions,
+        //            multiple textures (with reusing) etc. to construct single complicated Model
         std::vector<glm::vec3> vertices;
         std::vector<glm::vec2> uvs;
         std::vector<glm::vec3> normals;
@@ -55,7 +57,7 @@ public:
 
     ~Model() {
         // clear all meshes
-        //for (auto & mesh : meshes) {
+        // for (auto & mesh : meshes) {
         //    mesh.clear();
         //}
     }
@@ -64,14 +66,14 @@ public:
     void update(const float delta_t) {
         // origin += glm::vec3(3,0,0) * delta_t; s=s0+v*dt
     }
-    
+
     // call draw() on mesh (all meshes)
-    void draw(glm::vec3 const & offset = glm::vec3(0.0), glm::vec3 const & rotation = glm::vec3(0.0f)) {
-        for (auto & mesh : meshes) {
-            mesh.draw(origin+offset, orientation+rotation);
+    void draw(glm::vec3 const& offset = glm::vec3(0.0),
+              glm::vec3 const& rotation = glm::vec3(0.0f)) {
+        for (auto& mesh : meshes) {
+            mesh.draw(origin + offset, orientation + rotation);
         }
     }
 };
 
-#endif // MODEL_HPP
-
+#endif  // MODEL_HPP

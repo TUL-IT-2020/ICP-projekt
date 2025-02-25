@@ -10,6 +10,7 @@
 
 #include "assets.hpp"
 #include "ShaderProgram.hpp"
+#include "Vertex.hpp"
 
 class Mesh {
 public:
@@ -85,12 +86,9 @@ public:
             std::cerr << "VAO not initialized!\n";
             return;
         }
-        std::cout << "Using shader: " << shader.getID() << std::endl;
         
         shader.activate();
-        std::cout << "VAO: " << VAO << std::endl;
         glBindVertexArray(VAO);
-        std::cout << "Indices size: " << indices.size() << std::endl;
 
         glDrawElements(primitive_type, indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);

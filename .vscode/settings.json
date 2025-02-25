@@ -64,6 +64,9 @@
         "thread": "cpp",
         "cinttypes": "cpp",
         "typeinfo": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "condition_variable": "cpp",
+        "list": "cpp",
+        "fstream": "cpp"
     }
 }

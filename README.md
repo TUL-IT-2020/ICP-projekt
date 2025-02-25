@@ -22,7 +22,7 @@ Pro instalaci závislostí spusťte následující příkaz:
 
 ### WSL
 
-Vzhledem k tomu, že `./install.sh` skript pravděpodobně vybouchne, tak prověďte instalaci závislostí ručně.
+Vzhledem k tomu, že `./install.sh` skript pravděpodobně vybouchne, tak prověďte instalaci závislostí ručně. 
 
 ## Změna grafiky na NVIDIA
 
@@ -30,8 +30,15 @@ export MESA_D3D12_DEFAULT_ADAPTER_NAME=NVIDIA
 
 #### GLEW
 ```bash
-sudo apt install -y libopencv-dev libglfw3-dev libglm-dev libglew-dev
+sudo apt install -y libopencv-dev libglfw3-dev libglm-dev libglew-dev 
+mesa-utils
 ```
+
+```bash
+glxinfo | grep "OpenGL version"
+```
+
+`OpenGL version string: 4.6 (Compatibility Profile) Mesa 24.2.8-1ubuntu1~24.04.1`
 
 #### X11
 ```bash
