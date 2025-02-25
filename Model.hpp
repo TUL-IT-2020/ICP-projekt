@@ -55,9 +55,9 @@ public:
 
     ~Model() {
         // clear all meshes
-        for (auto & mesh : meshes) {
-            mesh.clear();
-        }
+        //for (auto & mesh : meshes) {
+        //    mesh.clear();
+        //}
     }
 
     // update position etc. based on running time
