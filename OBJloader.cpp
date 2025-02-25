@@ -35,7 +35,6 @@ bool loadOBJ(const char * path, std::vector < glm::vec3 > & out_vertices, std::v
 
 		if (lineHeaderStr == "v") {
 			glm::vec3 vertex;
-			fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
 			if (fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z) == 3) {
 				temp_vertices.push_back(vertex);
 			} else {

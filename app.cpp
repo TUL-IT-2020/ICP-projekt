@@ -181,26 +181,10 @@ void App::init_assets(void) {
     // Create and load data into GPU using OpenGL DSA (Direct State Access)
     //
 
-    //Model model("path/to/your/model.obj", shader);
+    Model model("resources/obj/triangle.obj", shader);
     //model.loadModel("path/to/your/model.obj");
-	//models.push_back(model);
-
-    // Convert triangle to mesh
-    std::vector<Vertex> triangleVertices = {
-        {{0.0f,  0.5f,  0.0f}, {0.0f, 0.0f, 1.0f}, {0.5f, 1.0f}},
-        {{0.5f, -0.5f,  0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},
-        {{-0.5f, -0.5f,  0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}}
-    };
-    std::vector<GLuint> triangleIndices = {0, 1, 2};
-
-    // create mesh and put it into model
-	std::shared_ptr<Mesh> triangleMesh;
-
-	triangleMesh = std::make_shared<Mesh>(GL_TRIANGLES, shader, triangleVertices, triangleIndices, glm::vec3(0.0f), glm::vec3(0.0f), 0);
-
-	Model triangle(triangleMesh);
-	triangle.name = "triangle";
-	models.push_back(triangle);
+	model.name = "triangle";
+	models.push_back(model);
 }
 
 void App::print_opencv_info() {
