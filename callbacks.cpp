@@ -10,6 +10,53 @@ void App::glfw_error_callback(int error, const char* description)
 	std::cerr << "GLFW error: " << description << std::endl;
 }
 
+void App::scroll_callback(GLFWwindow * window, double xoffset, double yoffset)
+{
+    // get App instance
+    auto this_inst = static_cast<App*>(glfwGetWindowUserPointer(window));
+    this_inst->fov += 10*yoffset; // yoffset is mostly +1 or -1; one degree difference in fov is not visible
+    this_inst->fov = glm::clamp(this_inst->fov, 20.0f, 170.0f); // limit FOV to reasonable values...
+    
+    this_inst->update_projection_matrix(); 
+}
+
+void App::fbsize_callback(GLFWwindow* window, int width, int height)
+{
+    auto this_inst = static_cast<App*>(glfwGetWindowUserPointer(window));
+    this_inst->width = width;
+    this_inst->height = height;
+
+    // set viewport
+    glViewport(0, 0, width, height);
+    //now your canvas has [0,0] in bottom left corner, and its size is [width x height] 
+
+    this_inst->update_projection_matrix(); 
+};
+
+//--------------------------------------------------------------------------
+
+void App::update_projection_matrix(void)
+{
+    if (height < 1)
+        height = 1;   // avoid division by 0
+
+    float ratio = static_cast<float>(width) / height;
+
+    projection_matrix = glm::perspective(
+        glm::radians(fov),   // The vertical Field of View, in radians: the amount of "zoom". Think "camera lens". Usually between 90° (extra wide) and 30° (quite zoomed in)
+        ratio,               // Aspect Ratio. Depends on the size of your window.
+        0.1f,                // Near clipping plane. Keep as big as possible, or you'll get precision issues.
+        20000.0f             // Far clipping plane. Keep as little as possible.
+    );
+}
+void App::cursorPositionCallback(GLFWwindow* window, double xpos, double ypos) {
+    auto app = static_cast<App*>(glfwGetWindowUserPointer(window));
+
+    app->camera.ProcessMouseMovement(xpos - app->cursorLastX, (ypos - app->cursorLastY) * -1.0);
+    app->cursorLastX = xpos;
+    app->cursorLastY = ypos;
+}
+
 void App::glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	auto this_inst = static_cast<App*>(glfwGetWindowUserPointer(window));
@@ -34,11 +81,13 @@ void App::glfw_key_callback(GLFWwindow* window, int key, int scancode, int actio
 		case GLFW_KEY_S:
 			this_inst->update_triangle_color(-0.1f);
 			break;
+		
 		default:
 			break;
 		}
 	}
 }
+
 
 void App::glfw_scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 }

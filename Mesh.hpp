@@ -94,6 +94,26 @@ public:
         glBindVertexArray(0);
     }
 
+    void draw(glm::mat4 const & model_matrix) const {
+        if (VAO == 0) {
+            std::cerr << "VAO not initialized!\n";
+            return;
+        }
+    
+        shader.activate();
+        glBindVertexArray(VAO);
+        
+        // Bind texture if it exists
+        if (texture_id != 0) {
+            glBindTexture(GL_TEXTURE_2D, texture_id);
+        }
+    
+        glDrawElements(primitive_type, indices.size(), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+    }
+    
+    
+
     void clear(void) {
         texture_id = 0;
         primitive_type = GL_POINT;

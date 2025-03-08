@@ -26,6 +26,7 @@
 #include <imgui.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
+#include <unordered_map>
 
 #include "App.hpp"
 #include "assets.hpp"
@@ -140,7 +141,8 @@ bool App::init() {
 		std::cerr << "Init failed : " << e.what() << std::endl;
 		throw;
 	}
-
+	glfwSetFramebufferSizeCallback(window, fbsize_callback);    // On GL framebuffer resize callback.
+    glfwSetScrollCallback(window, scroll_callback);             // On mouse wheel.
 	return true;
 }
 
@@ -292,10 +294,25 @@ int App::run(void) {
 		double frame_begin_timepoint = now;
 		double previous_frame_render_time{};
 		double time_speed{};
+		//add:
+		glCullFace(GL_BACK);
+		glEnable(GL_CULL_FACE);
+		// disable cursor, so that it can not leave window, and we can process movement
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		// get first position of mouse cursor
+		glfwGetCursorPos(window, &cursorLastX, &cursorLastY);
+		update_projection_matrix();
+		glViewport(0, 0, width, height);
 
+		camera.Position = glm::vec3(0, 0, 1000);
+		double last_frame_time = glfwGetTime();
+
+		// we have only one shader...
+		shader.activate();
+		
 		// Clear color saved to OpenGL state machine: no need to set repeatedly in game loop
 		glClearColor(0, 0, 0, 0);
-
+		glEnable(GL_DEPTH_TEST);
 		while (!glfwWindowShouldClose(window)) {
 			// ImGui prepare render (only if required)
 			if (show_imgui) {
@@ -328,13 +345,16 @@ int App::run(void) {
 				time_speed = 1.0;
 			}
 
-			//
-			// RENDER: GL drawCalls
-			// 
-
+		
 			// clear canvas
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			double delta_t = 5000;// render time of the last frame 
+			camera.ProcessInput(window, delta_t); // process keys etc.
+			shader.setUniform("uM_m", projection_matrix);
+			shader.setUniform("uV_m", camera.GetViewMatrix());		
+			shader.setUniform("uP_m", projection_matrix);	
 
+	
 			// draw all models
 			for (auto & model : models) {
 				if (model.name == "triangle") {
@@ -342,12 +362,15 @@ int App::run(void) {
 					for (auto & mesh : model.meshes) {
 						const glm::vec4 triangle_color_vec(triangle_color.r, triangle_color.g, triangle_color.b, 1.0f);
 						mesh.shader.setUniform("uniform_Color", triangle_color_vec);
+							
+						
+
 					}
-				}
+				} 
 				model.draw();
 				
 			}
-
+			
 			// ImGui display
 			if (show_imgui) {
 				ImGui::Render();
@@ -357,8 +380,8 @@ int App::run(void) {
 			// SWAP + VSYNC
 			glfwSwapBuffers(window);
 
-			// POLL
 			glfwPollEvents();
+
 
 			// Time/FPS measurement
 			now = glfwGetTime();
@@ -378,7 +401,6 @@ int App::run(void) {
 		std::cerr << "App failed : " << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}
-
 	return EXIT_SUCCESS;
 }
 
@@ -421,3 +443,4 @@ void App::update_triangle_color(float delta) {
     triangle_color.g = glm::clamp(triangle_color.g, 0.0f, 1.0f);
     triangle_color.b = glm::clamp(triangle_color.b, 0.0f, 1.0f);
 }
+
