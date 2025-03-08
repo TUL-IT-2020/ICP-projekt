@@ -19,7 +19,7 @@ bool loadOBJ(const char * path, std::vector < glm::vec3 > & out_vertices, std::v
 
 	FILE * file = fopen(path, "r");
 	if (file == NULL) {
-		printf("Impossible to open the file !\n");
+		printf("Impossible to open the file!\n");
 		return false;
 	}
 

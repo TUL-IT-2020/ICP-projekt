@@ -6,7 +6,8 @@
 #include <filesystem>
 #include <algorithm>
 #include <random>
-
+#include <fstream>
+#include <nlohmann/json.hpp>
 
 #include <opencv2/opencv.hpp>
 #include <GL/glew.h>
@@ -166,25 +167,68 @@ void App::init_gl_debug() {
 	}
 }
 
-
+/*
+ * Initialize pipeline: compile, link and use shaders
+ * Create and load data into GPU using OpenGL DSA (Direct State Access)
+ */
 void App::init_assets(void) {
-    //
-    // Initialize pipeline: compile, link and use shaders
-    //
-    
-    shader = ShaderProgram(vertex_shader_path, fragment_shader_path);
-
-	// print shader ID
-	std::cout << "Shader program ID: " << shader.getID() << " ready for use." << std::endl;
-
-    // 
-    // Create and load data into GPU using OpenGL DSA (Direct State Access)
-    //
-
+    //Model model("resources/obj/teapot_tri_vnt.obj", shader);
+	/*
+	Model model("resources/obj/cube_triangles_vnt.obj", shader);
+	glm::vec3 origin{ 0.0f, 0.0f, 0.0f };
+	model.origin = origin;
+	model.name = "cube";
+	models.push_back(model);
+	
     Model model("resources/obj/triangle.obj", shader);
-    //model.loadModel("path/to/your/model.obj");
+	glm::vec3 origin{ 0.0f, 0.0f, 0.0f };
+	model.origin = origin;
 	model.name = "triangle";
 	models.push_back(model);
+	*/
+	
+	// Load models from JSON file
+    std::ifstream file("resources/map.json");
+    if (!file.is_open()) {
+        throw std::runtime_error("Could not open JSON file.");
+    }
+
+    nlohmann::json json;
+    file >> json;
+
+    for (const auto& model_data : json["models"]) {
+		try {
+			std::string name = model_data["name"];
+			std::string path = model_data["obj_path"];
+			std::filesystem::path vertex_shader_path = model_data["vertex_shader_path"];
+			std::filesystem::path fragment_shader_path = model_data["fragment_shader_path"];
+			glm::vec3 origin = glm::vec3(model_data["origin"][0], model_data["origin"][1], model_data["origin"][2]);
+		
+			if (!std::filesystem::exists(vertex_shader_path) || !std::filesystem::exists(fragment_shader_path)) {
+				throw std::runtime_error("Shader file not found: " + vertex_shader_path.string() + " or " + fragment_shader_path.string());
+			}
+
+			if (!std::filesystem::exists(path)) {
+				throw std::runtime_error("Model file not found: " + path);
+			}
+
+			std::string shader_key = vertex_shader_path.string() + fragment_shader_path.string();
+			if (shader_cache.find(shader_key) == shader_cache.end()) {
+				shader_cache[shader_key] = ShaderProgram(vertex_shader_path, fragment_shader_path);
+				std::cout << "Shader program ID: " << shader_cache[shader_key].getID() << " compiled and cached." << std::endl;
+			} else {
+				std::cout << "Shader program ID: " << shader_cache[shader_key].getID() << " loaded from cache." << std::endl;
+			}
+
+			Model model(path, shader_cache[shader_key]);
+			model.origin = origin;
+			model.name = name;
+			models.push_back(model);
+		} catch (std::exception const& e) {
+			std::cerr << "Loading model failed : " << model_data["name"] << ", " << e.what() << std::endl;
+			exit(EXIT_FAILURE);
+		}
+    }
 }
 
 void App::print_opencv_info() {
@@ -343,9 +387,14 @@ int App::run(void) {
 						const glm::vec4 triangle_color_vec(triangle_color.r, triangle_color.g, triangle_color.b, 1.0f);
 						mesh.shader.setUniform("uniform_Color", triangle_color_vec);
 					}
+				} else {
+					// blue color for other models
+					for (auto & mesh : model.meshes) {
+						const glm::vec4 blue_color(0.0f, 0.0f, 1.0f, 1.0f);
+						mesh.shader.setUniform("uniform_Color", blue_color);
+					}
 				}
 				model.draw();
-				
 			}
 
 			// ImGui display

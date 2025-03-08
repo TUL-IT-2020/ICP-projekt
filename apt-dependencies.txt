@@ -1,3 +1,7 @@
+curl 
+zip 
+unzip 
+tar
 make
 libopencv-dev
 libglfw3-dev
