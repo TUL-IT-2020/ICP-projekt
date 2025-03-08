@@ -18,9 +18,17 @@ ShaderProgram::ShaderProgram(const std::filesystem::path& VS_file,
 
 /* Get location and write error to console */
 GLuint ShaderProgram::getUniformLocation(const std::string& name) {
+    // Check if the location is already cached
+    if (uniform_location_cache.find(name) != uniform_location_cache.end()) {
+        return uniform_location_cache[name];
+    }
+
+    // Get the location and cache it
     auto loc = glGetUniformLocation(ID, name.c_str());
     if (loc == -1) {
-        std::cerr << "no uniform with name: " << name << '\n';
+        std::cerr << "No uniform with name: " << name << '\n';
+    } else {
+        uniform_location_cache[name] = loc;
     }
     return loc;
 }

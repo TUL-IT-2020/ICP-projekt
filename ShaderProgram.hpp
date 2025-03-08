@@ -3,6 +3,8 @@
 
 #include <string>
 #include <vector>
+#include <string>
+#include <unordered_map>
 #include <filesystem>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
@@ -47,6 +49,8 @@ public:
 private:
 	GLuint ID{0}; // default = 0, empty shader
 	static GLuint currently_used;
+	std::unordered_map<std::string, GLuint> uniform_location_cache;
+
 	GLuint getUniformLocation(const std::string& name);
 	std::string getShaderInfoLog(const GLuint obj);   // TODO: check for shader compilation error; if any, print compiler output  
 	std::string getProgramInfoLog(const GLuint obj);  // TODO: check for linker error; if any, print linker output
