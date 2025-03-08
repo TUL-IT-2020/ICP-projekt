@@ -173,36 +173,23 @@ void App::init_gl_debug() {
  */
 void App::init_assets(void) {
     //Model model("resources/obj/teapot_tri_vnt.obj", shader);
-	/*
-	Model model("resources/obj/cube_triangles_vnt.obj", shader);
-	glm::vec3 origin{ 0.0f, 0.0f, 0.0f };
-	model.origin = origin;
-	model.name = "cube";
-	models.push_back(model);
-	
-    Model model("resources/obj/triangle.obj", shader);
-	glm::vec3 origin{ 0.0f, 0.0f, 0.0f };
-	model.origin = origin;
-	model.name = "triangle";
-	models.push_back(model);
-	*/
 	
 	// Load models from JSON file
-    std::ifstream file("resources/map.json");
-    if (!file.is_open()) {
+    std::ifstream models_file("resources/models.json");
+    if (!models_file.is_open()) {
         throw std::runtime_error("Could not open JSON file.");
     }
 
     nlohmann::json json;
-    file >> json;
+    models_file >> json;
 
     for (const auto& model_data : json["models"]) {
+		std::cout << "Loading model: " << model_data["name"] << std::endl;
 		try {
 			std::string name = model_data["name"];
 			std::string path = model_data["obj_path"];
 			std::filesystem::path vertex_shader_path = model_data["vertex_shader_path"];
 			std::filesystem::path fragment_shader_path = model_data["fragment_shader_path"];
-			glm::vec3 origin = glm::vec3(model_data["origin"][0], model_data["origin"][1], model_data["origin"][2]);
 		
 			if (!std::filesystem::exists(vertex_shader_path) || !std::filesystem::exists(fragment_shader_path)) {
 				throw std::runtime_error("Shader file not found: " + vertex_shader_path.string() + " or " + fragment_shader_path.string());
@@ -221,14 +208,54 @@ void App::init_assets(void) {
 			}
 
 			Model model(path, shader_cache[shader_key]);
-			model.origin = origin;
 			model.name = name;
-			models.push_back(model);
+			model_cache[name] = model;
 		} catch (std::exception const& e) {
 			std::cerr << "Loading model failed : " << model_data["name"] << ", " << e.what() << std::endl;
 			exit(EXIT_FAILURE);
 		}
-    }
+	}
+	std::cout << "Models loaded." << std::endl;
+	
+	// load position for objects -> models
+	// place models to the scene
+	std::ifstream map_file("resources/map.json");
+	if (!map_file.is_open()) {
+		throw std::runtime_error("Could not open JSON file.");
+	}
+
+	map_file >> json;
+
+	for (const auto& model_data : json["scene"]) {
+		std::cout << "Placing model: " << model_data["name"] << std::endl;
+		try {
+			std::string name = model_data["name"];
+			glm::vec3 origin = glm::vec3(model_data["origin"][0], model_data["origin"][1], model_data["origin"][2]);
+	
+			// copy model from cache
+			Model model = model_cache[name];
+			model.origin = origin;
+			models.push_back(model);
+
+		} catch (std::exception const& e) {
+			std::cerr << "ERROR placing model to scene: " << model_data["name"] << ", " << e.what() << std::endl;
+			exit(EXIT_FAILURE);
+		}
+	}
+	std::cout << "Scene generated." << std::endl;
+
+	/*
+	int n = 10000;
+	for (int i = 0; i < n; i++) {
+		std::string shader_key = "resources/shaders/defoult.vertresources/shaders/defoult.frag";
+		Model model("resources/obj/triangle.obj", shader_cache[shader_key]);
+		glm::vec3 origin{ 0.0f, 0.0f, 0.0f };
+		model.origin = origin;
+		model.name = "triangle";
+		models.push_back(model);
+	}
+	*/
+	
 }
 
 void App::print_opencv_info() {

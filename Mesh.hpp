@@ -81,6 +81,90 @@ public:
         //*/
     }
 
+    // Copy constructor
+    Mesh(const Mesh& other) 
+        : origin(other.origin),
+          orientation(other.orientation),
+          texture_id(other.texture_id),
+          primitive_type(other.primitive_type),
+          shader(other.shader),
+          ambient_material(other.ambient_material),
+          diffuse_material(other.diffuse_material),
+          specular_material(other.specular_material),
+          reflectivity(other.reflectivity),
+          vertices(other.vertices),
+          indices(other.indices),
+          VBO(0),
+          VAO(0),
+          EBO(0)
+    {
+        // Generate and bind VAO, VBO, and EBO
+        glGenVertexArrays(1, &VAO);
+        glGenBuffers(1, &VBO);
+        glGenBuffers(1, &EBO);
+
+        glBindVertexArray(VAO);
+
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
+
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Position));
+
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
+
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
+
+        glBindVertexArray(0);
+    }
+
+    // Copy assignment operator
+    Mesh& operator=(const Mesh& other) {
+        if (this != &other) {
+            origin = other.origin;
+            orientation = other.orientation;
+            texture_id = other.texture_id;
+            primitive_type = other.primitive_type;
+            shader = other.shader;
+            ambient_material = other.ambient_material;
+            diffuse_material = other.diffuse_material;
+            specular_material = other.specular_material;
+            reflectivity = other.reflectivity;
+            vertices = other.vertices;
+            indices = other.indices;
+
+            // Generate and bind VAO, VBO, and EBO
+            glGenVertexArrays(1, &VAO);
+            glGenBuffers(1, &VBO);
+            glGenBuffers(1, &EBO);
+
+            glBindVertexArray(VAO);
+
+            glBindBuffer(GL_ARRAY_BUFFER, VBO);
+            glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_STATIC_DRAW);
+
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Position));
+
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
+
+            glEnableVertexAttribArray(2);
+            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
+
+            glBindVertexArray(0);
+        }
+        return *this;
+    }
+
     void draw(glm::vec3 const & offset = glm::vec3(0.0), glm::vec3 const & rotation = glm::vec3(0.0f)) {
         if (VAO == 0) {
             std::cerr << "VAO not initialized!\n";

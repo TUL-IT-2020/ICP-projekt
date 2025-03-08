@@ -1,18 +1,12 @@
 {
-    "models": [
+    "scene": [
         {
             "name": "cube",
-            "origin": [0.0, 0.0, 0.0],
-            "obj_path": "resources/obj/cube_triangles_vnt.obj",
-            "vertex_shader_path": "resources/shaders/defoult.vert",
-	        "fragment_shader_path": "resources/shaders/defoult.frag"
+            "origin": [0.0, 0.0, 0.0]
         },
         {
             "name": "triangle",
-            "origin": [0.0, 50.0, 0.0],
-            "obj_path": "resources/obj/triangle.obj",
-            "vertex_shader_path": "resources/shaders/defoult.vert",
-	        "fragment_shader_path": "resources/shaders/defoult.frag"
+            "origin": [0.0, 50.0, 0.0]
         }
     ]
 }

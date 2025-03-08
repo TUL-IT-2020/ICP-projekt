@@ -27,7 +27,6 @@ public:
 
     ~App(); //default destructor, called on app instance destruction
 private:
-    std::unordered_map<std::string, ShaderProgram> shader_cache;
 
     // GL
     GLFWwindow* window = nullptr;
@@ -35,6 +34,8 @@ private:
     bool show_imgui = true;
 
     // list of Models
+    std::unordered_map<std::string, ShaderProgram> shader_cache;
+    std::unordered_map<std::string, Model> model_cache;
     std::vector<Model> models;
     ShaderProgram shader;
 

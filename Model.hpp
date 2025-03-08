@@ -16,11 +16,14 @@
 #include "assets.hpp"
 
 class Model {
-   public:
+public:
     std::vector<Mesh> meshes;
     std::string name;
     glm::vec3 origin{};
     glm::vec3 orientation{};
+
+    // Default constructor
+    Model() = default;
 
     Model(const std::filesystem::path& filename, ShaderProgram& shader) {
         // load mesh (all meshes) of the model, load material of each mesh, load textures...
@@ -53,6 +56,14 @@ class Model {
 
     Model(std::shared_ptr<Mesh> mesh) {
         meshes.push_back(*mesh);
+    }
+
+    // Copy constructor
+    Model(const Model& other)
+        : meshes(other.meshes),
+          name(other.name),
+          origin(other.origin),
+          orientation(other.orientation) {
     }
 
     ~Model() {
