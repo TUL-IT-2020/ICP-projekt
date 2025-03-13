@@ -1,0 +1,12 @@
+{
+    "scene": [
+        {
+            "name": "cube",
+            "origin": [0.0, 0.0, 0.0]
+        },
+        {
+            "name": "triangle",
+            "origin": [0.0, 50.0, 0.0]
+        }
+    ]
+}

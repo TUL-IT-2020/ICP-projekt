@@ -1,14 +1,14 @@
 # Soubor s programem:
 FILE_NAME = ICP
-PROJECT_FILES = callbacks.cpp app.cpp ShaderProgram.cpp 
-PROJECT_HEADERS = Model.hpp Mesh.hpp Vertex.hpp
+PROJECT_FILES = callbacks.cpp app.cpp ShaderProgram.cpp OBJloader.cpp
+PROJECT_HEADERS = Model.hpp Mesh.hpp Vertex.hpp OBJloader.hpp
 # Imgui soubory:
 IMGUI_FILES = ./imgui-master/imgui.cpp ./imgui-master/imgui_draw.cpp ./imgui-master/imgui_widgets.cpp ./imgui-master/imgui_tables.cpp ./imgui-master/backends/imgui_impl_opengl3.cpp ./imgui-master/backends/imgui_impl_glfw.cpp
 
 # Nastaveni pro kompilator
 CC = g++
 CFLAGS = -pthread -std=c++17 -g -O2 -MMD -MP
-INCLUDES = -I/usr/include -I/usr/include/opencv4 -I./imgui-master 
+INCLUDES = -I/usr/include -I/usr/include/opencv4 -I./imgui-master -I./vcpkg/installed/x64-linux/include
 OPENCV_LIBS = -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_videoio -lopencv_objdetect -lopencv_imgcodecs
 GLFW_LIBS = -lglfw -lGL -lXrandr -lXi -lXinerama -lX11 -lrt -ldl
 GLEW_LIBS = -lGLEW

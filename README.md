@@ -7,7 +7,7 @@
 #### GLEW
 `apt-dependencies.txt` obsahuje seznam balíčků, které je potřeba nainstalovat pro správný chod programu. 
 
-```
+```txt
 libopencv-dev
 libglfw3-dev
 libglm-dev
@@ -20,13 +20,16 @@ Pro instalaci závislostí spusťte následující příkaz:
 ./install.sh
 ```
 
+Tan také nainstaluje závsilosti `C++` knihoven:
+```txt
+nlohmann-json
+```
+
 ### WSL
-
-Vzhledem k tomu, že `./install.sh` skript pravděpodobně vybouchne, tak prověďte instalaci závislostí ručně. 
-
-## Změna grafiky na NVIDIA
-
-export MESA_D3D12_DEFAULT_ADAPTER_NAME=NVIDIA
+Pro instalaci závislostí spusťte následující příkaz:
+```bash
+./install.sh
+```
 
 #### GLEW
 ```bash
@@ -45,7 +48,12 @@ glxinfo | grep "OpenGL version"
 sudo apt-get install libxi-dev libxinerama-dev
 ```
 
-### Win
+### Windows
+
+#### Změna grafiky na NVIDIA
+
+`export MESA_D3D12_DEFAULT_ADAPTER_NAME=NVIDIA`
+
 #### ImGUI
 
 To add ImGUI to your project:
@@ -63,3 +71,6 @@ Pro spuštění programu je potřeba zdrojoý kód zkompilovat a spustit.
 ```bash
 make run
 ```
+
+## TODO:
+- [ ] Shader program hpp - přidat inline k metodám setUniform

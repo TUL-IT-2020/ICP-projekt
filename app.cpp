@@ -6,7 +6,8 @@
 #include <filesystem>
 #include <algorithm>
 #include <random>
-
+#include <fstream>
+#include <nlohmann/json.hpp>
 
 #include <opencv2/opencv.hpp>
 #include <GL/glew.h>
@@ -166,41 +167,95 @@ void App::init_gl_debug() {
 	}
 }
 
-
+/*
+ * Initialize pipeline: compile, link and use shaders
+ * Create and load data into GPU using OpenGL DSA (Direct State Access)
+ */
 void App::init_assets(void) {
-    //
-    // Initialize pipeline: compile, link and use shaders
-    //
-    
-    shader = ShaderProgram(vertex_shader_path, fragment_shader_path);
+    //Model model("resources/obj/teapot_tri_vnt.obj", shader);
+	
+	// Load models from JSON file
+    std::ifstream models_file("resources/models.json");
+    if (!models_file.is_open()) {
+        throw std::runtime_error("Could not open JSON file.");
+    }
 
-	// print shader ID
-	std::cout << "Shader program ID: " << shader.getID() << " ready for use." << std::endl;
+    nlohmann::json json;
+    models_file >> json;
 
-    // 
-    // Create and load data into GPU using OpenGL DSA (Direct State Access)
-    //
+    for (const auto& model_data : json["models"]) {
+		std::cout << "Loading model: " << model_data["name"] << std::endl;
+		try {
+			std::string name = model_data["name"];
+			std::string path = model_data["obj_path"];
+			std::filesystem::path vertex_shader_path = model_data["vertex_shader_path"];
+			std::filesystem::path fragment_shader_path = model_data["fragment_shader_path"];
+		
+			if (!std::filesystem::exists(vertex_shader_path) || !std::filesystem::exists(fragment_shader_path)) {
+				throw std::runtime_error("Shader file not found: " + vertex_shader_path.string() + " or " + fragment_shader_path.string());
+			}
 
-    //Model model("path/to/your/model.obj", shader);
-    //model.loadModel("path/to/your/model.obj");
-	//models.push_back(model);
+			if (!std::filesystem::exists(path)) {
+				throw std::runtime_error("Model file not found: " + path);
+			}
 
-    // Convert triangle to mesh
-    std::vector<Vertex> triangleVertices = {
-        {{0.0f,  0.5f,  0.0f}, {0.0f, 0.0f, 1.0f}, {0.5f, 1.0f}},
-        {{0.5f, -0.5f,  0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},
-        {{-0.5f, -0.5f,  0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}}
-    };
-    std::vector<GLuint> triangleIndices = {0, 1, 2};
+			std::string shader_key = vertex_shader_path.string() + fragment_shader_path.string();
+			if (shader_cache.find(shader_key) == shader_cache.end()) {
+				shader_cache[shader_key] = ShaderProgram(vertex_shader_path, fragment_shader_path);
+				std::cout << "Shader program ID: " << shader_cache[shader_key].getID() << " compiled and cached." << std::endl;
+			} else {
+				std::cout << "Shader program ID: " << shader_cache[shader_key].getID() << " loaded from cache." << std::endl;
+			}
 
-    // create mesh and put it into model
-	std::shared_ptr<Mesh> triangleMesh;
+			Model model(path, shader_cache[shader_key]);
+			model.name = name;
+			model_cache[name] = model;
+		} catch (std::exception const& e) {
+			std::cerr << "Loading model failed : " << model_data["name"] << ", " << e.what() << std::endl;
+			exit(EXIT_FAILURE);
+		}
+	}
+	std::cout << "Models loaded." << std::endl;
+	
+	// load position for objects -> models
+	// place models to the scene
+	std::ifstream map_file("resources/map.json");
+	if (!map_file.is_open()) {
+		throw std::runtime_error("Could not open JSON file.");
+	}
 
-	triangleMesh = std::make_shared<Mesh>(GL_TRIANGLES, shader, triangleVertices, triangleIndices, glm::vec3(0.0f), glm::vec3(0.0f), 0);
+	map_file >> json;
 
-	Model triangle(triangleMesh);
-	triangle.name = "triangle";
-	models.push_back(triangle);
+	for (const auto& model_data : json["scene"]) {
+		std::cout << "Placing model: " << model_data["name"] << std::endl;
+		try {
+			std::string name = model_data["name"];
+			glm::vec3 origin = glm::vec3(model_data["origin"][0], model_data["origin"][1], model_data["origin"][2]);
+	
+			// copy model from cache
+			Model model = model_cache[name];
+			model.origin = origin;
+			models.push_back(model);
+
+		} catch (std::exception const& e) {
+			std::cerr << "ERROR placing model to scene: " << model_data["name"] << ", " << e.what() << std::endl;
+			exit(EXIT_FAILURE);
+		}
+	}
+	std::cout << "Scene generated." << std::endl;
+
+	/*
+	int n = 10000;
+	for (int i = 0; i < n; i++) {
+		std::string shader_key = "resources/shaders/defoult.vertresources/shaders/defoult.frag";
+		Model model("resources/obj/triangle.obj", shader_cache[shader_key]);
+		glm::vec3 origin{ 0.0f, 0.0f, 0.0f };
+		model.origin = origin;
+		model.name = "triangle";
+		models.push_back(model);
+	}
+	*/
+	
 }
 
 void App::print_opencv_info() {
@@ -359,9 +414,14 @@ int App::run(void) {
 						const glm::vec4 triangle_color_vec(triangle_color.r, triangle_color.g, triangle_color.b, 1.0f);
 						mesh.shader.setUniform("uniform_Color", triangle_color_vec);
 					}
+				} else {
+					// blue color for other models
+					for (auto & mesh : model.meshes) {
+						const glm::vec4 blue_color(0.0f, 0.0f, 1.0f, 1.0f);
+						mesh.shader.setUniform("uniform_Color", blue_color);
+					}
 				}
 				model.draw();
-				
 			}
 
 			// ImGui display

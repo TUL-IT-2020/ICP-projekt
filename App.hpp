@@ -5,6 +5,8 @@
 #include <GL/wglew.h>
 #endif
 #include <GLFW/glfw3.h>
+#include <unordered_map>
+#include <string>
 
 #include "assets.hpp"
 #include "Model.hpp"
@@ -20,20 +22,20 @@ public:
     int run(void);
     void destroy(void);
 
-	std::filesystem::path vertex_shader_path = "resources/shaders/defoult.vert";
-	std::filesystem::path fragment_shader_path = "resources/shaders/defoult.frag";
-
     color triangle_color{ 1.0f, 0.0f, 0.0f, 1.0f };
     void update_triangle_color(float delta);
 
     ~App(); //default destructor, called on app instance destruction
 private:
+
     // GL
     GLFWwindow* window = nullptr;
     bool is_vsync_on = true;
     bool show_imgui = true;
 
     // list of Models
+    std::unordered_map<std::string, ShaderProgram> shader_cache;
+    std::unordered_map<std::string, Model> model_cache;
     std::vector<Model> models;
     ShaderProgram shader;
 
