@@ -9,8 +9,8 @@
 #include <iostream>
 
 #include "assets.hpp"
-#include "ShaderProgram.hpp"
 #include "Vertex.hpp"
+#include "ShaderProgram.hpp"
 
 class Mesh {
 public:
