@@ -381,9 +381,10 @@ int App::run(void) {
 				ImGui::Text("V-Sync: %s", is_vsync_on ? "ON" : "OFF");
 				ImGui::Text("FPS: %.1f", FPS);
 				ImGui::Text("Triangle color: (%.2f, %.2f, %.2f)", triangle_color.r, triangle_color.g, triangle_color.b);
-				ImGui::Text("(press W/S to change color)");
+				ImGui::Text("(press UP/DOWN to change color)");
 				ImGui::Text("(press RMB to release mouse)");
-				ImGui::Text("(hit D to show/hide info)");
+				ImGui::Text("(hit C to show/hide info)");
+				ImGui::Text("(hit V to toggle V-Sync)");
 				ImGui::End();
 			}
 

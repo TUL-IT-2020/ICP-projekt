@@ -5,13 +5,11 @@
 
 #include "App.hpp"
 
-void App::glfw_error_callback(int error, const char* description)
-{
+void App::glfw_error_callback(int error, const char* description) {
 	std::cerr << "GLFW error: " << description << std::endl;
 }
 
-void App::glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
+void App::glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	auto this_inst = static_cast<App*>(glfwGetWindowUserPointer(window));
 	if ((action == GLFW_PRESS) || (action == GLFW_REPEAT)) {
 		switch (key) {
@@ -25,13 +23,22 @@ void App::glfw_key_callback(GLFWwindow* window, int key, int scancode, int actio
 			glfwSwapInterval(this_inst->is_vsync_on);
 			std::cout << "VSync: " << this_inst->is_vsync_on << "\n";
 			break;
-		case GLFW_KEY_D:
+		case GLFW_KEY_C:
+			// Show/Hide ImGui
 			this_inst->show_imgui = !this_inst->show_imgui;
 			break;
+		case GLFW_KEY_A:
+			break;
+		case GLFW_KEY_D:
+			break;
 		case GLFW_KEY_W:
-			this_inst->update_triangle_color(0.1f);
 			break;
 		case GLFW_KEY_S:
+			break;
+		case GLFW_KEY_UP:
+			this_inst->update_triangle_color(0.1f);
+			break;
+		case GLFW_KEY_DOWN:
 			this_inst->update_triangle_color(-0.1f);
 			break;
 		default:
