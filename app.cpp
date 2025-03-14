@@ -412,12 +412,14 @@ int App::run(void) {
 				if (model.name == "triangle") {
 					// update triangle color
 					for (auto & mesh : model.meshes) {
+						mesh.shader.activate();
 						const glm::vec4 triangle_color_vec(triangle_color.r, triangle_color.g, triangle_color.b, 1.0f);
 						mesh.shader.setUniform("uniform_Color", triangle_color_vec);
 					}
 				} else {
 					// blue color for other models
 					for (auto & mesh : model.meshes) {
+						mesh.shader.activate();
 						const glm::vec4 blue_color(0.0f, 0.0f, 1.0f, 1.0f);
 						mesh.shader.setUniform("uniform_Color", blue_color);
 					}

@@ -73,9 +73,12 @@ public:
         //}
     }
 
-    // update position etc. based on running time
+    /* update position etc. based on running time
+     * e.g.: s=s0+v*dt
+     * @param delta_t: time passed since last update
+     */
     void update(const float delta_t) {
-        // origin += glm::vec3(3,0,0) * delta_t; s=s0+v*dt
+        // origin += glm::vec3(3,0,0) * delta_t; 
     }
 
     // call draw() on mesh (all meshes)

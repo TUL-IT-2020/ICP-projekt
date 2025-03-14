@@ -23,6 +23,7 @@ public:
             currently_used = ID;
         }
 	};
+	
 	void deactivate(void) { 
 		glUseProgram(0); 
         currently_used = 0; 
@@ -52,8 +53,8 @@ private:
 	std::unordered_map<std::string, GLuint> uniform_location_cache;
 
 	GLuint getUniformLocation(const std::string& name);
-	std::string getShaderInfoLog(const GLuint obj);   // TODO: check for shader compilation error; if any, print compiler output  
-	std::string getProgramInfoLog(const GLuint obj);  // TODO: check for linker error; if any, print linker output
+	std::string getShaderInfoLog(const GLuint obj);
+	std::string getProgramInfoLog(const GLuint obj);
 
 	GLuint compile_shader(const std::filesystem::path & source_file, const GLenum type);
 	GLuint link_shader(const std::vector<GLuint> shader_ids);
