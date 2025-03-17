@@ -34,6 +34,7 @@
 
 App::App() {
 	// default constructor
+	camera = Camera();
 }
 
 void App::init_glew(void) {
@@ -371,13 +372,27 @@ int App::run(void) {
 		// Clear color saved to OpenGL state machine: no need to set repeatedly in game loop
 		glClearColor(0, 0, 0, 0);
 
-		ShaderProgram& shader = models[0].meshes[0].shader;
-		shader.activate();
+
+		/*
+		glCullFace(GL_BACK);
+		glEnable(GL_CULL_FACE);
+		*/
+
+		// disable cursor, so that it can not leave window, and we can process movement
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		// get first position of mouse cursor
+		glfwGetCursorPos(window, &cursorLastX, &cursorLastY);
 		
 		// first update = manual (no event for update arrived yet)
 		glfwGetFramebufferSize(window, &width, &height);    // Get GL framebuffer size	
 		update_projection_matrix();
 		glViewport(0, 0, width, height);
+
+		camera.Position = glm::vec3(0, 0, 10);
+		double last_frame_time = glfwGetTime();
+		
+		ShaderProgram& shader = models[0].meshes[0].shader;
+		shader.activate();
 
 		while (!glfwWindowShouldClose(window)) {
 			// ImGui prepare render (only if required)
@@ -387,11 +402,11 @@ int App::run(void) {
 				ImGui::NewFrame();
 				//ImGui::ShowDemoWindow(); // Enable mouse when using Demo!
 				ImGui::SetNextWindowPos(ImVec2(10, 10));
-				ImGui::SetNextWindowSize(ImVec2(350, 150));
+				ImGui::SetNextWindowSize(ImVec2(350, 180));
 
 				ImGui::Begin("Info", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 				// X, Y, Z,
-				//ImGui::Text("Camera position: (%.2f, %.2f, %.2f)", camera.Position.x, camera.Position.y, camera.Position.z);
+				ImGui::Text("Camera position: (%.2f, %.2f, %.2f)", camera.Position.x, camera.Position.y, camera.Position.z);
 				ImGui::Text("V-Sync: %s", is_vsync_on ? "ON" : "OFF");
 				ImGui::Text("FPS: %.1f", FPS);
 				ImGui::Text("Triangle color: (%.2f, %.2f, %.2f)", triangle_color.r, triangle_color.g, triangle_color.b);
@@ -421,18 +436,17 @@ int App::run(void) {
 			// clear canvas
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			/*
-			//set View matrix = set CAMERA
-			glm::mat4 v_m = glm::lookAt(
-				glm::vec3(0, 0, 1000), // position of camera
-				glm::vec3(0, 0, 0),    // where to look
-				glm::vec3(0, 1, 0)     // up direction
-			);
+			// TODO:
+			double delta_t = glfwGetTime() - last_frame_time;
+			last_frame_time = glfwGetTime();
+        	glm::vec3 movement = camera.ProcessInput(window, delta_t); // process keys etc.
+			// update camera position
+			if (camera.ValidMovement(movement)) {
+				std::cout << "movement: " << movement.x << ", " << movement.y << ", " << movement.z << std::endl;
+				camera.UpdateCameraPosition(movement);
+			}
 
-			// set uniforms for shader - common for all objects (do not set for each object individually, they use same shader anyway)
-			shader.setUniform("uV_m", v_m);
-			*/
-
+			shader.setUniform("uV_m", camera.GetViewMatrix());	
 			shader.setUniform("uP_m", projection_matrix);
 
 			// draw all models
