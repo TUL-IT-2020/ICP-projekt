@@ -80,21 +80,6 @@ public:
           local_model_matrix(other.local_model_matrix) {
     }
 
-    /* Generate string representation of glm::mat4
-     * Return mat converted to sequence of lines
-     * @param matrix: glm::mat4 to be converted to string
-     */
-    std::string mat4_to_string(const glm::mat4& matrix) {
-        std::string result = "";
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                result += std::to_string(matrix[i][j]) + " ";
-            }
-            result += "\n";
-        }
-        return result;
-    }
-
     ~Model() {
         // clear all meshes
         // for (auto & mesh : meshes) {
@@ -130,7 +115,7 @@ public:
 
 		glm::mat4 model_matrix = local_model_matrix * s * rz * ry * rx * t * m_s * m_rz * m_ry * m_rx * m_off;
         // print
-        std::cout << "model_matrix: \n" << mat4_to_string(model_matrix) << std::endl;
+        //std::cout << "model_matrix: \n" << mat4_to_string(model_matrix) << std::endl;
         //std::cout << "local_model_matrix: \n" << mat4_to_string(local_model_matrix) << std::endl;
         //std::cout << "defoult: \n" << mat4_to_string(glm::mat4(1.0f)) << std::endl << std::endl;
          

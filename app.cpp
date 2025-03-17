@@ -373,52 +373,11 @@ int App::run(void) {
 
 		ShaderProgram& shader = models[0].meshes[0].shader;
 		shader.activate();
-
-		// test view matrix
-		int width, height;
-		glfwGetFramebufferSize(window, &width, &height);    // Get GL framebuffer size		
-
-		// avoid division by 0
-		if (height <= 0) {
-			height = 1;
-		}
-
-		float ratio = static_cast<float>(width) / height;
-		
-		glm::mat4 projectionMatrix = glm::perspective(
-			glm::radians(60.0f), // The vertical Field of View, in radians: the amount of "zoom". Think "camera lens". Usually between 90° (extra wide) and 30° (quite zoomed in)
-			ratio,			     // Aspect Ratio. Depends on the size of your window.
-			0.1f,                // Near clipping plane. Keep as big as possible, or you'll get precision issues.
-			20000.0f             // Far clipping plane. Keep as little as possible.
-		);
-    
-		//set uniform for shaders - projection matrix
-		shader.setUniform("uP_m", projectionMatrix);
-		
-		//
-		// set viewport
-		//
-		glViewport(0, 0, width, height);
-		
-		//now your canvas has [0,0] in bottom left corner, and its size is [width x height] 
-		
-		//
-		// set View matrix - no transformation (so far), e.g. identity matrix (unit matrix)
-		//
-		glm::mat4 v_m = glm::identity<glm::mat4>();
-		shader.setUniform("uV_m", v_m);
-		
-		//
-		// set Model matrix - no transformations (so far), e.g. identity matrix (unit matrix)
-		//
-		glm::mat4 m_m = glm::identity<glm::mat4>();
-		shader.setUniform("uM_m", m_m);
-
-		// now you are (camera is) at [0,0,0] point, looking at -Z direction  
 		
 		// first update = manual (no event for update arrived yet)
-		//update_projection_matrix();
-		//glViewport(0, 0, width, height);
+		glfwGetFramebufferSize(window, &width, &height);    // Get GL framebuffer size	
+		update_projection_matrix();
+		glViewport(0, 0, width, height);
 
 		while (!glfwWindowShouldClose(window)) {
 			// ImGui prepare render (only if required)
@@ -461,6 +420,20 @@ int App::run(void) {
 
 			// clear canvas
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			/*
+			//set View matrix = set CAMERA
+			glm::mat4 v_m = glm::lookAt(
+				glm::vec3(0, 0, 1000), // position of camera
+				glm::vec3(0, 0, 0),    // where to look
+				glm::vec3(0, 1, 0)     // up direction
+			);
+
+			// set uniforms for shader - common for all objects (do not set for each object individually, they use same shader anyway)
+			shader.setUniform("uV_m", v_m);
+			*/
+
+			shader.setUniform("uP_m", projection_matrix);
 
 			// draw all models
 			for (auto & model : models) {

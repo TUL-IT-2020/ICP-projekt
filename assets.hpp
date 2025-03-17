@@ -19,4 +19,20 @@ struct color {
     GLfloat r, g, b, a;
 };
 
+
+/* Generate string representation of glm::mat4
+* Return mat converted to sequence of lines
+* @param matrix: glm::mat4 to be converted to string
+*/
+inline std::string mat4_to_string(const glm::mat4& matrix) {
+    std::string result = "";
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            result += std::to_string(matrix[i][j]) + " ";
+        }
+        result += "\n";
+    }
+    return result;
+}
+
 #endif // ASSETS_HPP
