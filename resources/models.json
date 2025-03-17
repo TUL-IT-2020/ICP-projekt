@@ -3,13 +3,13 @@
         {
             "name": "cube",
             "obj_path": "resources/obj/cube_triangles_vnt.obj",
-            "vertex_shader_path": "resources/shaders/defoult.vert",
+            "vertex_shader_path": "resources/shaders/basic_core.vert",
 	        "fragment_shader_path": "resources/shaders/defoult.frag"
         },
         {
             "name": "triangle",
             "obj_path": "resources/obj/triangle.obj",
-            "vertex_shader_path": "resources/shaders/defoult.vert",
+            "vertex_shader_path": "resources/shaders/basic_core.vert",
 	        "fragment_shader_path": "resources/shaders/defoult.frag"
         }
     ]

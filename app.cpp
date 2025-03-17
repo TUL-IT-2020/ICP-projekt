@@ -94,10 +94,14 @@ void App::init_glfw(void) {
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// GLFW callbacks registration
-	glfwSetFramebufferSizeCallback(window, glfw_framebuffer_size_callback);
+	//glfwSetFramebufferSizeCallback(window, glfw_framebuffer_size_callback);
+	glfwSetFramebufferSizeCallback(window, fbsize_callback);    // On GL framebuffer resize callback.
+    glfwSetScrollCallback(window, glfw_scroll_callback);        // On mouse wheel.
 	glfwSetMouseButtonCallback(window, glfw_mouse_button_callback);
 	glfwSetKeyCallback(window, glfw_key_callback);
-	glfwSetScrollCallback(window, glfw_scroll_callback);
+
+	// use Z buffer
+	glEnable(GL_DEPTH_TEST);
 }
 
 bool App::init() {
@@ -367,6 +371,55 @@ int App::run(void) {
 		// Clear color saved to OpenGL state machine: no need to set repeatedly in game loop
 		glClearColor(0, 0, 0, 0);
 
+		ShaderProgram& shader = models[0].meshes[0].shader;
+		shader.activate();
+
+		// test view matrix
+		int width, height;
+		glfwGetFramebufferSize(window, &width, &height);    // Get GL framebuffer size		
+
+		// avoid division by 0
+		if (height <= 0) {
+			height = 1;
+		}
+
+		float ratio = static_cast<float>(width) / height;
+		
+		glm::mat4 projectionMatrix = glm::perspective(
+			glm::radians(60.0f), // The vertical Field of View, in radians: the amount of "zoom". Think "camera lens". Usually between 90° (extra wide) and 30° (quite zoomed in)
+			ratio,			     // Aspect Ratio. Depends on the size of your window.
+			0.1f,                // Near clipping plane. Keep as big as possible, or you'll get precision issues.
+			20000.0f             // Far clipping plane. Keep as little as possible.
+		);
+    
+		//set uniform for shaders - projection matrix
+		shader.setUniform("uP_m", projectionMatrix);
+		
+		//
+		// set viewport
+		//
+		glViewport(0, 0, width, height);
+		
+		//now your canvas has [0,0] in bottom left corner, and its size is [width x height] 
+		
+		//
+		// set View matrix - no transformation (so far), e.g. identity matrix (unit matrix)
+		//
+		glm::mat4 v_m = glm::identity<glm::mat4>();
+		shader.setUniform("uV_m", v_m);
+		
+		//
+		// set Model matrix - no transformations (so far), e.g. identity matrix (unit matrix)
+		//
+		glm::mat4 m_m = glm::identity<glm::mat4>();
+		shader.setUniform("uM_m", m_m);
+
+		// now you are (camera is) at [0,0,0] point, looking at -Z direction  
+		
+		// first update = manual (no event for update arrived yet)
+		//update_projection_matrix();
+		//glViewport(0, 0, width, height);
+
 		while (!glfwWindowShouldClose(window)) {
 			// ImGui prepare render (only if required)
 			if (show_imgui) {
@@ -378,6 +431,8 @@ int App::run(void) {
 				ImGui::SetNextWindowSize(ImVec2(350, 150));
 
 				ImGui::Begin("Info", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+				// X, Y, Z,
+				//ImGui::Text("Camera position: (%.2f, %.2f, %.2f)", camera.Position.x, camera.Position.y, camera.Position.z);
 				ImGui::Text("V-Sync: %s", is_vsync_on ? "ON" : "OFF");
 				ImGui::Text("FPS: %.1f", FPS);
 				ImGui::Text("Triangle color: (%.2f, %.2f, %.2f)", triangle_color.r, triangle_color.g, triangle_color.b);

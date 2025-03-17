@@ -2,11 +2,11 @@
     "scene": [
         {
             "name": "cube",
-            "origin": [0.0, 0.0, 0.0]
+            "origin": [0.2, -0.2, -2.0]
         },
         {
             "name": "triangle",
-            "origin": [0.0, 50.0, 0.0]
+            "origin": [-0.3, 0.5, -2.20]
         }
     ]
 }

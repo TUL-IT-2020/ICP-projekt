@@ -165,6 +165,23 @@ public:
         return *this;
     }
 
+    void draw(glm::mat4 const & model_matrix) const {
+        if (VAO == 0) {
+            std::cerr << "VAO not initialized!\n";
+            return;
+        }
+        
+        shader.activate();
+        
+        // Set uniform matrices
+        shader.setUniform("uM_m", model_matrix);
+        
+        glBindVertexArray(VAO);
+
+        glDrawElements(primitive_type, indices.size(), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+    }
+
     void draw(glm::vec3 const & offset = glm::vec3(0.0), glm::vec3 const & rotation = glm::vec3(0.0f)) {
         if (VAO == 0) {
             std::cerr << "VAO not initialized!\n";
@@ -172,6 +189,17 @@ public:
         }
         
         shader.activate();
+        
+        // Compute model matrix
+        glm::mat4 m_off = glm::translate(glm::mat4(1.0f), offset);
+		glm::mat4 m_rx = glm::rotate(glm::mat4(1.0f), rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+		glm::mat4 m_ry = glm::rotate(glm::mat4(1.0f), rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::mat4 m_rz = glm::rotate(glm::mat4(1.0f), rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+        glm::mat4 model_matrix = m_rz * m_ry * m_rx * m_off;
+
+        // Set uniform matrices
+        shader.setUniform("uM_m", model_matrix);
+        
         glBindVertexArray(VAO);
 
         glDrawElements(primitive_type, indices.size(), GL_UNSIGNED_INT, 0);
