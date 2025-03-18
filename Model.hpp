@@ -9,6 +9,7 @@
 #include <iterator>  // Include this header for std::begin and std::end
 #include <string>
 #include <vector>
+#include <nlohmann/json.hpp>
 
 #include "Mesh.hpp"
 #include "OBJloader.hpp"
@@ -87,12 +88,54 @@ public:
         //}
     }
 
+    /* Model loader from json
+    * Will update shader cache with new shader if not already present.
+    * @param model_data: json data with model information
+    * @param shader_cache: cache of shader programs
+    * @return: Model object
+    */
+    Model(const nlohmann::json& model_data, std::unordered_map<std::string, ShaderProgram>& shader_cache) {
+        // Načtení základních informací o modelu
+        name = model_data["name"];
+        std::string path = model_data["obj_path"];
+        std::filesystem::path vertex_shader_path = model_data["vertex_shader_path"];
+        std::filesystem::path fragment_shader_path = model_data["fragment_shader_path"];
+
+        // Kontrola existence shaderů
+        if (!std::filesystem::exists(vertex_shader_path) || !std::filesystem::exists(fragment_shader_path)) {
+            throw std::runtime_error("Shader file not found: " + vertex_shader_path.string() + " or " + fragment_shader_path.string());
+        }
+
+        // Kontrola existence modelového souboru
+        if (!std::filesystem::exists(path)) {
+            throw std::runtime_error("Model file not found: " + path);
+        }
+
+        // Načtení nebo vytvoření shaderu
+        std::string shader_key = vertex_shader_path.string() + fragment_shader_path.string();
+        if (shader_cache.find(shader_key) == shader_cache.end()) {
+            shader_cache[shader_key] = ShaderProgram(vertex_shader_path, fragment_shader_path);
+            std::cout << "Shader program ID: " << shader_cache[shader_key].getID() << " compiled and cached." << std::endl;
+        } else {
+            std::cout << "Shader program ID: " << shader_cache[shader_key].getID() << " loaded from cache." << std::endl;
+        }
+
+        // Inicializace modelu
+        ShaderProgram& shader = shader_cache[shader_key];
+        Model model(path, shader);
+        model.name = name;
+        *this = model;
+    }
+    
+
     /* update position etc. based on running time
      * e.g.: s=s0+v*dt
      * @param delta_t: time passed since last update
      */
     void update(const float delta_t) {
         // origin += glm::vec3(3,0,0) * delta_t; 
+        // rotate around y-axis
+        orientation.y += 0.5f * delta_t;
     }
 
     // call draw() on mesh (all meshes)
@@ -127,7 +170,7 @@ public:
     
     void draw(glm::mat4 const & model_matrix) {
         for (auto const& mesh : meshes) {
-            mesh.draw(local_model_matrix * model_matrix);  // do not forget to implement...
+            mesh.draw(local_model_matrix * model_matrix);
         }
     }
 };

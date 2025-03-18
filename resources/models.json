@@ -11,6 +11,12 @@
             "obj_path": "resources/obj/triangle.obj",
             "vertex_shader_path": "resources/shaders/basic_core.vert",
 	        "fragment_shader_path": "resources/shaders/defoult.frag"
+        },
+        {
+            "name": "teapot",
+            "obj_path": "resources/obj/teapot_tri_vnt.obj",
+            "vertex_shader_path": "resources/shaders/basic_core.vert",
+	        "fragment_shader_path": "resources/shaders/defoult.frag"
         }
     ]
 }

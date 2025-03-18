@@ -172,6 +172,13 @@ void App::init_gl_debug() {
 	}
 }
 
+glm::vec3 json_to_vec3(const nlohmann::json& json_array) {
+    if (!json_array.is_array() || json_array.size() != 3) {
+        throw std::invalid_argument("Invalid JSON format for vec3. Expected an array of size 3.");
+    }
+    return glm::vec3(json_array[0].get<float>(), json_array[1].get<float>(), json_array[2].get<float>());
+}
+
 /*
  * Initialize pipeline: compile, link and use shaders
  * Create and load data into GPU using OpenGL DSA (Direct State Access)
@@ -191,30 +198,8 @@ void App::init_assets(void) {
     for (const auto& model_data : json["models"]) {
 		std::cout << "Loading model: " << model_data["name"] << std::endl;
 		try {
-			std::string name = model_data["name"];
-			std::string path = model_data["obj_path"];
-			std::filesystem::path vertex_shader_path = model_data["vertex_shader_path"];
-			std::filesystem::path fragment_shader_path = model_data["fragment_shader_path"];
-		
-			if (!std::filesystem::exists(vertex_shader_path) || !std::filesystem::exists(fragment_shader_path)) {
-				throw std::runtime_error("Shader file not found: " + vertex_shader_path.string() + " or " + fragment_shader_path.string());
-			}
-
-			if (!std::filesystem::exists(path)) {
-				throw std::runtime_error("Model file not found: " + path);
-			}
-
-			std::string shader_key = vertex_shader_path.string() + fragment_shader_path.string();
-			if (shader_cache.find(shader_key) == shader_cache.end()) {
-				shader_cache[shader_key] = ShaderProgram(vertex_shader_path, fragment_shader_path);
-				std::cout << "Shader program ID: " << shader_cache[shader_key].getID() << " compiled and cached." << std::endl;
-			} else {
-				std::cout << "Shader program ID: " << shader_cache[shader_key].getID() << " loaded from cache." << std::endl;
-			}
-
-			Model model(path, shader_cache[shader_key]);
-			model.name = name;
-			model_cache[name] = model;
+			Model model(model_data, shader_cache); // Použití nového konstruktoru
+			model_cache[model.name] = model;
 		} catch (std::exception const& e) {
 			std::cerr << "Loading model failed : " << model_data["name"] << ", " << e.what() << std::endl;
 			exit(EXIT_FAILURE);
@@ -235,11 +220,18 @@ void App::init_assets(void) {
 		std::cout << "Placing model: " << model_data["name"] << std::endl;
 		try {
 			std::string name = model_data["name"];
-			glm::vec3 origin = glm::vec3(model_data["origin"][0], model_data["origin"][1], model_data["origin"][2]);
-	
+			
 			// copy model from cache
 			Model model = model_cache[name];
-			model.origin = origin;
+
+			if (model_data.find("origin") != model_data.end()) {
+				model.origin = json_to_vec3(model_data["origin"]);
+			}
+			
+			if (model_data.find("scale") != model_data.end()) {
+				model.scale = json_to_vec3(model_data["scale"]);
+			}
+	
 			models.push_back(model);
 
 		} catch (std::exception const& e) {
@@ -394,6 +386,11 @@ int App::run(void) {
 		ShaderProgram& shader = models[0].meshes[0].shader;
 		shader.activate();
 
+		
+		glm::vec3 offset = glm::vec3(0.0);
+		glm::vec3 rotation = glm::vec3(1.0f);	
+		glm::vec3 scale_change = glm::vec3(1.0f);
+
 		while (!glfwWindowShouldClose(window)) {
 			// ImGui prepare render (only if required)
 			if (show_imgui) {
@@ -458,6 +455,12 @@ int App::run(void) {
 						const glm::vec4 triangle_color_vec(triangle_color.r, triangle_color.g, triangle_color.b, 1.0f);
 						mesh.shader.setUniform("uniform_Color", triangle_color_vec);
 					}
+				} else if (model.name == "teapot") {
+					for (auto & mesh : model.meshes) {
+						mesh.shader.activate();
+						const glm::vec4 yellow_color(1.0f, 1.0f, 0.0f, 1.0f);
+						mesh.shader.setUniform("uniform_Color", yellow_color);
+					}
 				} else {
 					// blue color for other models
 					for (auto & mesh : model.meshes) {
@@ -466,7 +469,13 @@ int App::run(void) {
 						mesh.shader.setUniform("uniform_Color", blue_color);
 					}
 				}
-				model.draw();
+				//model.update(delta_t);
+				//model.draw();
+				rotation.x += 0.5f * delta_t;
+				rotation.y += 0.5f * delta_t;
+				rotation.z += 0.5f * delta_t;
+
+				model.draw(offset, rotation, scale_change);
 			}
 
 			// ImGui display
