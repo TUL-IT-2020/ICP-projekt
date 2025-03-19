@@ -2,16 +2,13 @@
     "scene": [
         {
             "name": "cube",
-            "origin": [0.2, -0.2, -2.0]
+            "origin": [0.2, -0.2, -2.0],
+            "texture_path": "resources/textures/box.png"
         },
         {
-            "name": "triangle",
-            "origin": [-0.3, 0.5, -2.20]
-        },
-        {
-            "name": "teapot",
-            "origin": [0.0, -2.0, -15.0],
-            "scale": [0.3, 0.3, 0.3]
+            "name": "cube",
+            "origin": [-1.0, 0.2, -1.0],
+            "texture_path": "resources/textures/box_rgb888.png"
         }
     ]
 }

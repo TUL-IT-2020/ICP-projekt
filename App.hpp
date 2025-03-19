@@ -7,10 +7,17 @@
 #include <GLFW/glfw3.h>
 #include <unordered_map>
 #include <string>
+#include <opencv2/opencv.hpp>
 
 #include "assets.hpp"
 #include "Model.hpp"
 #include "camera.hpp"
+
+enum class TextureFilter {
+    Nearest,       // Nearest neighbor - rychlé, ale nekvalitní
+    Bilinear,      // Bilineární filtrování - kvalitnější, ale pomalejší
+    TrilinearMipmap // Trilineární filtrování s MIPMAP - nejlepší kvalita, vyšší paměťové nároky
+};
 
 // our application class 
 class App {
@@ -25,6 +32,8 @@ public:
 
     color triangle_color{ 1.0f, 0.0f, 0.0f, 1.0f };
     void update_triangle_color(float delta);
+    
+    static GLuint gen_tex(cv::Mat& image, TextureFilter filter);
 
     ~App(); //default destructor, called on app instance destruction
 private:

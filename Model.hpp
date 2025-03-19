@@ -26,6 +26,8 @@ public:
     glm::vec3 scale{};
     glm::mat4 local_model_matrix{}; //for complex transformations 
 
+    GLuint texture_id{0}; // texture id=0  means no texture
+
     // Default constructor
     Model() = default;
 
@@ -34,6 +36,50 @@ public:
         this->orientation = glm::vec3(0.0f);
         this->scale = glm::vec3(1.0f);
         this->local_model_matrix = glm::identity<glm::mat4>();
+    }
+
+    /* Model loader from json
+     * Will update shader cache with new shader if not already present.
+     * @param model_data: json data with model information
+     * @param shader_cache: cache of shader programs
+     * @return: Model object
+     */
+    Model(const nlohmann::json& model_data,
+          std::unordered_map<std::string, ShaderProgram>& shader_cache) {
+        // Načtení základních informací o modelu
+        name = model_data["name"];
+        std::string path = model_data["obj_path"];
+        std::filesystem::path vertex_shader_path = model_data["vertex_shader_path"];
+        std::filesystem::path fragment_shader_path = model_data["fragment_shader_path"];
+
+        // Kontrola existence shaderů
+        if (!std::filesystem::exists(vertex_shader_path) ||
+            !std::filesystem::exists(fragment_shader_path)) {
+            throw std::runtime_error("Shader file not found: " + vertex_shader_path.string() +
+                                     " or " + fragment_shader_path.string());
+        }
+
+        // Kontrola existence modelového souboru
+        if (!std::filesystem::exists(path)) {
+            throw std::runtime_error("Model file not found: " + path);
+        }
+
+        // Načtení nebo vytvoření shaderu
+        std::string shader_key = vertex_shader_path.string() + fragment_shader_path.string();
+        if (shader_cache.find(shader_key) == shader_cache.end()) {
+            shader_cache[shader_key] = ShaderProgram(vertex_shader_path, fragment_shader_path);
+            std::cout << "Shader program ID: " << shader_cache[shader_key].getID()
+                      << " compiled and cached." << std::endl;
+        } else {
+            std::cout << "Shader program ID: " << shader_cache[shader_key].getID()
+                      << " loaded from cache." << std::endl;
+        }
+
+        // Inicializace modelu
+        ShaderProgram& shader = shader_cache[shader_key];
+        Model model(path, shader);
+        model.name = name;
+        *this = model;
     }
 
     Model(const std::filesystem::path& filename, ShaderProgram& shader) {
@@ -78,6 +124,7 @@ public:
           origin(other.origin),
           orientation(other.orientation),
           scale(other.scale),
+          texture_id(other.texture_id),
           local_model_matrix(other.local_model_matrix) {
     }
 
@@ -88,54 +135,15 @@ public:
         //}
     }
 
-    /* Model loader from json
-    * Will update shader cache with new shader if not already present.
-    * @param model_data: json data with model information
-    * @param shader_cache: cache of shader programs
-    * @return: Model object
-    */
-    Model(const nlohmann::json& model_data, std::unordered_map<std::string, ShaderProgram>& shader_cache) {
-        // Načtení základních informací o modelu
-        name = model_data["name"];
-        std::string path = model_data["obj_path"];
-        std::filesystem::path vertex_shader_path = model_data["vertex_shader_path"];
-        std::filesystem::path fragment_shader_path = model_data["fragment_shader_path"];
-
-        // Kontrola existence shaderů
-        if (!std::filesystem::exists(vertex_shader_path) || !std::filesystem::exists(fragment_shader_path)) {
-            throw std::runtime_error("Shader file not found: " + vertex_shader_path.string() + " or " + fragment_shader_path.string());
-        }
-
-        // Kontrola existence modelového souboru
-        if (!std::filesystem::exists(path)) {
-            throw std::runtime_error("Model file not found: " + path);
-        }
-
-        // Načtení nebo vytvoření shaderu
-        std::string shader_key = vertex_shader_path.string() + fragment_shader_path.string();
-        if (shader_cache.find(shader_key) == shader_cache.end()) {
-            shader_cache[shader_key] = ShaderProgram(vertex_shader_path, fragment_shader_path);
-            std::cout << "Shader program ID: " << shader_cache[shader_key].getID() << " compiled and cached." << std::endl;
-        } else {
-            std::cout << "Shader program ID: " << shader_cache[shader_key].getID() << " loaded from cache." << std::endl;
-        }
-
-        // Inicializace modelu
-        ShaderProgram& shader = shader_cache[shader_key];
-        Model model(path, shader);
-        model.name = name;
-        *this = model;
-    }
-    
-
     /* update position etc. based on running time
      * e.g.: s=s0+v*dt
      * @param delta_t: time passed since last update
      */
     void update(const float delta_t) {
-        // origin += glm::vec3(3,0,0) * delta_t; 
-        // rotate around y-axis
-        orientation.y += 0.5f * delta_t;
+		glm::vec3 offset = glm::vec3(0.0f);
+        glm::vec3 rotation = glm::vec3(0.0f, delta_t, 0.0f);  // Rotace kolem osy Y
+        glm::vec3 scale_change = glm::vec3(1.0f);
+        local_model_matrix *=  complete_transformation(offset, rotation, scale_change);
     }
 
     // call draw() on mesh (all meshes)
@@ -156,16 +164,21 @@ public:
 		glm::mat4 m_rz = glm::rotate(glm::mat4(1.0f), rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
 		glm::mat4 m_s = glm::scale(glm::mat4(1.0f), scale_change);
 
-		glm::mat4 model_matrix = local_model_matrix * s * rz * ry * rx * t * m_s * m_rz * m_ry * m_rx * m_off;
-        // print
-        //std::cout << "model_matrix: \n" << mat4_to_string(model_matrix) << std::endl;
-        //std::cout << "local_model_matrix: \n" << mat4_to_string(local_model_matrix) << std::endl;
-        //std::cout << "defoult: \n" << mat4_to_string(glm::mat4(1.0f)) << std::endl << std::endl;
-         
-        // call draw() on mesh (all meshes)
-        for (auto const& mesh : meshes) {
-            mesh.draw(model_matrix);  // do not forget to implement draw() overload with glm::mat4 parameter
+		glm::mat4 model_matrix = s * rz * ry * rx * t * m_s * m_rz * m_ry * m_rx * m_off;
+
+        
+        // conect texture to shader
+        if (texture_id != 0) {
+            ShaderProgram &shader = meshes[0].shader;
+            shader.activate();
+            int i = 0; 
+            glBindTextureUnit(i, texture_id);
+
+            //send texture unit number to FS
+            glUniform1i(glGetUniformLocation(shader.getID(), "tex0"), i);
         }
+        
+        draw(model_matrix);
     }
     
     void draw(glm::mat4 const & model_matrix) {

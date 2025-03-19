@@ -96,11 +96,11 @@ void App::init_glfw(void) {
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// GLFW callbacks registration
-	//glfwSetFramebufferSizeCallback(window, glfw_framebuffer_size_callback);
+	/*
 	glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
 		auto app = static_cast<App*>(glfwGetWindowUserPointer(window));
 		app->cursorPositionCallback(window, xpos, ypos);
-	});
+	});*/
 	glfwSetFramebufferSizeCallback(window, fbsize_callback);    // On GL framebuffer resize callback.
     glfwSetScrollCallback(window, glfw_scroll_callback);        // On mouse wheel.
 	glfwSetMouseButtonCallback(window, glfw_mouse_button_callback);
@@ -108,6 +108,87 @@ void App::init_glfw(void) {
 
 	// use Z buffer
 	glEnable(GL_DEPTH_TEST);
+
+    glEnable( GL_LINE_SMOOTH );
+    glEnable( GL_POLYGON_SMOOTH );
+}
+
+cv::Mat createCheckerboardTexture() {
+    // Vytvoření 2x2 matice s 3 kanály (RGB) a 8bitovými hodnotami
+    cv::Mat checkerboard(2, 2, CV_8UC3);
+
+    // Nastavení barev pixelů (černá a bílá)
+    checkerboard.at<cv::Vec3b>(0, 0) = cv::Vec3b(0, 0, 0);   // Černá
+    checkerboard.at<cv::Vec3b>(0, 1) = cv::Vec3b(255, 255, 255); // Bílá
+    checkerboard.at<cv::Vec3b>(1, 0) = cv::Vec3b(255, 255, 255); // Bílá
+    checkerboard.at<cv::Vec3b>(1, 1) = cv::Vec3b(0, 0, 0);   // Černá
+
+    return checkerboard;
+}
+
+GLuint textureInit(const std::filesystem::path& file_name)
+{
+	cv::Mat image = cv::imread(file_name.string(), cv::IMREAD_UNCHANGED);  // Read with (potential) Alpha
+	if (image.empty())	{
+		image = createCheckerboardTexture();
+		//throw std::runtime_error("No texture in file: " + file_name.string());
+		std::cerr << "No texture in file: " << file_name.string() << std::endl;
+	}
+
+	GLuint texture = App::gen_tex(image, TextureFilter::TrilinearMipmap);
+	
+	return texture;
+}
+
+GLuint App::gen_tex(cv::Mat& image, TextureFilter filter = TextureFilter::TrilinearMipmap)
+{
+	GLuint ID;
+
+	if (image.empty()) {
+        throw std::runtime_error("Image empty?\n");
+    }
+
+	// Generates an OpenGL texture object
+	glCreateTextures(GL_TEXTURE_2D, 1, &ID);
+
+	switch (image.channels()) {
+	case 3:
+		// Create and clear space for data - immutable format
+		glTextureStorage2D(ID, 1, GL_RGB8, image.cols, image.rows);
+		// Assigns the image to the OpenGL Texture object
+		glTextureSubImage2D(ID, 0, 0, 0, image.cols, image.rows, GL_BGR, GL_UNSIGNED_BYTE, image.data);
+		break;
+	case 4:
+		glTextureStorage2D(ID, 1, GL_RGBA8, image.cols, image.rows);
+		glTextureSubImage2D(ID, 0, 0, 0, image.cols, image.rows, GL_BGRA, GL_UNSIGNED_BYTE, image.data);
+		break;
+	default:
+		throw std::runtime_error("texture failed"); // Check the image, we want Alpha in this example    
+	}
+
+	switch (filter) {
+        case TextureFilter::Nearest:
+            glTextureParameteri(ID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTextureParameteri(ID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            break;
+
+        case TextureFilter::Bilinear:
+            glTextureParameteri(ID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTextureParameteri(ID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            break;
+
+        case TextureFilter::TrilinearMipmap:
+            glTextureParameteri(ID, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // bilinear magnifying
+            glTextureParameteri(ID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // trilinear minifying
+            glGenerateTextureMipmap(ID); // Generate mipmaps
+            break;
+    }
+
+	// Configures the way the texture repeats
+	glTextureParameteri(ID, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTextureParameteri(ID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	return ID;
 }
 
 bool App::init() {
@@ -205,6 +286,11 @@ void App::init_assets(void) {
 		std::cout << "Loading model: " << model_data["name"] << std::endl;
 		try {
 			Model model(model_data, shader_cache);
+			if (model_data.find("texture_path") != model_data.end()) {
+				model.texture_id = textureInit(model_data["texture_path"]);
+				std::cout << "Texture loaded: " << model_data["texture_path"] << std::endl;
+				std::cout << "Texture ID: " << model.texture_id << std::endl;
+			}
 			model_cache[model.name] = model;
 		} catch (std::exception const& e) {
 			std::cerr << "Loading model failed : " << model_data["name"] << ", " << e.what() << std::endl;
@@ -236,6 +322,10 @@ void App::init_assets(void) {
 			
 			if (model_data.find("scale") != model_data.end()) {
 				model.scale = json_to_vec3(model_data["scale"]);
+			}
+
+			if (model_data.find("texture_path") != model_data.end()) {
+				model.texture_id = textureInit(model_data["texture_path"]);
 			}
 	
 			models.push_back(model);
@@ -276,6 +366,10 @@ void App::print_gl_info() {
 
 	auto renderer_s = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
 	std::cout << "OpenGL renderer: " << (renderer_s ? renderer_s : "<UNKNOWN>") << '\n';
+
+	GLint maxTextureUnits = 0;
+	glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureUnits);
+	std::cout << "Max texture units supported by GPU: " << maxTextureUnits << std::endl;
 
 	auto version_s = reinterpret_cast<const char*>(glGetString(GL_VERSION));
 	std::cout << "OpenGL version: " << (version_s ? version_s : "<UNKNOWN>") << '\n';
@@ -380,7 +474,7 @@ int App::run(void) {
 		
 		glm::vec3 offset = glm::vec3(0.0);
 		glm::vec3 rotation = glm::vec3(1.0f);	
-		glm::vec3 scale_change = glm::vec3(1.0f);
+		glm::vec3 scale_change = glm::vec3(1.0f);   
 
 		while (!glfwWindowShouldClose(window)) {
 			// ImGui prepare render (only if required)
@@ -390,7 +484,7 @@ int App::run(void) {
 				ImGui::NewFrame();
 				//ImGui::ShowDemoWindow(); // Enable mouse when using Demo!
 				ImGui::SetNextWindowPos(ImVec2(10, 10));
-				ImGui::SetNextWindowSize(ImVec2(350, 180));
+				ImGui::SetNextWindowSize(ImVec2(350, 190));
 
 				ImGui::Begin("Info", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 				// X, Y, Z,
@@ -440,6 +534,7 @@ int App::run(void) {
 
 			// draw all models
 			for (auto & model : models) {
+				//shader = model.meshes[0].shader;
 				if (model.name == "triangle") {
 					// update triangle color
 					for (auto & mesh : model.meshes) {
@@ -453,21 +548,23 @@ int App::run(void) {
 						const glm::vec4 yellow_color(1.0f, 1.0f, 0.0f, 1.0f);
 						mesh.shader.setUniform("uniform_Color", yellow_color);
 					}
-				} else {
+				} else if (model.name == "cube") {
 					// blue color for other models
 					for (auto & mesh : model.meshes) {
 						mesh.shader.activate();
-						const glm::vec4 blue_color(0.0f, 0.0f, 1.0f, 1.0f);
-						mesh.shader.setUniform("uniform_Color", blue_color);
+						mesh.shader.setUniform("uV_m", camera.GetViewMatrix());	
+						mesh.shader.setUniform("uP_m", projection_matrix);
 					}
 				}
 				//model.update(delta_t);
-				//model.draw();
+				model.draw();
+				/*
 				rotation.x += 0.5f * delta_t;
 				rotation.y += 0.5f * delta_t;
 				rotation.z += 0.5f * delta_t;
+				*/
 
-				model.draw(offset, rotation, scale_change);
+				//model.draw(offset, rotation, scale_change);
 			}
 
 			// ImGui display
