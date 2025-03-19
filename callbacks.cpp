@@ -45,10 +45,11 @@ void App::cursorPositionCallback(GLFWwindow* window, double xpos, double ypos) {
     app->camera.ProcessMouseMovement(xpos - app->cursorLastX, (ypos - app->cursorLastY) * -1.0);
     app->cursorLastX = xpos;
     app->cursorLastY = ypos;
+	// print
+	std::cout << "xpos: " << xpos << ", ypos: " << ypos << std::endl;
 }
 
 void App::glfw_scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-    // get App instance
     auto this_inst = static_cast<App*>(glfwGetWindowUserPointer(window));
     this_inst->fov += 10 * yoffset;  // yoffset is mostly +1 or -1; one degree difference in fov is not visible
     this_inst->fov = glm::clamp(this_inst->fov, 20.0f, 170.0f);  // limit FOV to reasonable values...

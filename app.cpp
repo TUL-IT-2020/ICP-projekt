@@ -92,10 +92,15 @@ void App::init_glfw(void) {
 	glfwMakeContextCurrent(window);
 
 	// disable mouse cursor
+	// disable cursor, so that it can not leave window, and we can process movement
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// GLFW callbacks registration
 	//glfwSetFramebufferSizeCallback(window, glfw_framebuffer_size_callback);
+	glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
+		auto app = static_cast<App*>(glfwGetWindowUserPointer(window));
+		app->cursorPositionCallback(window, xpos, ypos);
+	});
 	glfwSetFramebufferSizeCallback(window, fbsize_callback);    // On GL framebuffer resize callback.
     glfwSetScrollCallback(window, glfw_scroll_callback);        // On mouse wheel.
 	glfwSetMouseButtonCallback(window, glfw_mouse_button_callback);
@@ -138,6 +143,7 @@ bool App::init() {
 		// When all is loaded, show the window.
 
 		glfwShowWindow(window);
+		//glfwFocusWindow(window);
 
 		// Initialize ImGUI (see https://github.com/ocornut/imgui/wiki/Getting-Started)
 		init_imgui();
@@ -198,7 +204,7 @@ void App::init_assets(void) {
     for (const auto& model_data : json["models"]) {
 		std::cout << "Loading model: " << model_data["name"] << std::endl;
 		try {
-			Model model(model_data, shader_cache); // Použití nového konstruktoru
+			Model model(model_data, shader_cache);
 			model_cache[model.name] = model;
 		} catch (std::exception const& e) {
 			std::cerr << "Loading model failed : " << model_data["name"] << ", " << e.what() << std::endl;
@@ -239,20 +245,7 @@ void App::init_assets(void) {
 			exit(EXIT_FAILURE);
 		}
 	}
-	std::cout << "Scene generated." << std::endl;
-
-	/*
-	int n = 10000;
-	for (int i = 0; i < n; i++) {
-		std::string shader_key = "resources/shaders/defoult.vertresources/shaders/defoult.frag";
-		Model model("resources/obj/triangle.obj", shader_cache[shader_key]);
-		glm::vec3 origin{ 0.0f, 0.0f, 0.0f };
-		model.origin = origin;
-		model.name = "triangle";
-		models.push_back(model);
-	}
-	*/
-	
+	std::cout << "Scene generated." << std::endl;	
 }
 
 void App::print_opencv_info() {
@@ -366,12 +359,10 @@ int App::run(void) {
 
 
 		/*
+		// enable back face culling
 		glCullFace(GL_BACK);
 		glEnable(GL_CULL_FACE);
 		*/
-
-		// disable cursor, so that it can not leave window, and we can process movement
-		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		// get first position of mouse cursor
 		glfwGetCursorPos(window, &cursorLastX, &cursorLastY);
 		
@@ -404,6 +395,7 @@ int App::run(void) {
 				ImGui::Begin("Info", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 				// X, Y, Z,
 				ImGui::Text("Camera position: (%.2f, %.2f, %.2f)", camera.Position.x, camera.Position.y, camera.Position.z);
+				ImGui::Text("Camera direction: (%.2f, %.2f, %.2f)", camera.Yaw, camera.Pitch, camera.Roll);
 				ImGui::Text("V-Sync: %s", is_vsync_on ? "ON" : "OFF");
 				ImGui::Text("FPS: %.1f", FPS);
 				ImGui::Text("Triangle color: (%.2f, %.2f, %.2f)", triangle_color.r, triangle_color.g, triangle_color.b);
