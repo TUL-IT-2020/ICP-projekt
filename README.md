@@ -20,7 +20,7 @@ Pro instalaci závislostí spusťte následující příkaz:
 ./install.sh
 ```
 
-Tan také nainstaluje závsilosti `C++` knihoven:
+Ten také nainstaluje závsilosti `C++` knihoven:
 ```txt
 nlohmann-json
 ```

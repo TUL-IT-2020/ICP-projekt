@@ -29,6 +29,7 @@
 #include <backends/imgui_impl_opengl3.h>
 
 #include "App.hpp"
+#include "Map.cpp"
 #include "assets.hpp"
 #include "ShaderProgram.hpp"
 
@@ -299,6 +300,7 @@ void App::init_assets(void) {
 	}
 	std::cout << "Models loaded." << std::endl;
 	
+	/*
 	// load position for objects -> models
 	// place models to the scene
 	std::ifstream map_file("resources/map.json");
@@ -335,6 +337,17 @@ void App::init_assets(void) {
 			exit(EXIT_FAILURE);
 		}
 	}
+	*/
+
+	// load level
+	Map map = Map(10, 25);
+	map.genenerateLabyrinth();
+
+	//set player position in 3D space (transform X-Y in map to XYZ in GL)
+	camera.Position.x = (map.start_position.x) + 1.0 / 2.0f;
+	camera.Position.z = (map.start_position.y) + 1.0 / 2.0f;
+	camera.Position.y = camera.camera_height;
+
 	std::cout << "Scene generated." << std::endl;	
 }
 
