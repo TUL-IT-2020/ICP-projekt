@@ -93,14 +93,14 @@ void App::init_glfw(void) {
 
 	// disable mouse cursor
 	// disable cursor, so that it can not leave window, and we can process movement
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); 
 
 	// GLFW callbacks registration
-	/*
-	glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
+	
+	/*glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
 		auto app = static_cast<App*>(glfwGetWindowUserPointer(window));
 		app->cursorPositionCallback(window, xpos, ypos);
-	});*/
+	}); */
 	glfwSetFramebufferSizeCallback(window, fbsize_callback);    // On GL framebuffer resize callback.
     glfwSetScrollCallback(window, glfw_scroll_callback);        // On mouse wheel.
 	glfwSetMouseButtonCallback(window, glfw_mouse_button_callback);
@@ -111,6 +111,7 @@ void App::init_glfw(void) {
 
     glEnable( GL_LINE_SMOOTH );
     glEnable( GL_POLYGON_SMOOTH );
+	glEnable( GL_CULL_FACE );
 }
 
 cv::Mat createCheckerboardTexture() {
@@ -150,6 +151,12 @@ GLuint App::gen_tex(cv::Mat& image, TextureFilter filter = TextureFilter::Trilin
 
 	// Generates an OpenGL texture object
 	glCreateTextures(GL_TEXTURE_2D, 1, &ID);
+
+	GLenum err;
+	while ((err = glGetError()) != GL_NO_ERROR) {
+		std::cerr << "OpenGL Error: " << err << std::endl;
+	}
+	std::cout << "Image channels: " << image.channels() << std::endl;
 
 	switch (image.channels()) {
 	case 3:
@@ -327,7 +334,7 @@ void App::init_assets(void) {
 			if (model_data.find("texture_path") != model_data.end()) {
 				model.texture_id = textureInit(model_data["texture_path"]);
 			}
-	
+			
 			models.push_back(model);
 
 		} catch (std::exception const& e) {

@@ -164,20 +164,24 @@ public:
 		glm::mat4 m_rz = glm::rotate(glm::mat4(1.0f), rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
 		glm::mat4 m_s = glm::scale(glm::mat4(1.0f), scale_change);
 
-		glm::mat4 model_matrix = s * rz * ry * rx * t * m_s * m_rz * m_ry * m_rx * m_off;
+		//glm::mat4 model_matrix = s * rz * ry * rx * t * m_s * m_rz * m_ry * m_rx * m_off;
+        glm::mat4 model_matrix = m_off * m_rx * m_ry * m_rz * m_s * t * rx * ry * rz * s;
 
-        
+        if (texture_id == 0) {
+            std::cerr << "Error: Texture ID is 0! Texture not loaded properly." << std::endl;
+        }
         // conect texture to shader
         if (texture_id != 0) {
             ShaderProgram &shader = meshes[0].shader;
             shader.activate();
-            int i = 0; 
-            glBindTextureUnit(i, texture_id);
-
-            //send texture unit number to FS
-            glUniform1i(glGetUniformLocation(shader.getID(), "tex0"), i);
+    
+            int texture_unit = 0;
+            glActiveTexture(GL_TEXTURE0 + texture_unit);
+            glBindTexture(GL_TEXTURE_2D, texture_id);
+    
+            int texUniformLocation = glGetUniformLocation(shader.getID(), "tex0");
+            glUniform1i(texUniformLocation, texture_unit);
         }
-        
         draw(model_matrix);
     }
     
