@@ -1,19 +1,29 @@
 {
     "map_2_models": [
         {
-            "token": "#",
-            "model_name": "cube",
-            "texture_path": "resources/textures/box.png"
-        },
-        {
-            "token": "e",
-            "model_name": "cube",
-            "texture_path": "resources/textures/TextureDouble_A.png"
-        },
-        {
             "token": "d",
             "model_name": "cube",
-            "texture_path": "resources/textures/box_rgb888.png"
+            "texture_path": "resources/textures/door.png"
+        },
+        {
+            "token": "S",
+            "model_name": "cube",
+            "texture_path": "resources/textures/stone_wall_1.png"
+        },
+        {
+            "token": "W",
+            "model_name": "cube",
+            "texture_path": "resources/textures/wood_wall_1.png"
+        },
+        {
+            "token": "B",
+            "model_name": "cube",
+            "texture_path": "resources/textures/blue_wall_1.png"
+        },
+        {
+            "token": "X",
+            "model_name": "cube",
+            "texture_path": "resources/textures/end_game.png"
         }
     ]
 }

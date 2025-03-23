@@ -7,10 +7,28 @@
 
 /* maze map
 characters in maze: 
-'#' wall
-'.' empty
-'e' end position (target, goal, gateway, etc.)
-'X' start position
+' ' = empty
+. = empty
+
+// walls:
+S = stone
+W = wood
+B = blue
+X = end lever
+
+// enemies:
+p = player start
+e = normal enemy
+k = killed enemy
+B = boss enemy
+
+// items:
+o = object/obsctacle
+g = gold
+h = health
+m = munition
+
+d = door
 */
 
 /* Class Map
@@ -81,12 +99,18 @@ Map::Map(const std::string& file_name) {
 		}
 		// fill map
 		for (int col = 0; col < map.cols; col++) {
-			if (line[col] == 'X') {
+			if (line[col] == 'p') {
 				start_position = cv::Point(col, row);
 				line[col] = '.';
 			}
-			else if (line[col] == 'e') {
+			else if (line[col] == 'X') {
 				end_position = cv::Point(col, row);
+			}
+			// S, W, B, d - pridej do mapy
+			if (line[col] == 'S' || line[col] == 'W' || line[col] == 'B' || line[col] == 'd') {
+				
+			} else {
+				line[col] = '.';
 			}
 			map.at<uchar>(cv::Point(col, row)) = line[col];
 		}

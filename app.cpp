@@ -112,7 +112,10 @@ void App::init_glfw(void) {
 
     glEnable( GL_LINE_SMOOTH );
     glEnable( GL_POLYGON_SMOOTH );
-	glEnable( GL_CULL_FACE );
+
+	// enable back face culling
+	glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
 }
 
 cv::Mat createCheckerboardTexture() {
@@ -516,12 +519,6 @@ int App::run(void) {
 		// Clear color saved to OpenGL state machine: no need to set repeatedly in game loop
 		glClearColor(0, 0, 0, 0);
 
-
-		/*
-		// enable back face culling
-		glCullFace(GL_BACK);
-		glEnable(GL_CULL_FACE);
-		*/
 		// get first position of mouse cursor
 		glfwGetCursorPos(window, &cursorLastX, &cursorLastY);
 		

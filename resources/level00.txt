@@ -1,8 +1,21 @@
-7 8
-########
-#.#..e.#
-#......#
-#......#
-####.###
-#.X....#
-########
+20 21
+SSSSSSSSSSSSSSSSSSSSS
+S...................S
+S..SWWWWWWWSSS......S
+S..S.......S..e.....S
+S..S..o....d........S
+S..S.......S........S
+S..SSSdSSSSSS...SSS.S
+S..S.......S....SXS.S
+S..S.......S....SSS.S
+S..S.......d........S
+S..S.e.....S....g...S
+S..S.......S........S
+S..SSS...SSSSSSS....S
+S....S.........B....S
+S....d.......h.B....S
+S.p..S...k.....d....S
+S....S.......B.B....S
+S....BBBBdBBBSSS....S
+S....B......B.......S
+SBBBBBBBBBBBBBSSSSSSS

@@ -73,8 +73,40 @@ make run
 ```
 
 ## Zdroje:
-Textury:
+Textury a snipety kódu jsou převzaty z následujících zdrojů:
 - [Fable Wolfenstein](https://github.com/JamesRandall/fsharp-wolfenstein)
+- [Wolfenstein 3D Re-implementation in C++](https://github.com/mhamzaqayyum/wolf3d-reimpl-cpp)
+- [Wolfenstein 3D C++](https://github.com/LeviMooreDev/Wolfenstein-3D-CPlusPlus)
+
+
+## Tvorba mapy:
+Legenda pro tvorbu mapy:
+```txt
+' ' = empty
+. = empty
+
+// walls:
+S = stone
+W = wood
+B = blue
+X = end lever
+
+// enemies:
+p = player start
+e = normal enemy
+k = killed enemy
+B = boss enemy
+
+// items:
+o = object/obsctacle
+g = gold
+h = health
+m = munition
+
+d = door
+```
+
+
 
 ## TODO:
 - [ ] Shader program hpp - přidat inline k metodám setUniform
