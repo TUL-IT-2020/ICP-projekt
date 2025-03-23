@@ -303,7 +303,7 @@ void App::init_assets(void) {
 	/*
 	// load position for objects -> models
 	// place models to the scene
-	std::ifstream map_file("resources/map.json");
+	std::ifstream map_file("resources/scene.json");
 	if (!map_file.is_open()) {
 		throw std::runtime_error("Could not open JSON file.");
 	}
@@ -340,8 +340,53 @@ void App::init_assets(void) {
 	*/
 
 	// load level
-	Map map = Map(10, 25);
-	map.genenerateLabyrinth();
+	Map map;
+	//map = Map(10, 25);
+	map = Map("resources/level00.txt");
+	map.printMap();
+
+	/*
+	*/
+	// load map objects to models in scene
+	std::ifstream map_2_models("resources/map_2_models.json");
+	if (!map_2_models.is_open()) {
+		throw std::runtime_error("Could not open JSON file.");
+	}
+
+	map_2_models >> json;
+	// prekladovy slovnik
+	std::unordered_map<std::string, Model> map_2_model_dict;
+
+	for (const auto& model_data : json["map_2_models"]) {
+		try {
+			std::string name = model_data["model_name"];
+			std::string token = model_data["token"];
+			
+			// copy model from cache
+			Model model = model_cache[name];
+
+			if (model_data.find("texture_path") != model_data.end()) {
+				model.texture_id = textureInit(model_data["texture_path"]);
+			}
+
+			map_2_model_dict[token] = model;
+		} catch (std::exception const& e) {
+			std::cerr << "ERROR loading textured model: " << model_data["model_name"] << ", " << e.what() << std::endl;
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	// place models to the scene
+	for (int j = 0; j < map.getRows(); j++) {
+		for (int i = 0; i < map.getCols(); i++) {
+			std::string token = std::string(1, map.fetchMapValue(i, j));
+			if (map_2_model_dict.find(token) != map_2_model_dict.end()) {
+				Model model = map_2_model_dict[token];
+				model.origin = glm::vec3(i, 0, j);
+				models.push_back(model);
+			}
+		}
+	}
 
 	//set player position in 3D space (transform X-Y in map to XYZ in GL)
 	camera.Position.x = (map.start_position.x) + 1.0 / 2.0f;
@@ -478,7 +523,7 @@ int App::run(void) {
 		update_projection_matrix();
 		glViewport(0, 0, width, height);
 
-		camera.Position = glm::vec3(0, 0, 10);
+		//camera.Position = glm::vec3(0, 0, 10);
 		double last_frame_time = glfwGetTime();
 		
 		ShaderProgram& shader = models[0].meshes[0].shader;
@@ -501,11 +546,10 @@ int App::run(void) {
 
 				ImGui::Begin("Info", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 				// X, Y, Z,
-				ImGui::Text("Camera position: (%.2f, %.2f, %.2f)", camera.Position.x, camera.Position.y, camera.Position.z);
+				ImGui::Text("Camera position: (%.2f, %.2f, %.2f)", camera.Position.x, camera.Position.z, camera.Position.y);
 				ImGui::Text("Camera direction: (%.2f, %.2f, %.2f)", camera.Yaw, camera.Pitch, camera.Roll);
 				ImGui::Text("V-Sync: %s", is_vsync_on ? "ON" : "OFF");
 				ImGui::Text("FPS: %.1f", FPS);
-				ImGui::Text("Triangle color: (%.2f, %.2f, %.2f)", triangle_color.r, triangle_color.g, triangle_color.b);
 				ImGui::Text("(press UP/DOWN to change color)");
 				ImGui::Text("(press RMB to release mouse)");
 				ImGui::Text("(hit C to show/hide info)");
@@ -538,7 +582,7 @@ int App::run(void) {
         	glm::vec3 movement = camera.ProcessInput(window, delta_t); // process keys etc.
 			// update camera position
 			if (camera.ValidMovement(movement)) {
-				std::cout << "movement: " << movement.x << ", " << movement.y << ", " << movement.z << std::endl;
+				//std::cout << "movement: " << movement.x << ", " << movement.y << ", " << movement.z << std::endl;
 				camera.UpdateCameraPosition(movement);
 			}
 
@@ -549,11 +593,10 @@ int App::run(void) {
 			for (auto & model : models) {
 				//shader = model.meshes[0].shader;
 				if (model.name == "triangle") {
-					// update triangle color
 					for (auto & mesh : model.meshes) {
 						mesh.shader.activate();
-						const glm::vec4 triangle_color_vec(triangle_color.r, triangle_color.g, triangle_color.b, 1.0f);
-						mesh.shader.setUniform("uniform_Color", triangle_color_vec);
+						const glm::vec4 red_color(1.0f, 0.0f, 0.0f, 1.0f);
+						mesh.shader.setUniform("uniform_Color", red_color);
 					}
 				} else if (model.name == "teapot") {
 					for (auto & mesh : model.meshes) {
@@ -562,7 +605,6 @@ int App::run(void) {
 						mesh.shader.setUniform("uniform_Color", yellow_color);
 					}
 				} else if (model.name == "cube") {
-					// blue color for other models
 					for (auto & mesh : model.meshes) {
 						mesh.shader.activate();
 						mesh.shader.setUniform("uV_m", camera.GetViewMatrix());	
@@ -637,19 +679,4 @@ App::~App() {
     destroy();
 
     std::cout << "Bye...\n";
-}
-
-/* Change the color of the triangle
- * clamps the color values to [0, 1], does not change the alpha value.
- * @param delta: the amount to change the color by
- */
-void App::update_triangle_color(float delta) {
-    triangle_color.r += delta;
-    triangle_color.g += delta;
-    triangle_color.b += delta;
-
-    // clamp the color values to [0, 1]
-    triangle_color.r = glm::clamp(triangle_color.r, 0.0f, 1.0f);
-    triangle_color.g = glm::clamp(triangle_color.g, 0.0f, 1.0f);
-    triangle_color.b = glm::clamp(triangle_color.b, 0.0f, 1.0f);
 }

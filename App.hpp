@@ -29,9 +29,6 @@ public:
     void init_imgui();
     int run(void);
     void destroy(void);
-
-    color triangle_color{ 1.0f, 0.0f, 0.0f, 1.0f };
-    void update_triangle_color(float delta);
     
     static GLuint gen_tex(cv::Mat& image, TextureFilter filter);
 

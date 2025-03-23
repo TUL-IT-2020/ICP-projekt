@@ -14,7 +14,7 @@ public:
     glm::vec3 Right;
     glm::vec3 Up; // camera local UP vector
 
-    GLfloat camera_height = 1.0f;
+    GLfloat camera_height = 0.0f;
 
     GLfloat Yaw;
     GLfloat Pitch;
@@ -70,6 +70,13 @@ public:
         
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
             direction -= Up;
+        
+        if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+            this->Yaw -= MouseSensitivity * deltaTime * 125;
+            this->updateCameraVectors();
+        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+            this->Yaw += MouseSensitivity * deltaTime * 125;
+            this->updateCameraVectors();
 
         return glm::normalize(direction) * MovementSpeed * deltaTime;
     }

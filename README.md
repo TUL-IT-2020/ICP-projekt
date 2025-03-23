@@ -72,6 +72,10 @@ Pro spuštění programu je potřeba zdrojoý kód zkompilovat a spustit.
 make run
 ```
 
+## Zdroje:
+Textury:
+- [Fable Wolfenstein](https://github.com/JamesRandall/fsharp-wolfenstein)
+
 ## TODO:
 - [ ] Shader program hpp - přidat inline k metodám setUniform
 

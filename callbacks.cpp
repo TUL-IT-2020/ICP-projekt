@@ -24,10 +24,8 @@ void App::glfw_key_callback(GLFWwindow* window, int key, int scancode, int actio
                 this_inst->show_imgui = !this_inst->show_imgui;
                 break;
             case GLFW_KEY_UP:
-                this_inst->update_triangle_color(0.1f);
                 break;
             case GLFW_KEY_DOWN:
-                this_inst->update_triangle_color(-0.1f);
                 break;
             default:
                 break;

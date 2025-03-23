@@ -5,14 +5,13 @@
 #include <random>
 #include <opencv2/opencv.hpp>
 
-// maze map
-// characters in maze: 
-// '#' wall
-// '.' empty
-// 'e' end position (target, goal, gateway, etc.)
-// 'X' start position
-//
-
+/* maze map
+characters in maze: 
+'#' wall
+'.' empty
+'e' end position (target, goal, gateway, etc.)
+'X' start position
+*/
 
 /* Class Map
 * print map
@@ -20,36 +19,100 @@
 * generate labyrinth
 */
 class Map {
+private:
+	cv::Mat map = cv::Mat(10, 25, CV_8U); // unsigned char
 public:
-    cv::Mat map = cv::Mat(10, 25, CV_8U); // unsigned char
 	cv::Point2i start_position, end_position;
 
     // default constructor
     Map() {}
     // constructor with map size
     Map(int rows, int cols) {
-        map = cv::Mat(rows, cols, CV_8U);
+		genenerateLabyrinth(rows, cols);
     }
+	// from text file
+	Map(const std::string& file_name);
     
     // print map
     void printMap();
     // get map
     uchar fetchMapValue(int x, int y);
     // generate labyrinth
-    void genenerateLabyrinth();
+    void genenerateLabyrinth(int rows, int cols);
+
+	int getCols() { return map.cols; }
+	int getRows() { return map.rows; }
 };
+
+
+
+Map::Map(const std::string& file_name) {
+	std::ifstream file(file_name);
+	if (!file.is_open()) {
+		throw std::runtime_error("Could not open file: " + file_name);
+	}
+
+	// Read first line to get map size: rows, cols
+	std::string first_line;
+	std::getline(file, first_line);
+	std::istringstream iss(first_line);
+	int rows, cols;	
+	iss >> rows >> cols;
+	map = cv::Mat(rows, cols, CV_8U);
+
+	std::cout << "Map size: " << rows << "x" << cols << std::endl;
+	
+	std::string line;
+	int row = 0;
+	while (std::getline(file, line)) {
+		// trim line
+		line.erase(std::remove(line.begin(), line.end(), '\n'), line.end());
+		line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
+		// skip empty lines
+		if (line.empty()) {
+			continue;
+		}
+		// check map size
+		if (row >= map.rows) {
+			throw std::runtime_error("Too many rows in file: " + file_name);
+		}
+		if (line.size() != map.cols) {
+			throw std::runtime_error("Row " + std::to_string(row) + " has wrong number of columns in file: " + file_name);
+		}
+		// fill map
+		for (int col = 0; col < map.cols; col++) {
+			if (line[col] == 'X') {
+				start_position = cv::Point(col, row);
+				line[col] = '.';
+			}
+			else if (line[col] == 'e') {
+				end_position = cv::Point(col, row);
+			}
+			map.at<uchar>(cv::Point(col, row)) = line[col];
+		}
+		row++;
+	}
+	if (row != map.rows) {
+		throw std::runtime_error("Too few rows in file: " + file_name);
+	}
+}
 
 // Print map
 void Map::printMap() {
     for (int j = 0; j < map.rows; j++) {
 		for (int i = 0; i < map.cols; i++) {
-			if ((i == start_position.x) && (j == start_position.y))
+			if ((i == start_position.x) && (j == start_position.y)) {
 				std::cout << 'X';
-			else
+			}
+			else {
 				std::cout << fetchMapValue(i, j);
+			}
 		}
 		std::cout << std::endl;
 	}
+	
+	std::cout << "Start: " << start_position << std::endl;
+	std::cout << "End: " << end_position << std::endl;
 }
 
 // Secure access to map
@@ -63,7 +126,8 @@ uchar Map::fetchMapValue(int x, int y)
 }
 
 // Random map gen
-void Map::genenerateLabyrinth() {
+void Map::genenerateLabyrinth(int rows, int cols) {
+	map = cv::Mat(rows, cols, CV_8U);
 
 	// C++ random numbers
 	std::random_device r; // Seed with a real random value, if available
@@ -109,12 +173,6 @@ void Map::genenerateLabyrinth() {
 		end_position.y = uniform_height(e1);
 	} while (start_position == end_position); //check overlap
 	map.at<uchar>(cv::Point(end_position.x, end_position.y)) = 'e';
-
-	std::cout << "Start: " << start_position << std::endl;
-	std::cout << "End: " << end_position << std::endl;
-
-	//print map
-	printMap();
 }
 
 #endif // MAZE_GEN_CPP
