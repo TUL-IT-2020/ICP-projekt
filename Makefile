@@ -15,7 +15,7 @@ GLEW_LIBS = -lGLEW
 
 # Set the LIBS variable to the sum of the OPENCV_LIBS and GLFW_LIBS variables
 LIBS = $(OPENCV_LIBS) $(GLFW_LIBS) $(GLEW_LIBS)
-TARGET = $(FILE_NAME).exe
+TARGET = $(FILE_NAME).out
 SRC = $(FILE_NAME).cpp $(IMGUI_FILES) $(PROJECT_FILES)
 OBJ = $(SRC:.cpp=.o)
 
