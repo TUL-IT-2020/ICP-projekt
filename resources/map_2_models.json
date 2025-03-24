@@ -59,11 +59,13 @@
         },
         {
             "token": "a",
+            "solid": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/barrel_1.png"
         },
         {
             "token": "b",
+            "solid": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/bead.png"
         },
@@ -84,6 +86,7 @@
         },
         {
             "token": "f",
+            "solid": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/flag.png"
         },
@@ -114,6 +117,7 @@
         },
         {
             "token": "o",
+            "solid": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/barrel_2.png"
         },
@@ -139,11 +143,13 @@
         },
         {
             "token": "t",
+            "solid": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/table_1.png"
         },
         {
             "token": "u",
+            "solid": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/table_2.png"
         },
