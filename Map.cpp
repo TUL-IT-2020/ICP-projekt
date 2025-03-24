@@ -9,13 +9,12 @@ characters in maze:
 S = stone
 W = wood
 B = blue
-X = end lever
+X = end level
 
 // enemies:
 p = player start
 e = normal enemy
 k = killed enemy
-B = boss enemy
 
 // items:
 o = object/obsctacle
@@ -81,6 +80,20 @@ Map::Map(const std::string& file_name) {
 	if (row != map.rows) {
 		throw std::runtime_error("Too few rows in file: " + file_name);
 	}
+}
+
+bool Map::outOfBounds(int x, int y) {
+	if (x < 0 || x >= map.cols || y < 0 || y >= map.rows) {
+		return true;
+	}
+	return false;
+}
+
+bool Map::containsSolid(int x, int y) {
+	if (std::find(solid_objects.begin(), solid_objects.end(), fetchMapValue(x, y)) != solid_objects.end()) {
+		return true;
+	}
+	return false;
 }
 
 // Print map

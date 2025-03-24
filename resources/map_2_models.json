@@ -1,33 +1,45 @@
 {
     "map_2_models": [
         {
+            "token": "floor",
+            "solid": true,
+            "model_name": "cube",
+            "texture_path": "resources/textures/floor.png"
+        },
+        {
             "token": "d",
+            "solid": true,
             "model_name": "cube",
             "texture_path": "resources/textures/door.png"
         },
         {
             "token": "S",
+            "solid": true,
             "model_name": "cube",
             "texture_path": "resources/textures/stone_wall_1.png"
         },
         {
             "token": "W",
+            "solid": true,
             "model_name": "cube",
             "texture_path": "resources/textures/wood_wall_1.png"
         },
         {
             "token": "B",
+            "solid": true,
             "model_name": "cube",
             "texture_path": "resources/textures/blue_wall_1.png"
         },
         {
             "token": "X",
             "model_name": "cube",
+            "solid": true,
             "texture_path": "resources/textures/end_game.png"
         },
         {
             "token": "o",
             "model_name": "sprite",
+            "solid": true,
             "texture_path": "resources/sprites/pillar.png"
         },
         {

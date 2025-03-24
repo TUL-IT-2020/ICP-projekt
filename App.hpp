@@ -38,6 +38,7 @@ public:
 private:
     // Map
     Map map;
+    bool CheckHitboxes(glm::vec3 movement);
 
     // camera related 
     Camera camera;

@@ -27,6 +27,8 @@ void App::glfw_key_callback(GLFWwindow* window, int key, int scancode, int actio
                 break;
             case GLFW_KEY_DOWN:
                 break;
+			case GLFW_KEY_F:
+				this_inst->camera.freeCam = !this_inst->camera.freeCam;
             default:
                 break;
         }

@@ -95,7 +95,6 @@ X = end lever
 p = player start
 e = normal enemy
 k = killed enemy
-B = boss enemy
 
 // items:
 o = object/obsctacle

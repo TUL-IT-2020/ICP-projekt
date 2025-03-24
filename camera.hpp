@@ -15,6 +15,7 @@ public:
     glm::vec3 Up; // camera local UP vector
 
     GLfloat camera_height = 0.0f;
+    bool freeCam = false;
 
     GLfloat Yaw;
     GLfloat Pitch;
@@ -64,12 +65,19 @@ public:
 
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
             direction += Right;
-        
-        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-            direction += Up;
-        
-        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+
+        if (freeCam) {
+            if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+                direction += Up;
+            }
+
+            if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+                direction -= Up;
+            }
+        } else if (Position.y > 0) {
+            // gravity
             direction -= Up;
+        }
         
         if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
             this->Yaw -= MouseSensitivity * deltaTime * 125;
@@ -90,6 +98,8 @@ public:
     void UpdateCameraPosition(glm::vec3 movement) {
         if (ValidMovement(movement)) {
             this->Position += movement;
+            // crop to 0
+            Position.y = std::max(Position.y, 0.0f);
         }
     }
 

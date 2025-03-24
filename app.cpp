@@ -378,12 +378,24 @@ void App::init_assets(void) {
 				model.texture_id = textureInit(model_data["texture_path"]);
 			}
 
+			if (model_data.find("scale") != model_data.end()) {
+				model.scale = json_to_vec3(model_data["scale"]);
+			}
+
+			// if solid -> add to solid objects in map
+			if (model_data.find("solid") != model_data.end()) {
+				map.solid_objects.push_back(token[0]);
+			}
+
 			map_2_model_dict[token] = model;
 		} catch (std::exception const& e) {
 			std::cerr << "ERROR loading textured model: " << model_data["model_name"] << ", " << e.what() << std::endl;
 			exit(EXIT_FAILURE);
 		}
 	}
+	
+	// size offset
+	glm::vec3 offset = glm::vec3(1.0, 0.0, 1.0);
 
 	// place models to the scene
 	for (int j = 0; j < map.getRows(); j++) {
@@ -391,11 +403,18 @@ void App::init_assets(void) {
 			std::string token = std::string(1, map.fetchMapValue(i, j));
 			if (map_2_model_dict.find(token) != map_2_model_dict.end()) {
 				Model model = map_2_model_dict[token];
-				model.origin = glm::vec3(i, 0, j);
+				model.origin = glm::vec3(i, 0, j) + offset;
 				models.push_back(model);
 			}
 		}
 	}
+	// add floor
+	Model floor = map_2_model_dict["floor"];
+	// change scale
+	floor.scale = glm::vec3(map.getCols(), 1.0, map.getRows());
+	// change origin
+	floor.origin = glm::vec3(0.5, -1.0, 0.5);
+	models.push_back(floor);
 
 	//set player position in 3D space (transform X-Y in map to XYZ in GL)
 	camera.Position.x = (map.start_position.x) + 1.0 / 2.0f;
@@ -487,6 +506,34 @@ void App::print_gl_info() {
 void App::init_opencv()
 {
 	// ...
+}
+
+
+/* Will copmare camera position with map and return true if there is no collision
+*/
+bool App::CheckHitboxes(glm::vec3 movement) {
+	// Prodloužení směru kroku
+    if (glm::length(movement) > 0.0f) {
+        movement = glm::normalize(movement) * (glm::length(movement) + 0.2f);
+    }
+	// camera adjustment
+	glm::vec3 camera_position = camera.Position;
+	// get camera position in map
+	int camera_x = (int)camera_position.x;
+	int camera_y = (int)camera_position.z;
+	// new position
+	camera_x += movement.x;
+	camera_y += movement.z;
+	
+	// check if camera is out of map
+	if (map.outOfBounds(camera_x, camera_y)) {
+		return false;
+	}
+	// check if camera is on wall
+	if (map.containsSolid(camera_x, camera_y)) {
+		return false;
+	}
+	return true;
 }
 
 int App::run(void) {
@@ -584,7 +631,7 @@ int App::run(void) {
 			last_frame_time = glfwGetTime();
         	glm::vec3 movement = camera.ProcessInput(window, delta_t); // process keys etc.
 			// update camera position
-			if (camera.ValidMovement(movement)) {
+			if (CheckHitboxes(movement) || camera.freeCam) {
 				//std::cout << "movement: " << movement.x << ", " << movement.y << ", " << movement.z << std::endl;
 				camera.UpdateCameraPosition(movement);
 			}
