@@ -29,9 +29,9 @@
 #include <backends/imgui_impl_opengl3.h>
 
 #include "App.hpp"
-#include "Map.cpp"
 #include "assets.hpp"
 #include "ShaderProgram.hpp"
+#include "Map.hpp"
 
 App::App() {
 	// default constructor
@@ -350,7 +350,6 @@ void App::init_assets(void) {
 	*/
 
 	// load level
-	Map map;
 	//map = Map(10, 25);
 	map = Map("resources/level00.txt");
 	map.printMap();

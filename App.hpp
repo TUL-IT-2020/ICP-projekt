@@ -1,4 +1,5 @@
-#pragma once
+#ifndef APP_HPP
+#define APP_HPP
 
 #include <GL/glew.h>
 #ifdef _WIN32
@@ -12,6 +13,7 @@
 #include "assets.hpp"
 #include "Model.hpp"
 #include "camera.hpp"
+#include "Map.hpp"
 
 enum class TextureFilter {
     Nearest,       // Nearest neighbor - rychlé, ale nekvalitní
@@ -34,6 +36,9 @@ public:
 
     ~App(); //default destructor, called on app instance destruction
 private:
+    // Map
+    Map map;
+
     // camera related 
     Camera camera;
     // remember last cursor position, move relative to that in the next frame
@@ -86,3 +91,5 @@ protected:
 	// all objects of the scene
     std::unordered_map<std::string, Model> scene; 
 };
+
+#endif // APP_HPP

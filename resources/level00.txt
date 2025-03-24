@@ -1,21 +1,21 @@
 20 21
-SSSSWWWWWWWWSSSSSSSSS
-S......W............S
-S..SWdWWWdWSSS......S
-S..S.......S..e.....S
-S..S..o....d........S
-S..S.......S........S
+   WWWWWWWWW SSSSSSSS
+   W...W...W S......S
+   SWdWWWdWSSS...o..S
+   S.......S..e.....S
+   S.gg....d........S
+   S.......S........S
 SSSSSSdSSSSSS...SSSSS
-S..S.......S....SXS.S
-S..S.......S....SdS.S
-S..S.......d........S
-S..d.e.....S....g...S
-S..S.......S........S
+S..S.......W....SXS.S
+Sh.S.h.....W....SdS.S
+S..d.......d........S
+SSSS.e.....W....g...S
+   S.......W........S
 SSSSSS...SSSSSSSSSSSS
-S....S.........B....S
-S....d.......h.B....S
-S.p..S...k.....d....S
-S....S.......B.B....S
-S....BBBBdBBBBBB....S
-S....B......B.......S
-SBBBBBBBBBBBBBSSSSSSS
+S....S.........S....S
+S.o..d.......h.S.hh.S
+S.p..S...k.o...d....S
+S....S.........SSSSSS
+S.o..SBBBdBBBBBB    .
+SSSSSSB.mm..B       .
+      BBBBBBB       .

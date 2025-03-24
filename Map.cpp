@@ -1,11 +1,6 @@
-#ifndef MAZE_GEN_CPP
-#define MAZE_GEN_CPP
+#include "Map.hpp"
 
-#include "App.hpp" // Fixed include directive
-#include <random>
-#include <opencv2/opencv.hpp>
-
-/* maze map
+/* map
 characters in maze: 
 ' ' = empty
 . = empty
@@ -30,39 +25,6 @@ m = munition
 
 d = door
 */
-
-/* Class Map
-* print map
-* get map
-* generate labyrinth
-*/
-class Map {
-private:
-	cv::Mat map = cv::Mat(10, 25, CV_8U); // unsigned char
-public:
-	cv::Point2i start_position, end_position;
-
-    // default constructor
-    Map() {}
-    // constructor with map size
-    Map(int rows, int cols) {
-		genenerateLabyrinth(rows, cols);
-    }
-	// from text file
-	Map(const std::string& file_name);
-    
-    // print map
-    void printMap();
-    // get map
-    uchar fetchMapValue(int x, int y);
-    // generate labyrinth
-    void genenerateLabyrinth(int rows, int cols);
-
-	int getCols() { return map.cols; }
-	int getRows() { return map.rows; }
-};
-
-
 
 Map::Map(const std::string& file_name) {
 	std::ifstream file(file_name);
@@ -198,5 +160,3 @@ void Map::genenerateLabyrinth(int rows, int cols) {
 	} while (start_position == end_position); //check overlap
 	map.at<uchar>(cv::Point(end_position.x, end_position.y)) = 'e';
 }
-
-#endif // MAZE_GEN_CPP

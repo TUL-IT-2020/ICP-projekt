@@ -24,6 +24,26 @@
             "token": "X",
             "model_name": "cube",
             "texture_path": "resources/textures/end_game.png"
+        },
+        {
+            "token": "o",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/pillar.png"
+        },
+        {
+            "token": "g",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/gold_1.png"
+        },
+        {
+            "token": "h",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/health_1.png"
+        },
+        {
+            "token": "m",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/munition.png"
         }
     ]
 }

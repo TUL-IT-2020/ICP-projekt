@@ -30,8 +30,8 @@ public:
         this->Yaw = -90.0f;
         this->Pitch = 0.0f;
         this->Roll = 0.0f;
-        this->MovementSpeed = 1.0f;
-        this->MouseSensitivity = 0.25f;
+        this->MovementSpeed = 1.0f*1.5f;
+        this->MouseSensitivity = 0.25f*1.25f;
         this->updateCameraVectors();
     }
 

@@ -10,14 +10,21 @@
         {
             "name": "triangle",
             "obj_path": "resources/obj/triangle.obj",
-            "vertex_shader_path": "resources/shaders/basic_core.vert",
-            "fragment_shader_path": "resources/shaders/defoult.frag"
+            "vertex_shader_path": "resources/shaders/tex.vert",
+            "fragment_shader_path": "resources/shaders/tex.frag"
         },
         {
             "name": "teapot",
             "obj_path": "resources/obj/teapot_tri_vnt.obj",
-            "vertex_shader_path": "resources/shaders/basic_core.vert",
-            "fragment_shader_path": "resources/shaders/defoult.frag"
+            "vertex_shader_path": "resources/shaders/tex.vert",
+            "fragment_shader_path": "resources/shaders/tex.frag"
+        },
+        {
+            "name": "sprite",
+            "obj_path": "resources/obj/sprite_vnt.obj",
+            "texture_path": "resources/textures/TextureDouble_A.png",
+            "vertex_shader_path": "resources/shaders/tex.vert",
+            "fragment_shader_path": "resources/shaders/tex.frag"
         }
     ]
 }
