@@ -94,6 +94,7 @@
         {
             "token": "f",
             "solid": true,
+            "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/flag.png"
         },
@@ -197,6 +198,12 @@
             "texture_path": "resources/sprites/chandelier_2.png"
         },
         {
+            "token": "C",
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/corpses_4.png"
+        },
+        {
             "token": "E",
             "solid": true,
             "model_name": "cube",
@@ -224,6 +231,7 @@
         {
             "token": "L",
             "solid": true,
+            "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/stove.png"
         },
@@ -245,25 +253,25 @@
             "token": "T",
             "solid": true,
             "model_name": "cube",
-            "texture_path": "resources/textures/stone_2.png"
+            "texture_path": "resources/textures/stone_wall_2.png"
         },
         {
             "token": "U",
             "solid": true,
             "model_name": "cube",
-            "texture_path": "resources/textures/stone_3.png"
+            "texture_path": "resources/textures/stone_wall_3.png"
         },
         {
             "token": "V",
             "solid": true,
             "model_name": "cube",
-            "texture_path": "resources/textures/wood_2.png"
+            "texture_path": "resources/textures/wood_wall_2.png"
         },
         {
             "token": "Y",
             "solid": true,
             "model_name": "cube",
-            "texture_path": "resources/textures/wood_3.png"
+            "texture_path": "resources/textures/wood_wall_3.png"
         }
     ]
 }
