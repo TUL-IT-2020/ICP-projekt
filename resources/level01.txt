@@ -1,0 +1,21 @@
+20 21
+   WWWWWWWWW SSSSSSSS
+   W...W...W S......S
+   SWDWWWDWSSS...o..S
+   S.......S..e.....S
+   S.gg....D........S
+   S.......S........S
+SSSSSSDSSSSSS...SSSSS
+S..S.......W....SXS.S
+Sh.S.h.....W....SDS.S
+S..D.......D........S
+SSSS.e.....W....g...S
+   S.......W........S
+SSSSSS...SSSSSSSSSSSS
+S.m..S.........S....S
+S....D.......h.S.hh.S
+S.p..S..ok.o...D....S
+S.o..S.........SSSSSS
+S....SBBBDBBBBBB    .
+SSSSSSB.mm..B       .
+      BBBBBBB       .

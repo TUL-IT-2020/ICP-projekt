@@ -7,7 +7,7 @@
             "texture_path": "resources/textures/floor.png"
         },
         {
-            "token": "d",
+            "token": "D",
             "solid": true,
             "model_name": "cube",
             "texture_path": "resources/textures/door.png"

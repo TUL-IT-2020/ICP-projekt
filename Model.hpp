@@ -27,6 +27,7 @@ public:
     glm::mat4 local_model_matrix{}; //for complex transformations 
 
     GLuint texture_id{0}; // texture id=0  means no texture
+    bool isSprite{false};
 
     // Default constructor
     Model() = default;

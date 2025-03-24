@@ -1,30 +1,5 @@
 #include "Map.hpp"
 
-/* map
-characters in maze: 
-' ' = empty
-. = empty
-
-// walls:
-S = stone
-W = wood
-B = blue
-X = end level
-
-// enemies:
-p = player start
-e = normal enemy
-k = killed enemy
-
-// items:
-o = object/obsctacle
-g = gold
-h = health
-m = munition
-
-d = door
-*/
-
 Map::Map(const std::string& file_name) {
 	std::ifstream file(file_name);
 	if (!file.is_open()) {
@@ -53,7 +28,7 @@ Map::Map(const std::string& file_name) {
 		}
 		// check map size
 		if (row >= map.rows) {
-			throw std::runtime_error("Too many rows in file: " + file_name);
+			throw std::runtime_error("Too many rows in file: " + file_name + ", row number: " + std::to_string(row));
 		}
 		if (line.size() != map.cols) {
 			throw std::runtime_error("Row " + std::to_string(row) + " has wrong number of columns in file: " + file_name);
@@ -67,18 +42,12 @@ Map::Map(const std::string& file_name) {
 			else if (line[col] == 'X') {
 				end_position = cv::Point(col, row);
 			}
-			// S, W, B, d - pridej do mapy
-			if (line[col] == 'S' || line[col] == 'W' || line[col] == 'B' || line[col] == 'd') {
-				
-			} else {
-				line[col] = '.';
-			}
 			map.at<uchar>(cv::Point(col, row)) = line[col];
 		}
 		row++;
 	}
 	if (row != map.rows) {
-		throw std::runtime_error("Too few rows in file: " + file_name);
+		throw std::runtime_error("Too few rows in file: " + file_name + ", row number: " + std::to_string(row));
 	}
 }
 
@@ -101,7 +70,7 @@ void Map::printMap() {
     for (int j = 0; j < map.rows; j++) {
 		for (int i = 0; i < map.cols; i++) {
 			if ((i == start_position.x) && (j == start_position.y)) {
-				std::cout << 'X';
+				std::cout << 'p';
 			}
 			else {
 				std::cout << fetchMapValue(i, j);
@@ -136,15 +105,17 @@ void Map::genenerateLabyrinth(int rows, int cols) {
 	std::uniform_int_distribution<int> uniform_block(0, 15); // how often are walls generated: 0=wall, anything else=empty
 
 	//inner maze 
+	char wall = 'S';
+	char empty = '.';
 	for (int j = 0; j < map.rows; j++) {
 		for (int i = 0; i < map.cols; i++) {
 			switch (uniform_block(e1))
 			{
 			case 0:
-				map.at<uchar>(cv::Point(i, j)) = '#';
+				map.at<uchar>(cv::Point(i, j)) = wall;
 				break;
 			default:
-				map.at<uchar>(cv::Point(i, j)) = '.';
+				map.at<uchar>(cv::Point(i, j)) = empty;
 				break;
 			}
 		}
@@ -152,24 +123,24 @@ void Map::genenerateLabyrinth(int rows, int cols) {
 
 	//walls
 	for (int i = 0; i < map.cols; i++) {
-		map.at<uchar>(cv::Point(i, 0)) = '#';
-		map.at<uchar>(cv::Point(i, map.rows - 1)) = '#';
+		map.at<uchar>(cv::Point(i, 0)) = wall;
+		map.at<uchar>(cv::Point(i, map.rows - 1)) = wall;
 	}
 	for (int j = 0; j < map.rows; j++) {
-		map.at<uchar>(cv::Point(0, j)) = '#';
-		map.at<uchar>(cv::Point(map.cols - 1, j)) = '#';
+		map.at<uchar>(cv::Point(0, j)) = wall;
+		map.at<uchar>(cv::Point(map.cols - 1, j)) = wall;
 	}
 
 	//gen start_position inside maze (excluding walls)
 	do {
 		start_position.x = uniform_width(e1);
 		start_position.y = uniform_height(e1);
-	} while (fetchMapValue(start_position.x, start_position.y) == '#'); //check wall
+	} while (fetchMapValue(start_position.x, start_position.y) == wall); //check wall
 
 	//gen end different from start, inside maze (excluding outer walls) 
 	do {
 		end_position.x = uniform_width(e1);
 		end_position.y = uniform_height(e1);
 	} while (start_position == end_position); //check overlap
-	map.at<uchar>(cv::Point(end_position.x, end_position.y)) = 'e';
+	map.at<uchar>(cv::Point(end_position.x, end_position.y)) = 'X';
 }

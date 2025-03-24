@@ -140,6 +140,8 @@ GLuint textureInit(const std::filesystem::path& file_name)
 		std::cerr << "No texture in file: " << file_name.string() << std::endl;
 	}
 
+	cv::flip(image, image, 0);
+
 	GLuint texture = App::gen_tex(image, TextureFilter::TrilinearMipmap);
 	
 	return texture;
@@ -159,8 +161,8 @@ GLuint App::gen_tex(cv::Mat& image, TextureFilter filter = TextureFilter::Trilin
 	GLenum err;
 	while ((err = glGetError()) != GL_NO_ERROR) {
 		std::cerr << "OpenGL Error: " << err << std::endl;
+		std::cout << "Image channels: " << image.channels() << std::endl;
 	}
-	std::cout << "Image channels: " << image.channels() << std::endl;
 
 	switch (image.channels()) {
 	case 3:
@@ -387,6 +389,10 @@ void App::init_assets(void) {
 				map.solid_objects.push_back(token[0]);
 			}
 
+			if (name == "sprite") {
+				model.isSprite = true;
+			}
+
 			map_2_model_dict[token] = model;
 		} catch (std::exception const& e) {
 			std::cerr << "ERROR loading textured model: " << model_data["model_name"] << ", " << e.what() << std::endl;
@@ -536,6 +542,20 @@ bool App::CheckHitboxes(glm::vec3 movement) {
 	return true;
 }
 
+glm::mat4 computeBillboardMatrix(const glm::mat4& view_matrix, const glm::vec3& sprite_position) {
+    glm::mat4 billboard_matrix = glm::mat4(1.0f);
+
+    // Extrahujte rotační část z pohledové matice
+    billboard_matrix[0] = glm::vec4(glm::normalize(glm::vec3(view_matrix[0])), 0.0f);
+    billboard_matrix[1] = glm::vec4(glm::normalize(glm::vec3(view_matrix[1])), 0.0f);
+    billboard_matrix[2] = glm::vec4(glm::normalize(glm::vec3(view_matrix[2])), 0.0f);
+
+    // Nastavte pozici spritu
+    billboard_matrix[3] = glm::vec4(sprite_position, 1.0f);
+
+    return billboard_matrix;
+}
+
 int App::run(void) {
 	/*
 	* Typical game loop:
@@ -641,28 +661,39 @@ int App::run(void) {
 
 			// draw all models
 			for (auto & model : models) {
-				//shader = model.meshes[0].shader;
-				if (model.name == "triangle") {
-					for (auto & mesh : model.meshes) {
-						mesh.shader.activate();
-						const glm::vec4 red_color(1.0f, 0.0f, 0.0f, 1.0f);
-						mesh.shader.setUniform("uniform_Color", red_color);
-					}
-				} else if (model.name == "teapot") {
-					for (auto & mesh : model.meshes) {
-						mesh.shader.activate();
-						const glm::vec4 yellow_color(1.0f, 1.0f, 0.0f, 1.0f);
-						mesh.shader.setUniform("uniform_Color", yellow_color);
-					}
-				} else if (model.name == "cube") {
+				/*
+				if (model.isSprite) {
+					// sprite
+					glm::mat4 view_matrix = camera.GetViewMatrix();
+					glm::mat4 projection_matrix = projection_matrix;
+
+					// Vypočítejte billboardovou matici
+					glm::mat4 billboard_matrix = computeBillboardMatrix(view_matrix, model.origin);
+
+					// Aktivujte shader a nastavte uniformy
+					shader.activate();
+					shader.setUniform("uV_m", view_matrix);
+					shader.setUniform("uP_m", projection_matrix);
+
+					// Vykreslete sprite
+					model.meshes[0].draw(billboard_matrix);
+				} else*/ if (model.name == "cube") {
 					for (auto & mesh : model.meshes) {
 						mesh.shader.activate();
 						mesh.shader.setUniform("uV_m", camera.GetViewMatrix());	
 						mesh.shader.setUniform("uP_m", projection_matrix);
 					}
+					model.draw();
+				} else {
+					// sprite
+					glm::vec3 sprite_position = model.origin;
+					glm::vec3 camera_position = camera.Position;
+					glm::vec3 direction = glm::normalize(camera_position - sprite_position);
+					float angle = atan2(direction.x, direction.z);
+					model.draw(offset, glm::vec3(0.0f, angle, 0.0f), scale_change);
 				}
+				
 				//model.update(delta_t);
-				model.draw();
 				/*
 				rotation.x += 0.5f * delta_t;
 				rotation.y += 0.5f * delta_t;

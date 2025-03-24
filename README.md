@@ -85,24 +85,60 @@ Legenda pro tvorbu mapy:
 ' ' = empty
 . = empty
 
-// walls:
-S = stone
-W = wood
-B = blue
-X = end lever
-
-// enemies:
-p = player start
-e = normal enemy
-k = killed enemy
-
-// items:
-o = object/obsctacle
+// malá abeceda
+a
+b = bead
+c
+d
+e = normal enemy (guard)
+f
 g = gold
 h = health
+i
+j
+k = killed enemy
+l
 m = munition
-
-d = door
+n
+o = object/obsctacle
+p = player start
+q
+r
+s
+t
+u
+v
+w
+x
+y
+z
+// velká abeceda
+A
+B = blue
+C
+D = door
+E = hidden door
+F
+G
+H = Hans
+I
+J
+K
+L
+M
+N
+O
+P
+Q
+R
+S = stone 1
+T = stone 2
+U = stone 3
+V = wood 2
+W = wood 1
+X = end level (exit/elevator)
+Y = wood 3
+Z
 ```
 
 
