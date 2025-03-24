@@ -116,6 +116,10 @@ void App::init_glfw(void) {
 	// enable back face culling
 	glCullFace(GL_BACK);
 	glEnable(GL_CULL_FACE);
+
+	// for transparency
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDepthFunc(GL_LEQUAL);
 }
 
 cv::Mat createCheckerboardTexture() {
@@ -389,6 +393,11 @@ void App::init_assets(void) {
 				map.solid_objects.push_back(token[0]);
 			}
 
+			// transparent
+			if (model_data.find("transparent") != model_data.end()) {
+				model.transparent = true;
+			}
+
 			if (name == "sprite") {
 				model.isSprite = true;
 			}
@@ -583,7 +592,10 @@ int App::run(void) {
 		double time_speed{};
 
 		// Clear color saved to OpenGL state machine: no need to set repeatedly in game loop
-		glClearColor(0, 0, 0, 0);
+		// gray background
+		glClearColor(0.2, 0.2, 0.2, 1.0);
+		// black background
+		//glClearColor(0, 0, 0, 0);
 
 		// get first position of mouse cursor
 		glfwGetCursorPos(window, &cursorLastX, &cursorLastY);
@@ -658,35 +670,72 @@ int App::run(void) {
 
 			shader.setUniform("uV_m", camera.GetViewMatrix());	
 			shader.setUniform("uP_m", projection_matrix);
-
 			// draw all models			
+			std::vector<Model*> transparent;    // temporary, vector of pointers to transparent objects
+            //transparent.reserve(scene.size());  // reserve size for all objects to avoid reallocation
+            transparent.reserve(models.size());  // reserve size for all objects to avoid reallocation
+
+            // FIRST PART - draw all non-transparent in any order
 			for (auto & model : models) {
 				rotation = glm::vec3(0.0f);	
-				if (model.name == "cube") {
-					for (auto & mesh : model.meshes) {
-						mesh.shader.activate();
-						mesh.shader.setUniform("uV_m", camera.GetViewMatrix());	
-						mesh.shader.setUniform("uP_m", projection_matrix);
+				if (! model.transparent) {
+					if (model.name == "cube") {
+						for (auto & mesh : model.meshes) {
+							mesh.shader.activate();
+							mesh.shader.setUniform("uV_m", camera.GetViewMatrix());	
+							mesh.shader.setUniform("uP_m", projection_matrix);
+						}
+					} else if (model.isSprite) {
+						// sprite
+						glm::vec3 sprite_position = model.origin;
+						glm::vec3 camera_position = camera.Position;
+						glm::vec3 direction = glm::normalize(camera_position - sprite_position);
+						float angle = atan2(direction.x, direction.z);
+						rotation = glm::vec3(0.0f, angle, 0.0f);
 					}
+					model.draw(offset, rotation, scale_change);
+					
+					//model.update(delta_t);
+					/*
+					rotation.x += 0.5f * delta_t;
+					rotation.y += 0.5f * delta_t;
+					rotation.z += 0.5f * delta_t;
+					*/
 				} else {
+					transparent.emplace_back(&model);
+				}
+
+			}
+
+			// SECOND PART - draw only transparent - painter's algorithm (sort by distance from camera, from far to near)
+            std::sort(transparent.begin(), transparent.end(), [&](Model const * a, Model const * b) {
+                glm::vec3 translation_a = glm::vec3(a->local_model_matrix[3]);  // get 3 values from last column of model matrix = translation
+                glm::vec3 translation_b = glm::vec3(b->local_model_matrix[3]);  // dtto for model B
+                return glm::distance(camera.Position, translation_a) < glm::distance(camera.Position, translation_b); // sort by distance from camera
+                });
+
+            // set GL for transparent objects
+            glEnable(GL_BLEND);
+            glDepthMask(GL_FALSE);
+            glDisable(GL_CULL_FACE);
+
+            // draw sorted transparent
+            for (auto model : transparent) {
+				if (model->isSprite) {
 					// sprite
-					glm::vec3 sprite_position = model.origin;
+					glm::vec3 sprite_position = model->origin;
 					glm::vec3 camera_position = camera.Position;
 					glm::vec3 direction = glm::normalize(camera_position - sprite_position);
 					float angle = atan2(direction.x, direction.z);
 					rotation = glm::vec3(0.0f, angle, 0.0f);
 				}
-				model.draw(offset, rotation, scale_change);
-				
-				//model.update(delta_t);
-				/*
-				rotation.x += 0.5f * delta_t;
-				rotation.y += 0.5f * delta_t;
-				rotation.z += 0.5f * delta_t;
-				*/
-
-				//model.draw(offset, rotation, scale_change);
-			}
+				model->draw(offset, rotation, scale_change);
+            }
+            
+            // restore GL properties
+            glDisable(GL_BLEND);
+            glDepthMask(GL_TRUE);
+            glEnable(GL_CULL_FACE);
 
 			// ImGui display
 			if (show_imgui) {

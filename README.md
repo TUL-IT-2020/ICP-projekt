@@ -145,6 +145,7 @@ Z
 
 ## TODO:
 - [ ] Shader program hpp - přidat inline k metodám setUniform
+- [ ] Opravit pořadí vykreslování průhledných modelů.
 
 ```cpp
 // remember:

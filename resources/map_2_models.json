@@ -40,37 +40,44 @@
             "token": "o",
             "model_name": "sprite",
             "solid": true,
+            "transparent": true,
             "texture_path": "resources/sprites/pillar.png"
         },
         {
             "token": "g",
             "model_name": "sprite",
+            "transparent": true,
             "texture_path": "resources/sprites/gold_1.png"
         },
         {
             "token": "h",
             "model_name": "sprite",
+            "transparent": true,
             "texture_path": "resources/sprites/health_1.png"
         },
         {
             "token": "m",
             "model_name": "sprite",
+            "transparent": true,
             "texture_path": "resources/sprites/munition.png"
         },
         {
             "token": "a",
             "solid": true,
+            "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/barrel_1.png"
         },
         {
             "token": "b",
             "solid": true,
+            "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/bead.png"
         },
         {
             "token": "c",
+            "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/corpse_1.png"
         },
@@ -92,21 +99,25 @@
         },
         {
             "token": "i",
+            "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/health_2.png"
         },
         {
             "token": "j",
+            "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/health_3.png"
         },
         {
             "token": "k",
+            "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/key.png"
         },
         {
             "token": "l",
+            "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/life.png"
         },
@@ -118,6 +129,7 @@
         {
             "token": "o",
             "solid": true,
+            "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/barrel_2.png"
         },
@@ -133,23 +145,27 @@
         },
         {
             "token": "r",
+            "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/gun_1.png"
         },
         {
             "token": "s",
+            "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/gun_2.png"
         },
         {
             "token": "t",
             "solid": true,
+            "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/table_1.png"
         },
         {
             "token": "u",
             "solid": true,
+            "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/table_2.png"
         },
@@ -170,11 +186,13 @@
         },
         {
             "token": "y",
+            "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/chandelier_1.png"
         },
         {
             "token": "z",
+            "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/chandelier_2.png"
         },
@@ -192,12 +210,14 @@
         {
             "token": "I",
             "solid": true,
+            "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/lamp.png"
         },
         {
             "token": "K",
             "solid": true,
+            "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/knight.png"
         },
@@ -210,12 +230,14 @@
         {
             "token": "M",
             "solid": true,
+            "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/spears.png"
         },
         {
             "token": "P",
             "solid": true,
+            "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/pillar.png"
         },

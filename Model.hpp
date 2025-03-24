@@ -27,7 +27,8 @@ public:
     glm::mat4 local_model_matrix{}; //for complex transformations 
 
     GLuint texture_id{0}; // texture id=0  means no texture
-    bool isSprite{false};
+    bool isSprite = false;
+    bool transparent = false; 
 
     // Default constructor
     Model() = default;
@@ -126,7 +127,9 @@ public:
           orientation(other.orientation),
           scale(other.scale),
           texture_id(other.texture_id),
-          local_model_matrix(other.local_model_matrix) {
+          local_model_matrix(other.local_model_matrix),
+          isSprite(other.isSprite),
+          transparent(other.transparent) {
     }
 
     ~Model() {
