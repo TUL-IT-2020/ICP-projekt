@@ -601,7 +601,7 @@ int App::run(void) {
 
 		
 		glm::vec3 offset = glm::vec3(0.0);
-		glm::vec3 rotation = glm::vec3(1.0f);	
+		glm::vec3 rotation = glm::vec3(0.0f);	
 		glm::vec3 scale_change = glm::vec3(1.0f);   
 
 		while (!glfwWindowShouldClose(window)) {
@@ -659,39 +659,24 @@ int App::run(void) {
 			shader.setUniform("uV_m", camera.GetViewMatrix());	
 			shader.setUniform("uP_m", projection_matrix);
 
-			// draw all models
+			// draw all models			
 			for (auto & model : models) {
-				/*
-				if (model.isSprite) {
-					// sprite
-					glm::mat4 view_matrix = camera.GetViewMatrix();
-					glm::mat4 projection_matrix = projection_matrix;
-
-					// Vypočítejte billboardovou matici
-					glm::mat4 billboard_matrix = computeBillboardMatrix(view_matrix, model.origin);
-
-					// Aktivujte shader a nastavte uniformy
-					shader.activate();
-					shader.setUniform("uV_m", view_matrix);
-					shader.setUniform("uP_m", projection_matrix);
-
-					// Vykreslete sprite
-					model.meshes[0].draw(billboard_matrix);
-				} else*/ if (model.name == "cube") {
+				rotation = glm::vec3(0.0f);	
+				if (model.name == "cube") {
 					for (auto & mesh : model.meshes) {
 						mesh.shader.activate();
 						mesh.shader.setUniform("uV_m", camera.GetViewMatrix());	
 						mesh.shader.setUniform("uP_m", projection_matrix);
 					}
-					model.draw();
 				} else {
 					// sprite
 					glm::vec3 sprite_position = model.origin;
 					glm::vec3 camera_position = camera.Position;
 					glm::vec3 direction = glm::normalize(camera_position - sprite_position);
 					float angle = atan2(direction.x, direction.z);
-					model.draw(offset, glm::vec3(0.0f, angle, 0.0f), scale_change);
+					rotation = glm::vec3(0.0f, angle, 0.0f);
 				}
+				model.draw(offset, rotation, scale_change);
 				
 				//model.update(delta_t);
 				/*

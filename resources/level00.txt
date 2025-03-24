@@ -1,30 +1,30 @@
 37 40
        WWWWWWWWWWWW     SSSSSSSSSSSS   .
-       W....W.....W     S......et..S   .
-       SWDWWWWDWWWWSSSSSS....o.....S   .
-       S.gg..g....S..e..S......et..S   .
-       S.gg.....g.D.....D....o.....S   .
+       WC...W...c.W     S......et..S   .
+       SWDWWWWDWWWWSSSSSS....P.....S   .
+       S.gg..g....S..e..S....y.et..S   .
+       S.gg..z..g.D..z..D....P.....S   .
        S..........S.....S......et..S   .
 SSSSSSSSSSDSSSSSSSSSSDSSSSSSSSSSSSSSSSSS
 S..h.S........W    S...................S
-Sh.h.S..o..o..W    S....o.....o.X......S
-Sh...D........W    S.................S.S
-SSSSSSe.......W    S....o.g...o......S.S
+Sh.h.S..P..P..W    S....P.....P.X......S
+Sh.y.D...y....W    S....y.....y......S.S
+SSSSSSeu...u..W    S....P.g...P......S.S
      S........W    S.................S.S
 SSSSSSSSS...SSSBBBBSSSDSSSSSSSSSSSSSSSSS
-S.mm....S....o...o..S.....S..........S .
-S.......D...........S.....D.hh..o....S .
+S.mm....S....P...P..S.....S..........S .
+S...y...D....z......S..z..D.hhz.P....S .
 S.p.....S...k.......S.....S..........S .
-S...o...S.....SSSSDSSSSSSSSSSSSSSSSSSS .
+S...P...S.....SSSSDSSSSSSSSSSSSSSSSSSS .
 S.......SBBBDBB S...S                S .
-SSSSSSSSB.....B S...S                S .
+SSSSSSSSB...l.B S.z.S                S .
         B.mm..B S...S                S .
         B.....B S...S                S .
-        BBBBBBB S...S                S .
+        BBBBBBB S.z.S                S .
                 S...S                S .
 SSSSSSSSSSSSSSSSSSDSS                S .
 S...................S                S .
-S...................S                S .
+S...y...........y...S                S .
 S......SSSSSS.......S                S .
 S......S    S.......S                  .
 S......S    S.......S                S .

@@ -86,49 +86,49 @@ Legenda pro tvorbu mapy:
 . = empty
 
 // malá abeceda
-a
+a = barel 1
 b = bead
-c
-d
+c = corpse 1
+d = killed enemy
 e = normal enemy (guard)
-f
+f = flag
 g = gold
-h = health
-i
-j
-k = killed enemy
-l
+h = health 1
+i = health 2
+j = health 3
+k = key
+l = life
 m = munition
 n
-o = object/obsctacle
+o = barel 2
 p = player start
 q
-r
-s
-t
-u
+r = gun 1
+s = gun 2
+t = table 1
+u = table 2
 v
 w
 x
-y
-z
+y = chandelier_1
+z = chandelier_2
 // velká abeceda
 A
-B = blue
-C
+B = blue wall
+C = corpse 4
 D = door
 E = hidden door
 F
 G
 H = Hans
-I
+I = lamp
 J
-K
-L
-M
+K = knight
+L = stove
+M = spears
 N
 O
-P
+P = pillar
 Q
 R
 S = stone 1

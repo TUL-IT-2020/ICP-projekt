@@ -56,6 +56,186 @@
             "token": "m",
             "model_name": "sprite",
             "texture_path": "resources/sprites/munition.png"
+        },
+        {
+            "token": "a",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/barrel_1.png"
+        },
+        {
+            "token": "b",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/bead.png"
+        },
+        {
+            "token": "c",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/corpse_1.png"
+        },
+        {
+            "token": "d",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/killed_enemy.png"
+        },
+        {
+            "token": "e",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/guard.png"
+        },
+        {
+            "token": "f",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/flag.png"
+        },
+        {
+            "token": "i",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/health_2.png"
+        },
+        {
+            "token": "j",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/health_3.png"
+        },
+        {
+            "token": "k",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/key.png"
+        },
+        {
+            "token": "l",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/life.png"
+        },
+        {
+            "token": "n",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/unknown_n.png"
+        },
+        {
+            "token": "o",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/barrel_2.png"
+        },
+        {
+            "token": "p",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/player_start.png"
+        },
+        {
+            "token": "q",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/unknown_q.png"
+        },
+        {
+            "token": "r",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/gun_1.png"
+        },
+        {
+            "token": "s",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/gun_2.png"
+        },
+        {
+            "token": "t",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/table_1.png"
+        },
+        {
+            "token": "u",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/table_2.png"
+        },
+        {
+            "token": "v",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/unknown_v.png"
+        },
+        {
+            "token": "w",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/unknown_w.png"
+        },
+        {
+            "token": "x",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/unknown_x.png"
+        },
+        {
+            "token": "y",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/chandelier_1.png"
+        },
+        {
+            "token": "z",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/chandelier_2.png"
+        },
+        {
+            "token": "E",
+            "solid": true,
+            "model_name": "cube",
+            "texture_path": "resources/textures/hidden_door.png"
+        },
+        {
+            "token": "H",
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/hans.png"
+        },
+        {
+            "token": "I",
+            "solid": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/lamp.png"
+        },
+        {
+            "token": "K",
+            "solid": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/knight.png"
+        },
+        {
+            "token": "L",
+            "solid": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/stove.png"
+        },
+        {
+            "token": "M",
+            "solid": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/spears.png"
+        },
+        {
+            "token": "P",
+            "solid": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/pillar.png"
+        },
+        {
+            "token": "T",
+            "solid": true,
+            "model_name": "cube",
+            "texture_path": "resources/textures/stone_2.png"
+        },
+        {
+            "token": "U",
+            "solid": true,
+            "model_name": "cube",
+            "texture_path": "resources/textures/stone_3.png"
+        },
+        {
+            "token": "V",
+            "solid": true,
+            "model_name": "cube",
+            "texture_path": "resources/textures/wood_2.png"
+        },
+        {
+            "token": "Y",
+            "solid": true,
+            "model_name": "cube",
+            "texture_path": "resources/textures/wood_3.png"
         }
     ]
 }
