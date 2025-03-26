@@ -79,17 +79,19 @@
             "token": "c",
             "transparent": true,
             "model_name": "sprite",
-            "texture_path": "resources/sprites/corpse_1.png"
+            "texture_path": "resources/sprites/corpses_1.png"
         },
         {
             "token": "d",
+            "transparent": true,
             "model_name": "sprite",
-            "texture_path": "resources/sprites/killed_enemy.png"
+            "texture_path": "resources/sprites/corpses_2.png"
         },
         {
             "token": "e",
+            "transparent": true,
             "model_name": "sprite",
-            "texture_path": "resources/sprites/guard.png"
+            "texture_path": "resources/sprites/Guard/SPR00050.png"
         },
         {
             "token": "f",
@@ -114,7 +116,7 @@
             "token": "k",
             "transparent": true,
             "model_name": "sprite",
-            "texture_path": "resources/sprites/key.png"
+            "texture_path": "resources/sprites/key_gold.png"
         },
         {
             "token": "l",
@@ -124,8 +126,9 @@
         },
         {
             "token": "n",
+            "transparent": true,
             "model_name": "sprite",
-            "texture_path": "resources/sprites/unknown_n.png"
+            "texture_path": "resources/sprites/SPR00000.png"
         },
         {
             "token": "o",
@@ -135,26 +138,22 @@
             "texture_path": "resources/sprites/barrel_2.png"
         },
         {
-            "token": "p",
-            "model_name": "sprite",
-            "texture_path": "resources/sprites/player_start.png"
-        },
-        {
             "token": "q",
+            "transparent": true,
             "model_name": "sprite",
-            "texture_path": "resources/sprites/unknown_q.png"
+            "texture_path": "resources/sprites/SPR00000.png"
         },
         {
             "token": "r",
             "transparent": true,
             "model_name": "sprite",
-            "texture_path": "resources/sprites/gun_1.png"
+            "texture_path": "resources/sprites/SPR00029.png"
         },
         {
             "token": "s",
             "transparent": true,
             "model_name": "sprite",
-            "texture_path": "resources/sprites/gun_2.png"
+            "texture_path": "resources/sprites/SPR00030.png"
         },
         {
             "token": "t",
@@ -172,18 +171,21 @@
         },
         {
             "token": "v",
+            "transparent": true,
             "model_name": "sprite",
-            "texture_path": "resources/sprites/unknown_v.png"
+            "texture_path": "resources/sprites/SPR00000.png"
         },
         {
             "token": "w",
+            "transparent": true,
             "model_name": "sprite",
-            "texture_path": "resources/sprites/unknown_w.png"
+            "texture_path": "resources/sprites/SPR00000.png"
         },
         {
             "token": "x",
+            "transparent": true,
             "model_name": "sprite",
-            "texture_path": "resources/sprites/unknown_x.png"
+            "texture_path": "resources/sprites/SPR00000.png"
         },
         {
             "token": "y",
@@ -207,12 +209,13 @@
             "token": "E",
             "solid": true,
             "model_name": "cube",
-            "texture_path": "resources/textures/hidden_door.png"
+            "texture_path": "resources/textures/stone_wall_2_dark.png"
         },
         {
             "token": "H",
+            "transparent": true,
             "model_name": "sprite",
-            "texture_path": "resources/sprites/hans.png"
+            "texture_path": "resources/sprites/Hans/SPR00300.png"
         },
         {
             "token": "I",

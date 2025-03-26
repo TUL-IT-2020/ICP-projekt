@@ -5,21 +5,21 @@
        W.hg..h....V..e..S....y.etI.S   .
        Y.gi..z..j.D..z..D....P.....T   .
        W..........V.....S......etI.S   .
-SSSSSS WYWWDWWYWYWWSSDSSSSSUSSSSUSSSSTSS
-S..h.SSSS.....W    SK....e.f....f..K.f.S
-Sh.h.S..P..P..V    S....P.....P..e.....S
-Sh.y.D...y....W    S....y.....y........T
-SSSSSSeu...u..V    S....P.g.e.P.....e..X
+BBBBBB WWWWDWWYWYWWSSDSSSSSUSSSSUSSSSTSS
+B..h.BSSS.....W    SK....e.f....f..K.f.S
+Bh.h.S..P..P..V    S....P.....P..e..H..S
+Bh.y.D...y....W    S....y.....y........T
+BBBBBSeu...u..V    S....P.g.e.P.....e..X
      S........W    SK......f....f..K.f.S
 SSTSSTSSSSSDSSSBBBUSSSDSSSSSSSSUSSSTSSSS
 S.mm....S....P...P..S.....S..........S .
-U...y...D....z......S..z..D.hhz.P....S .
+U...y.d.D....z......S..z..D.hhz.P....S .
 S.p.....S...k.......S.....S..........S .
 U...P...S.....SSSSDSSSSSSSSSSSUSSSUSSS .
 S.......SBBBDBB S...S  BBBB            .
 SSTSSSTSB...l.B S.z.SBBg.u.B           .
         B.mm..B S...S.....LB           .
-        B.....B S...D......B           .
+        B.....B So..D..k...B           .
         BBBBBBB S.z.S.....LB           .
                 S...SBB..u.B           .
 SSSSSSSSSSSSSSSSSSDSS  BBBB            .
@@ -28,11 +28,11 @@ S...y...........y...S                  .
 S......SSSSSSM......S                  .
 S...P..S    S.P...P.S                  .
 Sa.....S    S.t....rS                  .
-Sa.....S    SM......S                  .
+Sa....oS    SM......S                  .
 S......S    S.P...P.S  WWYWWYWW        .
 Sa..P..S    SMt.....S  W gg   W        .
 S......S    SM.s.mm.S  W  gg  W        .
-SSSDSSSSSSSSSSSSDSSSS  V    g W        .
+SSSDSSSSSSSSSSSSESSSS  V    g W        .
 Sg...g.S       S  SSSSSW   g  W        .
 S.la.a.S       S       D  g   W        .
 SSSSSSSS       SSSSSSSSWWWWWWWW        .
