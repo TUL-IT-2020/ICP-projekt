@@ -1,6 +1,6 @@
 # Soubor s programem:
 FILE_NAME = ICP
-PROJECT_FILES = callbacks.cpp app.cpp ShaderProgram.cpp OBJloader.cpp Map.cpp
+PROJECT_FILES = callbacks.cpp app.cpp ShaderProgram.cpp OBJloader.cpp Map.cpp Model.cpp
 PROJECT_HEADERS = Model.hpp Mesh.hpp Vertex.hpp OBJloader.hpp camera.hpp
 # Imgui soubory:
 IMGUI_FILES = ./imgui-master/imgui.cpp ./imgui-master/imgui_draw.cpp ./imgui-master/imgui_widgets.cpp ./imgui-master/imgui_tables.cpp ./imgui-master/backends/imgui_impl_opengl3.cpp ./imgui-master/backends/imgui_impl_glfw.cpp

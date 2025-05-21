@@ -28,6 +28,7 @@
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 
+#include "Model.hpp"
 #include "App.hpp"
 #include "assets.hpp"
 #include "ShaderProgram.hpp"
@@ -122,35 +123,6 @@ void App::init_glfw(void) {
 	// for transparency
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthFunc(GL_LEQUAL);
-}
-
-cv::Mat createCheckerboardTexture() {
-    // Vytvoření 2x2 matice s 3 kanály (RGB) a 8bitovými hodnotami
-    cv::Mat checkerboard(2, 2, CV_8UC3);
-
-    // Nastavení barev pixelů (černá a bílá)
-    checkerboard.at<cv::Vec3b>(0, 0) = cv::Vec3b(0, 0, 0);   // Černá
-    checkerboard.at<cv::Vec3b>(0, 1) = cv::Vec3b(255, 255, 255); // Bílá
-    checkerboard.at<cv::Vec3b>(1, 0) = cv::Vec3b(255, 255, 255); // Bílá
-    checkerboard.at<cv::Vec3b>(1, 1) = cv::Vec3b(0, 0, 0);   // Černá
-
-    return checkerboard;
-}
-
-GLuint textureInit(const std::filesystem::path& file_name)
-{
-	cv::Mat image = cv::imread(file_name.string(), cv::IMREAD_UNCHANGED);  // Read with (potential) Alpha
-	if (image.empty())	{
-		image = createCheckerboardTexture();
-		//throw std::runtime_error("No texture in file: " + file_name.string());
-		std::cerr << "No texture in file: " << file_name.string() << std::endl;
-	}
-
-	cv::flip(image, image, 0);
-
-	GLuint texture = App::gen_tex(image, TextureFilter::TrilinearMipmap);
-	
-	return texture;
 }
 
 GLuint App::gen_tex(cv::Mat& image, TextureFilter filter = TextureFilter::TrilinearMipmap)
@@ -278,11 +250,19 @@ void App::init_gl_debug() {
 	}
 }
 
-glm::vec3 json_to_vec3(const nlohmann::json& json_array) {
-    if (!json_array.is_array() || json_array.size() != 3) {
-        throw std::invalid_argument("Invalid JSON format for vec3. Expected an array of size 3.");
-    }
-    return glm::vec3(json_array[0].get<float>(), json_array[1].get<float>(), json_array[2].get<float>());
+GLuint textureInit(const std::filesystem::path& file_name) {
+	cv::Mat image = cv::imread(file_name.string(), cv::IMREAD_UNCHANGED);  // Read with (potential) Alpha
+	if (image.empty())	{
+		image = createCheckerboardTexture();
+		//throw std::runtime_error("No texture in file: " + file_name.string());
+		std::cerr << "No texture in file: " << file_name.string() << std::endl;
+	}
+
+	cv::flip(image, image, 0);
+
+	GLuint texture = App::gen_tex(image, TextureFilter::TrilinearMipmap);
+	
+	return texture;
 }
 
 /*
@@ -379,60 +359,13 @@ void App::init_assets(void) {
 			
 			// copy model from cache
 			Model model = model_cache[name];
-
-			if (model_data.find("texture_path") != model_data.end()) {
-				model.texture_id = textureInit(model_data["texture_path"]);
-			}
-
-			if (model_data.find("scale") != model_data.end()) {
-				model.scale = json_to_vec3(model_data["scale"]);
-			}
-
+			
 			// if solid -> add to solid objects in map
 			if (model_data.find("solid") != model_data.end()) {
 				map.solid_objects.push_back(token[0]);
 			}
 
-			// transparent
-			if (model_data.find("transparent") != model_data.end()) {
-				model.transparent = model_data["transparent"];
-			}
-
-			// collectible
-			if (model_data.find("collectible") != model_data.end()) {
-				model.collectible = model_data["collectible"];
-			}
-
-			// collect type
-			if (model_data.find("collect_type") != model_data.end()) {
-				model.collect_type = model_data["collect_type"];
-			}
-
-			// value
-			if (model_data.find("value") != model_data.end()) {
-				model.value = model_data["value"];
-			}
-
-			// light source
-			if (model_data.find("light_source") != model_data.end()) {
-				model.light_source = model_data["light_source"];
-			}
-
-			if (model_data.find("isEnemy") != model_data.end()) {
-				model.isEnemy = model_data["isEnemy"];
-			}
-			if (model_data.find("radius") != model_data.end()) {
-				model.radius = model_data["radius"];
-			}
-			if (model_data.find("health") != model_data.end()) {
-				model.health = model_data["health"];
-			}
-
-			if (name == "sprite") {
-				model.isSprite = true;
-			}
-
-			map_2_model_dict[token] = model;
+			map_2_model_dict[token] = Model::parse_json_to_model(model_data, model, model_cache);
 		} catch (std::exception const& e) {
 			std::cerr << "ERROR loading textured model: " << model_data["model_name"] << ", " << e.what() << std::endl;
 			exit(EXIT_FAILURE);

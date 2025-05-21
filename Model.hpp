@@ -1,7 +1,7 @@
 #ifndef MODEL_HPP
 #define MODEL_HPP
 
-#include <bits/stl_numeric.h>
+#include <numeric>
 
 #include <filesystem>
 #include <glm/glm.hpp>
@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <nlohmann/json.hpp>
+#include <opencv2/opencv.hpp>
 
 #include "Mesh.hpp"
 #include "OBJloader.hpp"
@@ -40,6 +41,10 @@ public:
 
     // for light sources
     bool light_source = false;
+
+    // parse json to model
+    static Model parse_json_to_model(const nlohmann::json& model_data, Model& model,
+                      std::unordered_map<std::string, Model> model_cache);
 
     // Default constructor
     Model() = default;
@@ -212,5 +217,12 @@ public:
         }
     }
 };
+
+GLuint textureInit(const std::filesystem::path& file_name);
+glm::vec3 json_to_vec3(const nlohmann::json& json_array);
+cv::Mat createCheckerboardTexture();
+Model parse_json_to_model(const nlohmann::json& model_data, Model& model,
+                         std::unordered_map<std::string, Model> model_cache);
+
 
 #endif  // MODEL_HPP
