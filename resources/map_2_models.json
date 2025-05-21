@@ -47,19 +47,28 @@
             "token": "g",
             "model_name": "sprite",
             "transparent": true,
-            "texture_path": "resources/sprites/gold_1.png"
+            "texture_path": "resources/sprites/gold_1.png",
+            "collectible": true,
+            "collect_type": "gold",
+            "value": 10
         },
         {
             "token": "h",
             "model_name": "sprite",
             "transparent": true,
-            "texture_path": "resources/sprites/health_1.png"
+            "texture_path": "resources/sprites/health_1.png",
+            "collectible": true,
+            "collect_type": "health",
+            "value": 10
         },
         {
             "token": "m",
             "model_name": "sprite",
             "transparent": true,
-            "texture_path": "resources/sprites/munition.png"
+            "texture_path": "resources/sprites/munition.png",
+            "collectible": true,
+            "collect_type": "ammo",
+            "value": 10
         },
         {
             "token": "a",
@@ -91,7 +100,10 @@
             "token": "e",
             "transparent": true,
             "model_name": "sprite",
-            "texture_path": "resources/sprites/Guard/SPR00050.png"
+            "texture_path": "resources/sprites/Guard/SPR00050.png",
+            "isEnemy": true,
+            "radius": 0.5,
+            "health": 15
         },
         {
             "token": "f",
@@ -104,25 +116,35 @@
             "token": "i",
             "transparent": true,
             "model_name": "sprite",
-            "texture_path": "resources/sprites/health_2.png"
+            "texture_path": "resources/sprites/health_2.png",
+            "collectible": true,
+            "collect_type": "health",
+            "value": 15
         },
         {
             "token": "j",
             "transparent": true,
             "model_name": "sprite",
-            "texture_path": "resources/sprites/health_3.png"
+            "texture_path": "resources/sprites/health_3.png",
+            "collectible": true,
+            "collect_type": "health",
+            "value": 20
         },
         {
             "token": "k",
             "transparent": true,
             "model_name": "sprite",
-            "texture_path": "resources/sprites/key_gold.png"
+            "texture_path": "resources/sprites/key_gold.png",
+            "collectible": true,
+            "collect_type": "key_gold"
         },
         {
             "token": "l",
             "transparent": true,
             "model_name": "sprite",
-            "texture_path": "resources/sprites/life.png"
+            "texture_path": "resources/sprites/life.png",
+            "collectible": true,
+            "collect_type": "life"
         },
         {
             "token": "n",
@@ -147,13 +169,17 @@
             "token": "r",
             "transparent": true,
             "model_name": "sprite",
-            "texture_path": "resources/sprites/SPR00029.png"
+            "texture_path": "resources/sprites/SPR00029.png",
+            "collectible": true,
+            "collect_type": "weapon"
         },
         {
             "token": "s",
             "transparent": true,
             "model_name": "sprite",
-            "texture_path": "resources/sprites/SPR00030.png"
+            "texture_path": "resources/sprites/SPR00030.png",
+            "collectible": true,
+            "collect_type": "weapon"
         },
         {
             "token": "t",
@@ -191,13 +217,15 @@
             "token": "y",
             "transparent": true,
             "model_name": "sprite",
-            "texture_path": "resources/sprites/chandelier_1.png"
+            "texture_path": "resources/sprites/chandelier_1.png",
+            "light_source": true
         },
         {
             "token": "z",
             "transparent": true,
             "model_name": "sprite",
-            "texture_path": "resources/sprites/chandelier_2.png"
+            "texture_path": "resources/sprites/chandelier_2.png",
+            "light_source": true
         },
         {
             "token": "C",
@@ -215,14 +243,18 @@
             "token": "H",
             "transparent": true,
             "model_name": "sprite",
-            "texture_path": "resources/sprites/Hans/SPR00300.png"
+            "texture_path": "resources/sprites/Hans/SPR00300.png",
+            "isEnemy": true,
+            "radius": 1.2,
+            "health": 45
         },
         {
             "token": "I",
             "solid": true,
             "transparent": true,
             "model_name": "sprite",
-            "texture_path": "resources/sprites/lamp.png"
+            "texture_path": "resources/sprites/lamp.png",
+            "light_source": true
         },
         {
             "token": "K",

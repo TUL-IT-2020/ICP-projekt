@@ -28,7 +28,18 @@ public:
 
     GLuint texture_id{0}; // texture id=0  means no texture
     bool isSprite = false;
-    bool transparent = false; 
+    bool transparent = false;
+    // for collectible objects
+    bool collectible = false; 
+    std::string collect_type = "";
+    int value = 0; 
+    // for enemy objects
+    bool isEnemy = false;
+    float radius = 0.5f;
+    int health = 1; 
+
+    // for light sources
+    bool light_source = false;
 
     // Default constructor
     Model() = default;
@@ -120,16 +131,23 @@ public:
     }
 
     // Copy constructor
-    Model(const Model& other)
-        : meshes(other.meshes),
-          name(other.name),
-          origin(other.origin),
-          orientation(other.orientation),
-          scale(other.scale),
-          texture_id(other.texture_id),
-          local_model_matrix(other.local_model_matrix),
-          isSprite(other.isSprite),
-          transparent(other.transparent) {
+    Model(const Model& other): 
+        meshes(other.meshes),
+        name(other.name),
+        origin(other.origin),
+        orientation(other.orientation),
+        scale(other.scale),
+        texture_id(other.texture_id),
+        local_model_matrix(other.local_model_matrix),
+        isSprite(other.isSprite),
+        transparent(other.transparent),
+        collectible(other.collectible),
+        collect_type(other.collect_type),
+        value(other.value),
+        light_source(other.light_source),
+        isEnemy(other.isEnemy),
+        radius(other.radius),
+        health(other.health) {
     }
 
     ~Model() {

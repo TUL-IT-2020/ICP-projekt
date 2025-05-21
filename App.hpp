@@ -14,6 +14,8 @@
 #include "Model.hpp"
 #include "camera.hpp"
 #include "Map.hpp"
+#include "Player.hpp"
+#include "Bullet.hpp"
 
 enum class TextureFilter {
     Nearest,       // Nearest neighbor - rychlé, ale nekvalitní
@@ -38,10 +40,14 @@ public:
 private:
     // Map
     Map map;
+	std::unordered_map<std::string, Model> map_2_model_dict;
+    // list of bullets
+    std::vector<Bullet> bullets;
     bool CheckHitboxes(glm::vec3 movement);
 
     // camera related 
     Camera camera;
+    Player player;
     // remember last cursor position, move relative to that in the next frame
     double cursorLastX{ 0 };
     double cursorLastY{ 0 };

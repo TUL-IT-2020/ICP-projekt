@@ -85,6 +85,7 @@ void App::update_projection_matrix(void) {
 }
 
 void App::glfw_mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    auto this_inst = static_cast<App*>(glfwGetWindowUserPointer(window));
 	if (action == GLFW_PRESS) {
 		switch (button) {
 		case GLFW_MOUSE_BUTTON_LEFT: {
@@ -95,7 +96,15 @@ void App::glfw_mouse_button_callback(GLFWwindow* window, int button, int action,
 			}
 			else {
 				// we are inside our game: shoot, click, etc.
-				std::cout << "Bang!\n";
+				if (this_inst->player.ammo > 0) {
+					this_inst->player.ammo--;
+					std::cout << "Bang! Ammo left: " << this_inst->player.ammo << "\n";
+					glm::vec3 pos = this_inst->camera.Position;
+					glm::vec3 dir = this_inst->camera.Front;
+					this_inst->bullets.emplace_back(pos, dir);
+				} else {
+					std::cout << "Click! (No ammo)\n";
+				}
 			}
 			break;
 		}

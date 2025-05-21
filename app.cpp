@@ -32,10 +32,12 @@
 #include "assets.hpp"
 #include "ShaderProgram.hpp"
 #include "Map.hpp"
+#include "Player.hpp"
 
 App::App() {
 	// default constructor
 	camera = Camera();
+	player = Player();
 }
 
 void App::init_glew(void) {
@@ -369,8 +371,6 @@ void App::init_assets(void) {
 	}
 
 	map_2_models >> json;
-	// prekladovy slovnik
-	std::unordered_map<std::string, Model> map_2_model_dict;
 
 	for (const auto& model_data : json["map_2_models"]) {
 		try {
@@ -395,7 +395,37 @@ void App::init_assets(void) {
 
 			// transparent
 			if (model_data.find("transparent") != model_data.end()) {
-				model.transparent = true;
+				model.transparent = model_data["transparent"];
+			}
+
+			// collectible
+			if (model_data.find("collectible") != model_data.end()) {
+				model.collectible = model_data["collectible"];
+			}
+
+			// collect type
+			if (model_data.find("collect_type") != model_data.end()) {
+				model.collect_type = model_data["collect_type"];
+			}
+
+			// value
+			if (model_data.find("value") != model_data.end()) {
+				model.value = model_data["value"];
+			}
+
+			// light source
+			if (model_data.find("light_source") != model_data.end()) {
+				model.light_source = model_data["light_source"];
+			}
+
+			if (model_data.find("isEnemy") != model_data.end()) {
+				model.isEnemy = model_data["isEnemy"];
+			}
+			if (model_data.find("radius") != model_data.end()) {
+				model.radius = model_data["radius"];
+			}
+			if (model_data.find("health") != model_data.end()) {
+				model.health = model_data["health"];
 			}
 
 			if (name == "sprite") {
@@ -408,6 +438,35 @@ void App::init_assets(void) {
 			exit(EXIT_FAILURE);
 		}
 	}
+
+	std::cout << "Models loaded." << std::endl;
+
+	// print loaded collectible objects
+	std::cout << "Collectible objects: ";
+	for (const auto& obj : map_2_model_dict) {
+		if (obj.second.collectible) {
+			std::cout << obj.first << " ";
+		}
+	}
+	std::cout << std::endl;
+
+	// print loaded light sources
+	std::cout << "Light sources: ";
+	for (const auto& obj : map_2_model_dict) {
+		if (obj.second.light_source) {
+			std::cout << obj.first << " ";
+		}
+	}
+	std::cout << std::endl;
+
+	// print loaded enemies
+	std::cout << "Enemies: ";
+	for (const auto& obj : map_2_model_dict) {
+		if (obj.second.isEnemy) {
+			std::cout << obj.first << " ";
+		}
+	}
+	std::cout << std::endl;
 	
 	// size offset
 	glm::vec3 offset = glm::vec3(1.0, 0.0, 1.0);
@@ -423,6 +482,19 @@ void App::init_assets(void) {
 			}
 		}
 	}
+	
+	// print all placed collectible objects
+	/*
+	std::cout << "Placed collectible objects: ";
+	for (const auto& obj : models) {
+		if (obj.collectible) {
+			std::cout << obj.collect_type << " ";
+			std::cout << obj.value << "\n";
+		}
+	}
+	std::cout << std::endl;
+	*/
+
 	// add floor
 	Model floor = map_2_model_dict["floor"];
 	// change scale
@@ -632,6 +704,7 @@ int App::run(void) {
 				ImGui::Text("Camera direction: (%.2f, %.2f, %.2f)", camera.Yaw, camera.Pitch, camera.Roll);
 				ImGui::Text("V-Sync: %s", is_vsync_on ? "ON" : "OFF");
 				ImGui::Text("FPS: %.1f", FPS);
+				ImGui::Text("Player Health: %d, Gold: %d, Ammo: %d", player.health, player.gold, player.ammo);
 				ImGui::Text("(press UP/DOWN to change color)");
 				ImGui::Text("(press RMB to release mouse)");
 				ImGui::Text("(hit C to show/hide info)");
@@ -651,14 +724,7 @@ int App::run(void) {
 				time_speed = 1.0;
 			}
 
-			//
-			// RENDER: GL drawCalls
-			// 
-
-			// clear canvas
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			// TODO:
+			// update camera position
 			double delta_t = glfwGetTime() - last_frame_time;
 			last_frame_time = glfwGetTime();
         	glm::vec3 movement = camera.ProcessInput(window, delta_t); // process keys etc.
@@ -667,6 +733,78 @@ int App::run(void) {
 				//std::cout << "movement: " << movement.x << ", " << movement.y << ", " << movement.z << std::endl;
 				camera.UpdateCameraPosition(movement);
 			}
+
+			float radius = 0.7f;
+			// check for collisions with collectibles
+			for (auto it = models.begin(); it != models.end(); ) {
+				if (it->collectible) {
+					float dist = glm::distance(camera.Position, it->origin);
+					if (dist < radius) {
+						std::cout << "Collected item: " << it->collect_type << std::endl;
+						if (it->collect_type == "gold") {
+							player.gold += it->value;
+						} else if (it->collect_type == "health") {
+							player.health += it->value;
+						} else if (it->collect_type == "ammo") {
+							player.ammo += it->value;
+						}
+						// Odstraň předmět ze scény
+						it = models.erase(it);
+						continue;
+					}
+				}
+				++it;
+			}
+
+			// move bullets
+			for (auto& bullet : bullets) {
+				if (bullet.active)
+					bullet.position += bullet.direction * bullet.speed * float(delta_t);
+			}
+
+			// bullet collision
+			for (auto& bullet : bullets) {
+				if (!bullet.active) continue;
+				// Kolize s nepřáteli
+				for (auto it = models.begin(); it != models.end(); ) {
+					if (it->isEnemy) {
+						float dist = glm::distance(bullet.position, it->origin);
+						if (dist < it->radius) {
+							bullet.active = false;
+							it->health -= bullet.damage;
+							
+							// check if enemy is dead
+							if (it->health <= 0) {
+								Model corpse = map_2_model_dict["d"];
+								corpse.origin = it->origin;
+								models.push_back(corpse);
+								std::cout << "Enemy killed: " << it->name << std::endl;
+								// remove enemy from scene
+								it = models.erase(it);
+								continue;
+							}
+						}
+					}
+					// walls
+					if (map.containsSolid(bullet.position.x, bullet.position.z)) {
+						bullet.active = false;
+					}
+					++it;
+				}
+				// Kolize s předměty (většinou ignoruj, pokud nechceš ničit předměty)
+			}
+
+			// remove inactive bullets
+			bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const Bullet& bullet) {
+				return !bullet.active;
+			}), bullets.end());
+
+			//
+			// RENDER: GL drawCalls
+			// 
+
+			// clear canvas
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			shader.setUniform("uV_m", camera.GetViewMatrix());	
 			shader.setUniform("uP_m", projection_matrix);
