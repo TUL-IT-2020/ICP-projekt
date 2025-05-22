@@ -388,30 +388,6 @@ void App::init_assets(void) {
 		}
 	}
 
-	// print all door objects
-	/*
-	std::cout << "Placed door objects: \n";
-	for (auto& obj : models) {
-		Door* door = dynamic_cast<Door*>(obj.get());
-		if (door) {
-			std::cout << door->name << " ";
-			std::cout << door->origin.x << " " << door->origin.y << " " << door->origin.z << "\n";
-		}
-	}
-	*/
-	
-	// print all placed collectible objects
-	/*
-	std::cout << "Placed collectible objects: ";
-	for (const auto& obj : models) {
-		if (obj.collectible) {
-			std::cout << obj.collect_type << " ";
-			std::cout << obj.value << "\n";
-		}
-	}
-	std::cout << std::endl;
-	*/
-
 	// add floor
 	Model floor = map_2_model_dict["floor"];
 	// change scale
@@ -512,6 +488,24 @@ void App::init_opencv()
 	// ...
 }
 
+/* AABB collision detection functions
+ * AABB = Axis-Aligned Bounding Box
+ */
+bool aabb_contains_point(const glm::vec3& min, const glm::vec3& max, const glm::vec3& point) {
+    return (point.x >= min.x && point.x <= max.x) &&
+           (point.y >= min.y && point.y <= max.y) &&
+           (point.z >= min.z && point.z <= max.z);
+}
+
+/* AABB intersection test
+ * Returns true if the two AABBs intersect
+ */
+bool aabb_intersect(const glm::vec3& minA, const glm::vec3& maxA,
+                    const glm::vec3& minB, const glm::vec3& maxB) {
+    return (minA.x <= maxB.x && maxA.x >= minB.x) &&
+           (minA.y <= maxB.y && maxA.y >= minB.y) &&
+           (minA.z <= maxB.z && maxA.z >= minB.z);
+}
 
 /* Will copmare camera position with map and return true if there is no collision
 */
@@ -533,10 +527,25 @@ bool App::CheckHitboxes(glm::vec3 movement) {
 	if (map.outOfBounds(camera_x, camera_y)) {
 		return false;
 	}
-	// check if camera is on wall
-	if (map.containsSolid(camera_x, camera_y)) {
-		return false;
+	glm::vec3 new_camera_position = camera_position + movement;
+	for (auto& obj : models) {
+		if (obj->isSolid) {
+			// Get the object's AABB
+			glm::vec3 obj_min = obj->origin - obj->scale / 2.0f;
+			glm::vec3 obj_max = obj->origin + obj->scale / 2.0f;
+
+			// Get the camera's AABB
+			glm::vec3 camera_min = new_camera_position - glm::vec3(player.radius);
+			glm::vec3 camera_max = new_camera_position + glm::vec3(player.radius);
+			
+			// Check for intersection
+			if (aabb_intersect(obj_min, obj_max, camera_min, camera_max)) {
+				std::cout << "Collision detected with object: " << obj->name << " " << obj->collectible << std::endl;
+				return false;
+			}
+		}
 	}
+
 	return true;
 }
 

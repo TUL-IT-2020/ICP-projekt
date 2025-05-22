@@ -37,16 +37,9 @@ void App::glfw_key_callback(GLFWwindow* window, int key, int scancode, int actio
 					// in reach of the player
 					float dist = glm::distance(this_inst->camera.Position, model->origin);
 					if (dist < model->radius) {
-						// interact with the model
-						std::cout << "Interacted with model: " << model->name << std::endl;
 						Door* door = dynamic_cast<Door*>(model.get());
 						if (door) {
-							// Tento objekt je dveře, můžeš s ním pracovat jako s Door
 							door->interact();
-							std::cout << "Dveře otevřeny/uzavřeny." << std::endl;
-						}
-						else {
-							std::cout << "Tento objekt není dveře." << std::endl;
 						}
 					}
 				}

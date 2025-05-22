@@ -38,6 +38,7 @@ public:
     int health = 1; 
     // for door objects
     bool isDoor = false;
+    bool isSolid = false;
 
     // for light sources
     bool light_source = false;
@@ -158,7 +159,8 @@ public:
         isEnemy(other.isEnemy),
         radius(other.radius),
         health(other.health),
-        isDoor(other.isDoor) {
+        isDoor(other.isDoor),
+        isSolid(other.isSolid) {
     }
 
     virtual ~Model() = default;

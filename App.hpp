@@ -1,6 +1,7 @@
 #ifndef APP_HPP
 #define APP_HPP
 
+#include <opencv2/opencv.hpp>
 #include <GL/glew.h>
 #ifdef _WIN32
 #include <GL/wglew.h>
@@ -8,7 +9,6 @@
 #include <GLFW/glfw3.h>
 #include <unordered_map>
 #include <string>
-#include <opencv2/opencv.hpp>
 
 #include "assets.hpp"
 #include "Model.hpp"
