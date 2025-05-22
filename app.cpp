@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <random>
 #include <fstream>
-#include <nlohmann/json.hpp>
 
 #include <opencv2/opencv.hpp>
 #include <GL/glew.h>
@@ -29,12 +28,11 @@
 #include <backends/imgui_impl_opengl3.h>
 
 #include "App.hpp"
-#include "assets.hpp"
-#include "ShaderProgram.hpp"
 
 App::App() {
 	// default constructor
 	camera = Camera();
+	player = Player();
 }
 
 void App::init_glew(void) {
@@ -111,34 +109,14 @@ void App::init_glfw(void) {
 
     glEnable( GL_LINE_SMOOTH );
     glEnable( GL_POLYGON_SMOOTH );
-	glEnable( GL_CULL_FACE );
-}
 
-cv::Mat createCheckerboardTexture() {
-    // Vytvoření 2x2 matice s 3 kanály (RGB) a 8bitovými hodnotami
-    cv::Mat checkerboard(2, 2, CV_8UC3);
+	// enable back face culling
+	glCullFace(GL_BACK);
+	glEnable(GL_CULL_FACE);
 
-    // Nastavení barev pixelů (černá a bílá)
-    checkerboard.at<cv::Vec3b>(0, 0) = cv::Vec3b(0, 0, 0);   // Černá
-    checkerboard.at<cv::Vec3b>(0, 1) = cv::Vec3b(255, 255, 255); // Bílá
-    checkerboard.at<cv::Vec3b>(1, 0) = cv::Vec3b(255, 255, 255); // Bílá
-    checkerboard.at<cv::Vec3b>(1, 1) = cv::Vec3b(0, 0, 0);   // Černá
-
-    return checkerboard;
-}
-
-GLuint textureInit(const std::filesystem::path& file_name)
-{
-	cv::Mat image = cv::imread(file_name.string(), cv::IMREAD_UNCHANGED);  // Read with (potential) Alpha
-	if (image.empty())	{
-		image = createCheckerboardTexture();
-		//throw std::runtime_error("No texture in file: " + file_name.string());
-		std::cerr << "No texture in file: " << file_name.string() << std::endl;
-	}
-
-	GLuint texture = App::gen_tex(image, TextureFilter::TrilinearMipmap);
-	
-	return texture;
+	// for transparency
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDepthFunc(GL_LEQUAL);
 }
 
 GLuint App::gen_tex(cv::Mat& image, TextureFilter filter = TextureFilter::TrilinearMipmap)
@@ -155,8 +133,8 @@ GLuint App::gen_tex(cv::Mat& image, TextureFilter filter = TextureFilter::Trilin
 	GLenum err;
 	while ((err = glGetError()) != GL_NO_ERROR) {
 		std::cerr << "OpenGL Error: " << err << std::endl;
+		std::cout << "Image channels: " << image.channels() << std::endl;
 	}
-	std::cout << "Image channels: " << image.channels() << std::endl;
 
 	switch (image.channels()) {
 	case 3:
@@ -266,11 +244,19 @@ void App::init_gl_debug() {
 	}
 }
 
-glm::vec3 json_to_vec3(const nlohmann::json& json_array) {
-    if (!json_array.is_array() || json_array.size() != 3) {
-        throw std::invalid_argument("Invalid JSON format for vec3. Expected an array of size 3.");
-    }
-    return glm::vec3(json_array[0].get<float>(), json_array[1].get<float>(), json_array[2].get<float>());
+GLuint textureInit(const std::filesystem::path& file_name) {
+	cv::Mat image = cv::imread(file_name.string(), cv::IMREAD_UNCHANGED);  // Read with (potential) Alpha
+	if (image.empty())	{
+		image = createCheckerboardTexture();
+		//throw std::runtime_error("No texture in file: " + file_name.string());
+		std::cerr << "No texture in file: " << file_name.string() << std::endl;
+	}
+
+	cv::flip(image, image, 0);
+
+	GLuint texture = App::gen_tex(image, TextureFilter::TrilinearMipmap);
+	
+	return texture;
 }
 
 /*
@@ -305,43 +291,116 @@ void App::init_assets(void) {
 		}
 	}
 	std::cout << "Models loaded." << std::endl;
-	
-	// load position for objects -> models
-	// place models to the scene
-	std::ifstream map_file("resources/map.json");
-	if (!map_file.is_open()) {
+
+	// load level
+	//map = Map(10, 25);
+	map = Map("resources/level00.txt");
+	map.printMap();
+
+	/*
+	*/
+	// load map objects to models in scene
+	std::ifstream map_2_models("resources/map_2_models.json");
+	if (!map_2_models.is_open()) {
 		throw std::runtime_error("Could not open JSON file.");
 	}
 
-	map_file >> json;
+	map_2_models >> json;
 
-	for (const auto& model_data : json["scene"]) {
-		std::cout << "Placing model: " << model_data["name"] << std::endl;
+	for (const auto& model_data : json["map_2_models"]) {
 		try {
-			std::string name = model_data["name"];
+			std::string name = model_data["model_name"];
+			std::string token = model_data["token"];
 			
 			// copy model from cache
 			Model model = model_cache[name];
-
-			if (model_data.find("origin") != model_data.end()) {
-				model.origin = json_to_vec3(model_data["origin"]);
-			}
 			
-			if (model_data.find("scale") != model_data.end()) {
-				model.scale = json_to_vec3(model_data["scale"]);
+			// if solid -> add to solid objects in map
+			if (model_data.find("solid") != model_data.end()) {
+				map.solid_objects.push_back(token[0]);
 			}
 
-			if (model_data.find("texture_path") != model_data.end()) {
-				model.texture_id = textureInit(model_data["texture_path"]);
-			}
-			
-			models.push_back(model);
-
+			map_2_model_dict[token] = Model::parse_json_to_model(model_data, model, model_cache);
 		} catch (std::exception const& e) {
-			std::cerr << "ERROR placing model to scene: " << model_data["name"] << ", " << e.what() << std::endl;
+			std::cerr << "ERROR loading textured model: " << model_data["model_name"] << ", " << e.what() << std::endl;
 			exit(EXIT_FAILURE);
 		}
 	}
+
+	std::cout << "Models loaded." << std::endl;
+
+	// print loaded collectible objects
+	std::cout << "Collectible objects: ";
+	for (const auto& obj : map_2_model_dict) {
+		if (obj.second.collectible) {
+			std::cout << obj.first << " ";
+		}
+	}
+	std::cout << std::endl;
+
+	// print loaded light sources
+	std::cout << "Light sources: ";
+	for (const auto& obj : map_2_model_dict) {
+		if (obj.second.light_source) {
+			std::cout << obj.first << " ";
+		}
+	}
+	std::cout << std::endl;
+
+	// print loaded enemies
+	std::cout << "Enemies: ";
+	for (const auto& obj : map_2_model_dict) {
+		if (obj.second.isEnemy) {
+			std::cout << obj.first << " ";
+		}
+	}
+	std::cout << std::endl;
+
+	// print loaded doors
+	std::cout << "Doors: ";
+	for (const auto& obj : map_2_model_dict) {
+		if (obj.second.isDoor) {
+			std::cout << obj.first << " ";
+		}
+	}
+	std::cout << std::endl;
+	
+	// size offset
+	glm::vec3 offset = glm::vec3(1.0, 0.0, 1.0);
+
+	// place models to the scene
+	for (int j = 0; j < map.getRows(); j++) {
+		for (int i = 0; i < map.getCols(); i++) {
+			std::string token = std::string(1, map.fetchMapValue(i, j));
+			if (map_2_model_dict.find(token) != map_2_model_dict.end()) {
+				Model& base = map_2_model_dict[token];
+				glm::vec3 pos = glm::vec3(i, 0, j) + offset;
+				if (base.isDoor) {
+					auto door = std::make_unique<Door>(base);
+					door->origin = pos;
+					models.push_back(std::move(door));
+				} else {
+					auto model = std::make_unique<Model>(base);
+					model->origin = pos;
+					models.push_back(std::move(model));
+				}
+			}
+		}
+	}
+
+	// add floor
+	Model floor = map_2_model_dict["floor"];
+	// change scale
+	floor.scale = glm::vec3(map.getCols(), 1.0, map.getRows());
+	// change origin
+	floor.origin = glm::vec3(0.5, -1.0, 0.5);
+	models.push_back(std::make_unique<Model>(floor));
+
+	//set player position in 3D space (transform X-Y in map to XYZ in GL)
+	camera.Position.x = (map.start_position.x) + 1.0 / 2.0f;
+	camera.Position.z = (map.start_position.y) + 1.0 / 2.0f;
+	camera.Position.y = camera.camera_height;
+
 	std::cout << "Scene generated." << std::endl;	
 }
 
@@ -429,6 +488,81 @@ void App::init_opencv()
 	// ...
 }
 
+/* AABB collision detection functions
+ * AABB = Axis-Aligned Bounding Box
+ */
+bool aabb_contains_point(const glm::vec3& min, const glm::vec3& max, const glm::vec3& point) {
+    return (point.x >= min.x && point.x <= max.x) &&
+           (point.y >= min.y && point.y <= max.y) &&
+           (point.z >= min.z && point.z <= max.z);
+}
+
+/* AABB intersection test
+ * Returns true if the two AABBs intersect
+ */
+bool aabb_intersect(const glm::vec3& minA, const glm::vec3& maxA,
+                    const glm::vec3& minB, const glm::vec3& maxB) {
+    return (minA.x <= maxB.x && maxA.x >= minB.x) &&
+           (minA.y <= maxB.y && maxA.y >= minB.y) &&
+           (minA.z <= maxB.z && maxA.z >= minB.z);
+}
+
+/* Will copmare camera position with map and return true if there is no collision
+*/
+bool App::CheckHitboxes(glm::vec3 movement) {
+	// Prodloužení směru kroku
+    if (glm::length(movement) > 0.0f) {
+        movement = glm::normalize(movement) * (glm::length(movement) + 0.2f);
+    }
+	// camera adjustment
+	glm::vec3 camera_position = camera.Position;
+	// get camera position in map
+	int camera_x = (int)camera_position.x;
+	int camera_y = (int)camera_position.z;
+	// new position
+	camera_x += movement.x;
+	camera_y += movement.z;
+	
+	// check if camera is out of map
+	if (map.outOfBounds(camera_x, camera_y)) {
+		return false;
+	}
+	glm::vec3 new_camera_position = camera_position + movement;
+	for (auto& obj : models) {
+		if (obj->isSolid) {
+			// Get the object's AABB
+			glm::vec3 obj_min = obj->origin - obj->scale / 2.0f;
+			glm::vec3 obj_max = obj->origin + obj->scale / 2.0f;
+
+			// Get the camera's AABB
+			glm::vec3 camera_min = new_camera_position - glm::vec3(player.radius);
+			glm::vec3 camera_max = new_camera_position + glm::vec3(player.radius);
+			
+			// Check for intersection
+			if (aabb_intersect(obj_min, obj_max, camera_min, camera_max)) {
+				std::cout << "Collision detected with object: " << obj->name << " " << obj->collectible << std::endl;
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+glm::mat4 computeBillboardMatrix(const glm::mat4& view_matrix, const glm::vec3& sprite_position) {
+    glm::mat4 billboard_matrix = glm::mat4(1.0f);
+
+    // Extrahujte rotační část z pohledové matice
+    billboard_matrix[0] = glm::vec4(glm::normalize(glm::vec3(view_matrix[0])), 0.0f);
+    billboard_matrix[1] = glm::vec4(glm::normalize(glm::vec3(view_matrix[1])), 0.0f);
+    billboard_matrix[2] = glm::vec4(glm::normalize(glm::vec3(view_matrix[2])), 0.0f);
+
+    // Nastavte pozici spritu
+    billboard_matrix[3] = glm::vec4(sprite_position, 1.0f);
+
+    return billboard_matrix;
+}
+
 int App::run(void) {
 	/*
 	* Typical game loop:
@@ -456,14 +590,11 @@ int App::run(void) {
 		double time_speed{};
 
 		// Clear color saved to OpenGL state machine: no need to set repeatedly in game loop
-		glClearColor(0, 0, 0, 0);
+		// gray background
+		glClearColor(0.2, 0.2, 0.2, 1.0);
+		// black background
+		//glClearColor(0, 0, 0, 0);
 
-
-		/*
-		// enable back face culling
-		glCullFace(GL_BACK);
-		glEnable(GL_CULL_FACE);
-		*/
 		// get first position of mouse cursor
 		glfwGetCursorPos(window, &cursorLastX, &cursorLastY);
 		
@@ -472,15 +603,15 @@ int App::run(void) {
 		update_projection_matrix();
 		glViewport(0, 0, width, height);
 
-		camera.Position = glm::vec3(0, 0, 10);
+		//camera.Position = glm::vec3(0, 0, 10);
 		double last_frame_time = glfwGetTime();
 		
-		ShaderProgram& shader = models[0].meshes[0].shader;
+		ShaderProgram& shader = (*models[0]).meshes[0].shader;
 		shader.activate();
 
 		
 		glm::vec3 offset = glm::vec3(0.0);
-		glm::vec3 rotation = glm::vec3(1.0f);	
+		glm::vec3 rotation = glm::vec3(0.0f);	
 		glm::vec3 scale_change = glm::vec3(1.0f);   
 
 		while (!glfwWindowShouldClose(window)) {
@@ -495,11 +626,11 @@ int App::run(void) {
 
 				ImGui::Begin("Info", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
 				// X, Y, Z,
-				ImGui::Text("Camera position: (%.2f, %.2f, %.2f)", camera.Position.x, camera.Position.y, camera.Position.z);
+				ImGui::Text("Camera position: (%.2f, %.2f, %.2f)", camera.Position.x, camera.Position.z, camera.Position.y);
 				ImGui::Text("Camera direction: (%.2f, %.2f, %.2f)", camera.Yaw, camera.Pitch, camera.Roll);
 				ImGui::Text("V-Sync: %s", is_vsync_on ? "ON" : "OFF");
 				ImGui::Text("FPS: %.1f", FPS);
-				ImGui::Text("Triangle color: (%.2f, %.2f, %.2f)", triangle_color.r, triangle_color.g, triangle_color.b);
+				ImGui::Text("Player Health: %d, Gold: %d, Ammo: %d", player.health, player.gold, player.ammo);
 				ImGui::Text("(press UP/DOWN to change color)");
 				ImGui::Text("(press RMB to release mouse)");
 				ImGui::Text("(hit C to show/hide info)");
@@ -519,6 +650,81 @@ int App::run(void) {
 				time_speed = 1.0;
 			}
 
+			// update camera position
+			double delta_t = glfwGetTime() - last_frame_time;
+			last_frame_time = glfwGetTime();
+        	glm::vec3 movement = camera.ProcessInput(window, delta_t); // process keys etc.
+			// update camera position
+			if (CheckHitboxes(movement) || camera.freeCam) {
+				//std::cout << "movement: " << movement.x << ", " << movement.y << ", " << movement.z << std::endl;
+				camera.UpdateCameraPosition(movement);
+			}
+
+			float radius = 0.7f;
+			// check for collisions with collectibles
+			for (auto it = models.begin(); it != models.end(); ) {
+				if ((*it)->collectible) {
+					float dist = glm::distance(camera.Position, (*it)->origin);
+					if (dist < radius) {
+						std::cout << "Collected item: " << (*it)->collect_type << std::endl;
+						if ((*it)->collect_type == "gold") {
+							player.gold += (*it)->value;
+						} else if ((*it)->collect_type == "health") {
+							player.health += (*it)->value;
+						} else if ((*it)->collect_type == "ammo") {
+							player.ammo += (*it)->value;
+						}
+						// Odstraň předmět ze scény
+						it = models.erase(it);
+						continue;
+					}
+				}
+				++it;
+			}
+
+			// move bullets
+			for (auto& bullet : bullets) {
+				if (bullet.active)
+					bullet.position += bullet.direction * bullet.speed * float(delta_t);
+			}
+
+			// bullet collision
+			for (auto& bullet : bullets) {
+				if (!bullet.active) continue;
+				// Kolize s nepřáteli
+				for (auto it = models.begin(); it != models.end(); ) {
+					if ((*it)->isEnemy) {
+						float dist = glm::distance(bullet.position, (*it)->origin);
+						if (dist < (*it)->radius) {
+							bullet.active = false;
+							(*it)->health -= bullet.damage;
+							
+							// check if enemy is dead
+							if ((*it)->health <= 0) {
+								Model corpse = map_2_model_dict["d"];
+								corpse.origin = (*it)->origin;
+								models.push_back(std::make_unique<Model>(corpse));
+								std::cout << "Enemy killed: " << (*it)->name << std::endl;
+								// remove enemy from scene
+								it = models.erase(it);
+								continue;
+							}
+						}
+					}
+					// walls
+					if (map.containsSolid(bullet.position.x, bullet.position.z)) {
+						bullet.active = false;
+					}
+					++it;
+				}
+				// Kolize s předměty (většinou ignoruj, pokud nechceš ničit předměty)
+			}
+
+			// remove inactive bullets
+			bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const Bullet& bullet) {
+				return !bullet.active;
+			}), bullets.end());
+
 			//
 			// RENDER: GL drawCalls
 			// 
@@ -526,53 +732,65 @@ int App::run(void) {
 			// clear canvas
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			// TODO:
-			double delta_t = glfwGetTime() - last_frame_time;
-			last_frame_time = glfwGetTime();
-        	glm::vec3 movement = camera.ProcessInput(window, delta_t); // process keys etc.
-			// update camera position
-			if (camera.ValidMovement(movement)) {
-				std::cout << "movement: " << movement.x << ", " << movement.y << ", " << movement.z << std::endl;
-				camera.UpdateCameraPosition(movement);
-			}
-
 			shader.setUniform("uV_m", camera.GetViewMatrix());	
 			shader.setUniform("uP_m", projection_matrix);
+			// draw all models			
+			std::vector<Model*> transparent;    // temporary, vector of pointers to transparent objects
+            //transparent.reserve(scene.size());  // reserve size for all objects to avoid reallocation
+            transparent.reserve(models.size());  // reserve size for all objects to avoid reallocation
 
-			// draw all models
+            // FIRST PART - draw all non-transparent in any order
 			for (auto & model : models) {
-				//shader = model.meshes[0].shader;
-				if (model.name == "triangle") {
-					// update triangle color
-					for (auto & mesh : model.meshes) {
-						mesh.shader.activate();
-						const glm::vec4 triangle_color_vec(triangle_color.r, triangle_color.g, triangle_color.b, 1.0f);
-						mesh.shader.setUniform("uniform_Color", triangle_color_vec);
+				rotation = glm::vec3(0.0f);	
+				model->update(delta_t);
+				if (!model->transparent) {
+					if (model->name == "cube") {
+						for (auto & mesh : model->meshes) {
+							mesh.shader.activate();
+							mesh.shader.setUniform("uV_m", camera.GetViewMatrix());	
+							mesh.shader.setUniform("uP_m", projection_matrix);
+						}
+					} else if (model->isSprite) {
+						// sprite
+						glm::vec3 sprite_position = model->origin;
+						glm::vec3 camera_position = camera.Position;
+						glm::vec3 direction = glm::normalize(camera_position - sprite_position);
+						float angle = atan2(direction.x, direction.z);
+						rotation = glm::vec3(0.0f, angle, 0.0f);
 					}
-				} else if (model.name == "teapot") {
-					for (auto & mesh : model.meshes) {
-						mesh.shader.activate();
-						const glm::vec4 yellow_color(1.0f, 1.0f, 0.0f, 1.0f);
-						mesh.shader.setUniform("uniform_Color", yellow_color);
-					}
-				} else if (model.name == "cube") {
-					// blue color for other models
-					for (auto & mesh : model.meshes) {
-						mesh.shader.activate();
-						mesh.shader.setUniform("uV_m", camera.GetViewMatrix());	
-						mesh.shader.setUniform("uP_m", projection_matrix);
-					}
+					model->draw(offset, rotation, scale_change);
+				} else {
+					transparent.emplace_back(model.get());
 				}
-				//model.update(delta_t);
-				model.draw();
-				/*
-				rotation.x += 0.5f * delta_t;
-				rotation.y += 0.5f * delta_t;
-				rotation.z += 0.5f * delta_t;
-				*/
-
-				//model.draw(offset, rotation, scale_change);
 			}
+
+			// SECOND PART - draw only transparent - painter's algorithm (sort by distance from camera, from far to near)
+			std::sort(transparent.begin(), transparent.end(), [&](Model const * a, Model const * b) {
+				return glm::distance(camera.Position, a->origin) > glm::distance(camera.Position, b->origin);
+			});
+
+            // set GL for transparent objects
+            glEnable(GL_BLEND);
+            glDepthMask(GL_FALSE);
+            glDisable(GL_CULL_FACE);
+
+            // draw sorted transparent
+            for (auto model : transparent) {
+				if (model->isSprite) {
+					// sprite
+					glm::vec3 sprite_position = model->origin;
+					glm::vec3 camera_position = camera.Position;
+					glm::vec3 direction = glm::normalize(camera_position - sprite_position);
+					float angle = atan2(direction.x, direction.z);
+					rotation = glm::vec3(0.0f, angle, 0.0f);
+				}
+				model->draw(offset, rotation, scale_change);
+            }
+            
+            // restore GL properties
+            glDisable(GL_BLEND);
+            glDepthMask(GL_TRUE);
+            glEnable(GL_CULL_FACE);
 
 			// ImGui display
 			if (show_imgui) {
@@ -631,19 +849,4 @@ App::~App() {
     destroy();
 
     std::cout << "Bye...\n";
-}
-
-/* Change the color of the triangle
- * clamps the color values to [0, 1], does not change the alpha value.
- * @param delta: the amount to change the color by
- */
-void App::update_triangle_color(float delta) {
-    triangle_color.r += delta;
-    triangle_color.g += delta;
-    triangle_color.b += delta;
-
-    // clamp the color values to [0, 1]
-    triangle_color.r = glm::clamp(triangle_color.r, 0.0f, 1.0f);
-    triangle_color.g = glm::clamp(triangle_color.g, 0.0f, 1.0f);
-    triangle_color.b = glm::clamp(triangle_color.b, 0.0f, 1.0f);
 }

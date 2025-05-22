@@ -4,6 +4,7 @@
 #include <glm/ext.hpp>
 
 #include "App.hpp"
+#include "Door.hpp"
 
 void App::glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     auto this_inst = static_cast<App*>(glfwGetWindowUserPointer(window));
@@ -24,11 +25,25 @@ void App::glfw_key_callback(GLFWwindow* window, int key, int scancode, int actio
                 this_inst->show_imgui = !this_inst->show_imgui;
                 break;
             case GLFW_KEY_UP:
-                this_inst->update_triangle_color(0.1f);
                 break;
             case GLFW_KEY_DOWN:
-                this_inst->update_triangle_color(-0.1f);
                 break;
+			case GLFW_KEY_F:
+				this_inst->camera.freeCam = !this_inst->camera.freeCam;
+				break;
+			case GLFW_KEY_R:
+				// interact with objects (open doors, etc.)
+				for (auto& model : this_inst->models) {
+					// in reach of the player
+					float dist = glm::distance(this_inst->camera.Position, model->origin);
+					if (dist < model->radius) {
+						Door* door = dynamic_cast<Door*>(model.get());
+						if (door) {
+							door->interact();
+						}
+					}
+				}
+				break;
             default:
                 break;
         }
@@ -85,6 +100,7 @@ void App::update_projection_matrix(void) {
 }
 
 void App::glfw_mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    auto this_inst = static_cast<App*>(glfwGetWindowUserPointer(window));
 	if (action == GLFW_PRESS) {
 		switch (button) {
 		case GLFW_MOUSE_BUTTON_LEFT: {
@@ -95,7 +111,15 @@ void App::glfw_mouse_button_callback(GLFWwindow* window, int button, int action,
 			}
 			else {
 				// we are inside our game: shoot, click, etc.
-				std::cout << "Bang!\n";
+				if (this_inst->player.ammo > 0) {
+					this_inst->player.ammo--;
+					std::cout << "Bang! Ammo left: " << this_inst->player.ammo << "\n";
+					glm::vec3 pos = this_inst->camera.Position;
+					glm::vec3 dir = this_inst->camera.Front;
+					this_inst->bullets.emplace_back(pos, dir);
+				} else {
+					std::cout << "Click! (No ammo)\n";
+				}
 			}
 			break;
 		}

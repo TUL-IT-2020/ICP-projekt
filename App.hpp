@@ -1,5 +1,7 @@
-#pragma once
+#ifndef APP_HPP
+#define APP_HPP
 
+#include <opencv2/opencv.hpp>
 #include <GL/glew.h>
 #ifdef _WIN32
 #include <GL/wglew.h>
@@ -7,11 +9,15 @@
 #include <GLFW/glfw3.h>
 #include <unordered_map>
 #include <string>
-#include <opencv2/opencv.hpp>
 
 #include "assets.hpp"
 #include "Model.hpp"
 #include "camera.hpp"
+#include "Map.hpp"
+#include "Player.hpp"
+#include "Bullet.hpp"
+#include "Door.hpp"
+#include "ShaderProgram.hpp"
 
 enum class TextureFilter {
     Nearest,       // Nearest neighbor - rychlé, ale nekvalitní
@@ -29,16 +35,21 @@ public:
     void init_imgui();
     int run(void);
     void destroy(void);
-
-    color triangle_color{ 1.0f, 0.0f, 0.0f, 1.0f };
-    void update_triangle_color(float delta);
     
     static GLuint gen_tex(cv::Mat& image, TextureFilter filter);
 
     ~App(); //default destructor, called on app instance destruction
 private:
+    // Map
+    Map map;
+	std::unordered_map<std::string, Model> map_2_model_dict;
+    // list of bullets
+    std::vector<Bullet> bullets;
+    bool CheckHitboxes(glm::vec3 movement);
+
     // camera related 
     Camera camera;
+    Player player;
     // remember last cursor position, move relative to that in the next frame
     double cursorLastX{ 0 };
     double cursorLastY{ 0 };
@@ -51,7 +62,7 @@ private:
     // list of Models
     std::unordered_map<std::string, ShaderProgram> shader_cache;
     std::unordered_map<std::string, Model> model_cache;
-    std::vector<Model> models;
+    std::vector<std::unique_ptr<Model>> models;
     //ShaderProgram shader;
 
     void thread_code(void);
@@ -89,3 +100,5 @@ protected:
 	// all objects of the scene
     std::unordered_map<std::string, Model> scene; 
 };
+
+#endif // APP_HPP

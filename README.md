@@ -20,7 +20,7 @@ Pro instalaci závislostí spusťte následující příkaz:
 ./install.sh
 ```
 
-Tan také nainstaluje závsilosti `C++` knihoven:
+Ten také nainstaluje závsilosti `C++` knihoven:
 ```txt
 nlohmann-json
 ```
@@ -72,8 +72,80 @@ Pro spuštění programu je potřeba zdrojoý kód zkompilovat a spustit.
 make run
 ```
 
+## Zdroje:
+Textury a snipety kódu jsou převzaty z následujících zdrojů:
+- [Fable Wolfenstein](https://github.com/JamesRandall/fsharp-wolfenstein)
+- [Wolfenstein 3D Re-implementation in C++](https://github.com/mhamzaqayyum/wolf3d-reimpl-cpp)
+- [Wolfenstein 3D C++](https://github.com/LeviMooreDev/Wolfenstein-3D-CPlusPlus)
+
+
+## Tvorba mapy:
+Legenda pro tvorbu mapy:
+```txt
+' ' = empty
+. = empty
+
+// malá abeceda
+a = barel 1
+b = bead
+c = corpse 1
+d = killed enemy
+e = normal enemy (guard)
+f = flag
+g = gold
+h = health 1
+i = health 2
+j = health 3
+k = key
+l = life
+m = munition
+n
+o = barel 2
+p = player start
+q
+r = gun 1
+s = gun 2
+t = table 1
+u = table 2
+v
+w
+x
+y = chandelier_1
+z = chandelier_2
+// velká abeceda
+A
+B = blue wall
+C = corpse 4
+D = door
+E = hidden door
+F
+G
+H = Hans
+I = lamp
+J
+K = knight
+L = stove
+M = spears
+N
+O
+P = pillar
+Q
+R
+S = stone 1
+T = stone 2
+U = stone 3
+V = wood 2
+W = wood 1
+X = end level (exit/elevator)
+Y = wood 3
+Z
+```
+
+
+
 ## TODO:
 - [ ] Shader program hpp - přidat inline k metodám setUniform
+- [ ] Opravit pořadí vykreslování průhledných modelů.
 
 ```cpp
 // remember:

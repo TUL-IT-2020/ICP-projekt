@@ -1,0 +1,314 @@
+{
+    "map_2_models": [
+        {
+            "token": "floor",
+            "solid": true,
+            "model_name": "cube",
+            "texture_path": "resources/textures/floor.png"
+        },
+        {
+            "token": "D",
+            "solid": true,
+            "model_name": "cube",
+            "texture_path": "resources/textures/door.png",
+            "radius": 1.2,
+            "type": "door"
+        },
+        {
+            "token": "S",
+            "solid": true,
+            "model_name": "cube",
+            "texture_path": "resources/textures/stone_wall_1.png"
+        },
+        {
+            "token": "W",
+            "solid": true,
+            "model_name": "cube",
+            "texture_path": "resources/textures/wood_wall_1.png"
+        },
+        {
+            "token": "B",
+            "solid": true,
+            "model_name": "cube",
+            "texture_path": "resources/textures/blue_wall_1.png"
+        },
+        {
+            "token": "X",
+            "model_name": "cube",
+            "solid": true,
+            "texture_path": "resources/textures/end_game.png"
+        },
+        {
+            "token": "o",
+            "model_name": "sprite",
+            "solid": true,
+            "transparent": true,
+            "texture_path": "resources/sprites/pillar.png"
+        },
+        {
+            "token": "g",
+            "model_name": "sprite",
+            "transparent": true,
+            "texture_path": "resources/sprites/gold_1.png",
+            "type": "collectible",
+            "collect_type": "gold",
+            "value": 10
+        },
+        {
+            "token": "h",
+            "model_name": "sprite",
+            "transparent": true,
+            "texture_path": "resources/sprites/health_1.png",
+            "type": "collectible",
+            "collect_type": "health",
+            "value": 10
+        },
+        {
+            "token": "m",
+            "model_name": "sprite",
+            "transparent": true,
+            "texture_path": "resources/sprites/munition.png",
+            "type": "collectible",
+            "collect_type": "ammo",
+            "value": 10
+        },
+        {
+            "token": "a",
+            "solid": true,
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/barrel_1.png"
+        },
+        {
+            "token": "b",
+            "solid": true,
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/bead.png"
+        },
+        {
+            "token": "c",
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/corpses_1.png"
+        },
+        {
+            "token": "d",
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/corpses_2.png"
+        },
+        {
+            "token": "e",
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/Guard/SPR00050.png",
+            "type" : "enemy",
+            "radius": 0.5,
+            "health": 15
+        },
+        {
+            "token": "f",
+            "solid": true,
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/flag.png"
+        },
+        {
+            "token": "i",
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/health_2.png",
+            "type": "collectible",
+            "collect_type": "health",
+            "value": 15
+        },
+        {
+            "token": "j",
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/health_3.png",
+            "type": "collectible",
+            "collect_type": "health",
+            "value": 20
+        },
+        {
+            "token": "k",
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/key_gold.png",
+            "type": "collectible",
+            "collect_type": "key_gold"
+        },
+        {
+            "token": "l",
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/life.png",
+            "type": "collectible",
+            "collect_type": "life"
+        },
+        {
+            "token": "n",
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/SPR00000.png"
+        },
+        {
+            "token": "o",
+            "solid": true,
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/barrel_2.png"
+        },
+        {
+            "token": "q",
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/SPR00000.png"
+        },
+        {
+            "token": "r",
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/SPR00029.png",
+            "type": "collectible",
+            "collect_type": "weapon"
+        },
+        {
+            "token": "s",
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/SPR00030.png",
+            "type": "collectible",
+            "collect_type": "weapon"
+        },
+        {
+            "token": "t",
+            "solid": true,
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/table_1.png"
+        },
+        {
+            "token": "u",
+            "solid": true,
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/table_2.png"
+        },
+        {
+            "token": "v",
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/SPR00000.png"
+        },
+        {
+            "token": "w",
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/SPR00000.png"
+        },
+        {
+            "token": "x",
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/SPR00000.png"
+        },
+        {
+            "token": "y",
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/chandelier_1.png",
+            "light_source": true
+        },
+        {
+            "token": "z",
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/chandelier_2.png",
+            "light_source": true
+        },
+        {
+            "token": "C",
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/corpses_4.png"
+        },
+        {
+            "token": "E",
+            "solid": true,
+            "model_name": "cube",
+            "texture_path": "resources/textures/stone_wall_2_dark.png"
+        },
+        {
+            "token": "H",
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/Hans/SPR00300.png",
+            "type" : "enemy",
+            "radius": 1.2,
+            "health": 45
+        },
+        {
+            "token": "I",
+            "solid": true,
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/lamp.png",
+            "light_source": true
+        },
+        {
+            "token": "K",
+            "solid": true,
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/knight.png"
+        },
+        {
+            "token": "L",
+            "solid": true,
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/stove.png"
+        },
+        {
+            "token": "M",
+            "solid": true,
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/spears.png"
+        },
+        {
+            "token": "P",
+            "solid": true,
+            "transparent": true,
+            "model_name": "sprite",
+            "texture_path": "resources/sprites/pillar.png"
+        },
+        {
+            "token": "T",
+            "solid": true,
+            "model_name": "cube",
+            "texture_path": "resources/textures/stone_wall_2.png"
+        },
+        {
+            "token": "U",
+            "solid": true,
+            "model_name": "cube",
+            "texture_path": "resources/textures/stone_wall_3.png"
+        },
+        {
+            "token": "V",
+            "solid": true,
+            "model_name": "cube",
+            "texture_path": "resources/textures/wood_wall_2.png"
+        },
+        {
+            "token": "Y",
+            "solid": true,
+            "model_name": "cube",
+            "texture_path": "resources/textures/wood_wall_3.png"
+        }
+    ]
+}

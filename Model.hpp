@@ -1,7 +1,7 @@
 #ifndef MODEL_HPP
 #define MODEL_HPP
 
-#include <bits/stl_numeric.h>
+#include <numeric>
 
 #include <filesystem>
 #include <glm/glm.hpp>
@@ -9,7 +9,6 @@
 #include <iterator>  // Include this header for std::begin and std::end
 #include <string>
 #include <vector>
-#include <nlohmann/json.hpp>
 
 #include "Mesh.hpp"
 #include "OBJloader.hpp"
@@ -27,6 +26,31 @@ public:
     glm::mat4 local_model_matrix{}; //for complex transformations 
 
     GLuint texture_id{0}; // texture id=0  means no texture
+    bool isSprite = false;
+    bool transparent = false;
+    // for collectible objects
+    bool collectible = false; 
+    std::string collect_type = "";
+    int value = 0; 
+    // for enemy objects
+    bool isEnemy = false;
+    float radius = 0.5f;
+    int health = 1; 
+    // for door objects
+    bool isDoor = false;
+    bool isSolid = false;
+
+    // for light sources
+    bool light_source = false;
+
+    /* Loads a model from JSON data and updates the model object.
+     * @param model_data: JSON data containing model information
+     * @param model: Model object to be updated
+     * @param model_cache: Cache of models to avoid reloading
+     * @return: Updated Model object
+     */
+    static Model parse_json_to_model(const nlohmann::json& model_data, Model& model,
+                      std::unordered_map<std::string, Model> model_cache);
 
     // Default constructor
     Model() = default;
@@ -118,33 +142,51 @@ public:
     }
 
     // Copy constructor
-    Model(const Model& other)
-        : meshes(other.meshes),
-          name(other.name),
-          origin(other.origin),
-          orientation(other.orientation),
-          scale(other.scale),
-          texture_id(other.texture_id),
-          local_model_matrix(other.local_model_matrix) {
+    Model(const Model& other): 
+        meshes(other.meshes),
+        name(other.name),
+        origin(other.origin),
+        orientation(other.orientation),
+        scale(other.scale),
+        texture_id(other.texture_id),
+        local_model_matrix(other.local_model_matrix),
+        isSprite(other.isSprite),
+        transparent(other.transparent),
+        collectible(other.collectible),
+        collect_type(other.collect_type),
+        value(other.value),
+        light_source(other.light_source),
+        isEnemy(other.isEnemy),
+        radius(other.radius),
+        health(other.health),
+        isDoor(other.isDoor),
+        isSolid(other.isSolid) {
     }
 
+    virtual ~Model() = default;
+    /*
     ~Model() {
         // clear all meshes
         // for (auto & mesh : meshes) {
         //    mesh.clear();
         //}
     }
+    */
 
     /* update position etc. based on running time
      * e.g.: s=s0+v*dt
      * @param delta_t: time passed since last update
      */
+    virtual void update(float) {}
+
+    /*
     void update(const float delta_t) {
 		glm::vec3 offset = glm::vec3(0.0f);
         glm::vec3 rotation = glm::vec3(0.0f, delta_t, 0.0f);  // Rotace kolem osy Y
         glm::vec3 scale_change = glm::vec3(1.0f);
-        local_model_matrix *=  complete_transformation(offset, rotation, scale_change);
+        local_model_matrix *= complete_transformation(offset, rotation, scale_change);
     }
+    */
 
     // call draw() on mesh (all meshes)
     void draw(glm::vec3 const & offset = glm::vec3(0.0),
@@ -164,8 +206,7 @@ public:
 		glm::mat4 m_rz = glm::rotate(glm::mat4(1.0f), rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
 		glm::mat4 m_s = glm::scale(glm::mat4(1.0f), scale_change);
 
-		//glm::mat4 model_matrix = s * rz * ry * rx * t * m_s * m_rz * m_ry * m_rx * m_off;
-        glm::mat4 model_matrix = m_off * m_rx * m_ry * m_rz * m_s * t * rx * ry * rz * s;
+		glm::mat4 model_matrix = s * rz * ry * rx * t * m_s * m_rz * m_ry * m_rx * m_off;
 
         if (texture_id == 0) {
             std::cerr << "Error: Texture ID is 0! Texture not loaded properly." << std::endl;
@@ -190,6 +231,13 @@ public:
             mesh.draw(local_model_matrix * model_matrix);
         }
     }
+
+    void interact() {}
 };
+
+GLuint textureInit(const std::filesystem::path& file_name);
+Model parse_json_to_model(const nlohmann::json& model_data, Model& model,
+                         std::unordered_map<std::string, Model> model_cache);
+
 
 #endif  // MODEL_HPP
