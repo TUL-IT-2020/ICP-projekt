@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <random>
 #include <fstream>
-#include <nlohmann/json.hpp>
 
 #include <opencv2/opencv.hpp>
 #include <GL/glew.h>
@@ -28,12 +27,7 @@
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 
-#include "Model.hpp"
 #include "App.hpp"
-#include "assets.hpp"
-#include "ShaderProgram.hpp"
-#include "Map.hpp"
-#include "Player.hpp"
 
 App::App() {
 	// default constructor
@@ -297,45 +291,6 @@ void App::init_assets(void) {
 		}
 	}
 	std::cout << "Models loaded." << std::endl;
-	
-	/*
-	// load position for objects -> models
-	// place models to the scene
-	std::ifstream map_file("resources/scene.json");
-	if (!map_file.is_open()) {
-		throw std::runtime_error("Could not open JSON file.");
-	}
-
-	map_file >> json;
-
-	for (const auto& model_data : json["scene"]) {
-		std::cout << "Placing model: " << model_data["name"] << std::endl;
-		try {
-			std::string name = model_data["name"];
-			
-			// copy model from cache
-			Model model = model_cache[name];
-
-			if (model_data.find("origin") != model_data.end()) {
-				model.origin = json_to_vec3(model_data["origin"]);
-			}
-			
-			if (model_data.find("scale") != model_data.end()) {
-				model.scale = json_to_vec3(model_data["scale"]);
-			}
-
-			if (model_data.find("texture_path") != model_data.end()) {
-				model.texture_id = textureInit(model_data["texture_path"]);
-			}
-			
-			models.push_back(model);
-
-		} catch (std::exception const& e) {
-			std::cerr << "ERROR placing model to scene: " << model_data["name"] << ", " << e.what() << std::endl;
-			exit(EXIT_FAILURE);
-		}
-	}
-	*/
 
 	// load level
 	//map = Map(10, 25);
@@ -400,6 +355,15 @@ void App::init_assets(void) {
 		}
 	}
 	std::cout << std::endl;
+
+	// print loaded doors
+	std::cout << "Doors: ";
+	for (const auto& obj : map_2_model_dict) {
+		if (obj.second.isDoor) {
+			std::cout << obj.first << " ";
+		}
+	}
+	std::cout << std::endl;
 	
 	// size offset
 	glm::vec3 offset = glm::vec3(1.0, 0.0, 1.0);
@@ -409,12 +373,32 @@ void App::init_assets(void) {
 		for (int i = 0; i < map.getCols(); i++) {
 			std::string token = std::string(1, map.fetchMapValue(i, j));
 			if (map_2_model_dict.find(token) != map_2_model_dict.end()) {
-				Model model = map_2_model_dict[token];
-				model.origin = glm::vec3(i, 0, j) + offset;
-				models.push_back(model);
+				Model& base = map_2_model_dict[token];
+				glm::vec3 pos = glm::vec3(i, 0, j) + offset;
+				if (base.isDoor) {
+					auto door = std::make_unique<Door>(base);
+					door->origin = pos;
+					models.push_back(std::move(door));
+				} else {
+					auto model = std::make_unique<Model>(base);
+					model->origin = pos;
+					models.push_back(std::move(model));
+				}
 			}
 		}
 	}
+
+	// print all door objects
+	/*
+	std::cout << "Placed door objects: \n";
+	for (auto& obj : models) {
+		Door* door = dynamic_cast<Door*>(obj.get());
+		if (door) {
+			std::cout << door->name << " ";
+			std::cout << door->origin.x << " " << door->origin.y << " " << door->origin.z << "\n";
+		}
+	}
+	*/
 	
 	// print all placed collectible objects
 	/*
@@ -434,7 +418,7 @@ void App::init_assets(void) {
 	floor.scale = glm::vec3(map.getCols(), 1.0, map.getRows());
 	// change origin
 	floor.origin = glm::vec3(0.5, -1.0, 0.5);
-	models.push_back(floor);
+	models.push_back(std::make_unique<Model>(floor));
 
 	//set player position in 3D space (transform X-Y in map to XYZ in GL)
 	camera.Position.x = (map.start_position.x) + 1.0 / 2.0f;
@@ -613,7 +597,7 @@ int App::run(void) {
 		//camera.Position = glm::vec3(0, 0, 10);
 		double last_frame_time = glfwGetTime();
 		
-		ShaderProgram& shader = models[0].meshes[0].shader;
+		ShaderProgram& shader = (*models[0]).meshes[0].shader;
 		shader.activate();
 
 		
@@ -670,16 +654,16 @@ int App::run(void) {
 			float radius = 0.7f;
 			// check for collisions with collectibles
 			for (auto it = models.begin(); it != models.end(); ) {
-				if (it->collectible) {
-					float dist = glm::distance(camera.Position, it->origin);
+				if ((*it)->collectible) {
+					float dist = glm::distance(camera.Position, (*it)->origin);
 					if (dist < radius) {
-						std::cout << "Collected item: " << it->collect_type << std::endl;
-						if (it->collect_type == "gold") {
-							player.gold += it->value;
-						} else if (it->collect_type == "health") {
-							player.health += it->value;
-						} else if (it->collect_type == "ammo") {
-							player.ammo += it->value;
+						std::cout << "Collected item: " << (*it)->collect_type << std::endl;
+						if ((*it)->collect_type == "gold") {
+							player.gold += (*it)->value;
+						} else if ((*it)->collect_type == "health") {
+							player.health += (*it)->value;
+						} else if ((*it)->collect_type == "ammo") {
+							player.ammo += (*it)->value;
 						}
 						// Odstraň předmět ze scény
 						it = models.erase(it);
@@ -700,18 +684,18 @@ int App::run(void) {
 				if (!bullet.active) continue;
 				// Kolize s nepřáteli
 				for (auto it = models.begin(); it != models.end(); ) {
-					if (it->isEnemy) {
-						float dist = glm::distance(bullet.position, it->origin);
-						if (dist < it->radius) {
+					if ((*it)->isEnemy) {
+						float dist = glm::distance(bullet.position, (*it)->origin);
+						if (dist < (*it)->radius) {
 							bullet.active = false;
-							it->health -= bullet.damage;
+							(*it)->health -= bullet.damage;
 							
 							// check if enemy is dead
-							if (it->health <= 0) {
+							if ((*it)->health <= 0) {
 								Model corpse = map_2_model_dict["d"];
-								corpse.origin = it->origin;
-								models.push_back(corpse);
-								std::cout << "Enemy killed: " << it->name << std::endl;
+								corpse.origin = (*it)->origin;
+								models.push_back(std::make_unique<Model>(corpse));
+								std::cout << "Enemy killed: " << (*it)->name << std::endl;
 								// remove enemy from scene
 								it = models.erase(it);
 								continue;
@@ -749,33 +733,26 @@ int App::run(void) {
             // FIRST PART - draw all non-transparent in any order
 			for (auto & model : models) {
 				rotation = glm::vec3(0.0f);	
-				if (! model.transparent) {
-					if (model.name == "cube") {
-						for (auto & mesh : model.meshes) {
+				model->update(delta_t);
+				if (!model->transparent) {
+					if (model->name == "cube") {
+						for (auto & mesh : model->meshes) {
 							mesh.shader.activate();
 							mesh.shader.setUniform("uV_m", camera.GetViewMatrix());	
 							mesh.shader.setUniform("uP_m", projection_matrix);
 						}
-					} else if (model.isSprite) {
+					} else if (model->isSprite) {
 						// sprite
-						glm::vec3 sprite_position = model.origin;
+						glm::vec3 sprite_position = model->origin;
 						glm::vec3 camera_position = camera.Position;
 						glm::vec3 direction = glm::normalize(camera_position - sprite_position);
 						float angle = atan2(direction.x, direction.z);
 						rotation = glm::vec3(0.0f, angle, 0.0f);
 					}
-					model.draw(offset, rotation, scale_change);
-					
-					//model.update(delta_t);
-					/*
-					rotation.x += 0.5f * delta_t;
-					rotation.y += 0.5f * delta_t;
-					rotation.z += 0.5f * delta_t;
-					*/
+					model->draw(offset, rotation, scale_change);
 				} else {
-					transparent.emplace_back(&model);
+					transparent.emplace_back(model.get());
 				}
-
 			}
 
 			// SECOND PART - draw only transparent - painter's algorithm (sort by distance from camera, from far to near)

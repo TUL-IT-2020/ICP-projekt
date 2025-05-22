@@ -16,6 +16,8 @@
 #include "Map.hpp"
 #include "Player.hpp"
 #include "Bullet.hpp"
+#include "Door.hpp"
+#include "ShaderProgram.hpp"
 
 enum class TextureFilter {
     Nearest,       // Nearest neighbor - rychlé, ale nekvalitní
@@ -60,7 +62,7 @@ private:
     // list of Models
     std::unordered_map<std::string, ShaderProgram> shader_cache;
     std::unordered_map<std::string, Model> model_cache;
-    std::vector<Model> models;
+    std::vector<std::unique_ptr<Model>> models;
     //ShaderProgram shader;
 
     void thread_code(void);

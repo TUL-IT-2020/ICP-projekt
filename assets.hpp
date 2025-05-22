@@ -8,6 +8,8 @@
 #endif
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <nlohmann/json.hpp>
+#include <opencv2/opencv.hpp>
 
 //vertex description
 struct vertex {
@@ -51,5 +53,8 @@ inline glm::mat4 complete_transformation(glm::vec3 const& origin = glm::vec3(0.0
 
     return s * rz * ry * rx * t;
 }
+
+glm::vec3 json_to_vec3(const nlohmann::json& json_array);
+cv::Mat createCheckerboardTexture();
 
 #endif // ASSETS_HPP

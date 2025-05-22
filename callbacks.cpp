@@ -4,6 +4,7 @@
 #include <glm/ext.hpp>
 
 #include "App.hpp"
+#include "Door.hpp"
 
 void App::glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     auto this_inst = static_cast<App*>(glfwGetWindowUserPointer(window));
@@ -29,6 +30,27 @@ void App::glfw_key_callback(GLFWwindow* window, int key, int scancode, int actio
                 break;
 			case GLFW_KEY_F:
 				this_inst->camera.freeCam = !this_inst->camera.freeCam;
+				break;
+			case GLFW_KEY_R:
+				// interact with objects (open doors, etc.)
+				for (auto& model : this_inst->models) {
+					// in reach of the player
+					float dist = glm::distance(this_inst->camera.Position, model->origin);
+					if (dist < model->radius) {
+						// interact with the model
+						std::cout << "Interacted with model: " << model->name << std::endl;
+						Door* door = dynamic_cast<Door*>(model.get());
+						if (door) {
+							// Tento objekt je dveře, můžeš s ním pracovat jako s Door
+							door->interact();
+							std::cout << "Dveře otevřeny/uzavřeny." << std::endl;
+						}
+						else {
+							std::cout << "Tento objekt není dveře." << std::endl;
+						}
+					}
+				}
+				break;
             default:
                 break;
         }

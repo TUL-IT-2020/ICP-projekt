@@ -10,7 +10,9 @@
             "token": "D",
             "solid": true,
             "model_name": "cube",
-            "texture_path": "resources/textures/door.png"
+            "texture_path": "resources/textures/door.png",
+            "radius": 1.2,
+            "type": "door"
         },
         {
             "token": "S",
@@ -48,7 +50,7 @@
             "model_name": "sprite",
             "transparent": true,
             "texture_path": "resources/sprites/gold_1.png",
-            "collectible": true,
+            "type": "collectible",
             "collect_type": "gold",
             "value": 10
         },
@@ -57,7 +59,7 @@
             "model_name": "sprite",
             "transparent": true,
             "texture_path": "resources/sprites/health_1.png",
-            "collectible": true,
+            "type": "collectible",
             "collect_type": "health",
             "value": 10
         },
@@ -66,7 +68,7 @@
             "model_name": "sprite",
             "transparent": true,
             "texture_path": "resources/sprites/munition.png",
-            "collectible": true,
+            "type": "collectible",
             "collect_type": "ammo",
             "value": 10
         },
@@ -101,7 +103,7 @@
             "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/Guard/SPR00050.png",
-            "isEnemy": true,
+            "type" : "enemy",
             "radius": 0.5,
             "health": 15
         },
@@ -117,7 +119,7 @@
             "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/health_2.png",
-            "collectible": true,
+            "type": "collectible",
             "collect_type": "health",
             "value": 15
         },
@@ -126,7 +128,7 @@
             "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/health_3.png",
-            "collectible": true,
+            "type": "collectible",
             "collect_type": "health",
             "value": 20
         },
@@ -135,7 +137,7 @@
             "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/key_gold.png",
-            "collectible": true,
+            "type": "collectible",
             "collect_type": "key_gold"
         },
         {
@@ -143,7 +145,7 @@
             "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/life.png",
-            "collectible": true,
+            "type": "collectible",
             "collect_type": "life"
         },
         {
@@ -170,7 +172,7 @@
             "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/SPR00029.png",
-            "collectible": true,
+            "type": "collectible",
             "collect_type": "weapon"
         },
         {
@@ -178,7 +180,7 @@
             "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/SPR00030.png",
-            "collectible": true,
+            "type": "collectible",
             "collect_type": "weapon"
         },
         {
@@ -244,7 +246,7 @@
             "transparent": true,
             "model_name": "sprite",
             "texture_path": "resources/sprites/Hans/SPR00300.png",
-            "isEnemy": true,
+            "type" : "enemy",
             "radius": 1.2,
             "health": 45
         },
