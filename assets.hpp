@@ -57,4 +57,16 @@ inline glm::mat4 complete_transformation(glm::vec3 const& origin = glm::vec3(0.0
 glm::vec3 json_to_vec3(const nlohmann::json& json_array);
 cv::Mat createCheckerboardTexture();
 
+glm::mat4 computeBillboardMatrix(const glm::mat4& view_matrix, const glm::vec3& sprite_position);
+/* AABB collision detection functions
+ * AABB = Axis-Aligned Bounding Box
+ */
+bool aabb_contains_point(const glm::vec3& min, const glm::vec3& max, const glm::vec3& point);
+
+/* AABB intersection test
+ * Returns true if the two AABBs intersect
+ */
+bool aabb_intersect(const glm::vec3& minA, const glm::vec3& maxA,
+                    const glm::vec3& minB, const glm::vec3& maxB);
+
 #endif // ASSETS_HPP
