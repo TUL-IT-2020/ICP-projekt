@@ -189,7 +189,7 @@ public:
     */
 
     // call draw() on mesh (all meshes)
-    void draw(glm::vec3 const & offset = glm::vec3(0.0),
+    virtual void draw(glm::vec3 const & offset = glm::vec3(0.0),
               glm::vec3 const & rotation = glm::vec3(0.0f),
               glm::vec3 const & scale_change = glm::vec3(1.0f) ) {
 

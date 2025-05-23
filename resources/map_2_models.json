@@ -146,7 +146,8 @@
             "model_name": "sprite",
             "texture_path": "resources/sprites/life.png",
             "type": "collectible",
-            "collect_type": "life"
+            "collect_type": "life",
+            "value": 1
         },
         {
             "token": "n",

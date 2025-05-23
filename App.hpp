@@ -18,6 +18,7 @@
 #include "Bullet.hpp"
 #include "Door.hpp"
 #include "ShaderProgram.hpp"
+#include "StatusBar.hpp"
 
 enum class TextureFilter {
     Nearest,       // Nearest neighbor - rychlé, ale nekvalitní
@@ -50,6 +51,7 @@ private:
     // camera related 
     Camera camera;
     Player player;
+    std::shared_ptr<StatusBar> status_bar;
     // remember last cursor position, move relative to that in the next frame
     double cursorLastX{ 0 };
     double cursorLastY{ 0 };

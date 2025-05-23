@@ -32,7 +32,7 @@
 App::App() {
 	// default constructor
 	camera = Camera();
-	player = Player();
+	player = Player(75, 0, 25, 3);
 }
 
 void App::init_glew(void) {
@@ -402,6 +402,12 @@ void App::init_assets(void) {
 	camera.Position.y = camera.camera_height;
 
 	std::cout << "Scene generated." << std::endl;	
+
+	// load status bar
+	status_bar = std::make_shared<StatusBar>(model_cache["statusbar"]);
+	status_bar->loadAssets();
+
+	std::cout << "Status bar loaded." << std::endl;
 }
 
 void App::print_opencv_info() {
@@ -638,8 +644,11 @@ int App::run(void) {
 							player.gold += (*it)->value;
 						} else if ((*it)->collect_type == "health") {
 							player.health += (*it)->value;
+							if (player.health > 100) player.health = 100;
 						} else if ((*it)->collect_type == "ammo") {
 							player.ammo += (*it)->value;
+						} else if ((*it)->collect_type == "life") {
+							player.lives += (*it)->value;
 						}
 						// Odstraň předmět ze scény
 						it = models.erase(it);
@@ -758,6 +767,11 @@ int App::run(void) {
             glDisable(GL_BLEND);
             glDepthMask(GL_TRUE);
             glEnable(GL_CULL_FACE);
+
+			// draw status bar
+			status_bar->update(player);
+			glm::vec3 default_value = glm::vec3(0.0, 0.0, 0.0);
+			status_bar->draw(default_value, default_value, default_value);
 
 			// ImGui display
 			if (show_imgui) {
