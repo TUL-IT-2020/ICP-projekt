@@ -20,6 +20,8 @@ public:
     int gold = 0;
     int ammo = 0;
     int health = 100;
+    int lives = 0;
+    int floor_number = 1;
 
     StatusBar() = default;
     StatusBar(const Model& base) : Model(base) {}
@@ -42,17 +44,18 @@ public:
         return face_index;
     }
 
-    bool if_change(int gold, int ammo, int health) {
-        return (this->gold != gold || this->ammo != ammo || this->health != health);
+    bool if_change(const Player& player) {
+        return (this->gold != gold || this->ammo != ammo || this->health != health, this->lives != lives);
     }
 
     // Update podle hráče
     void update(const Player& player) {
         int new_face = face_from_health(player.health);
-        if (gold != player.gold || ammo != player.ammo || health != player.health) {
+        if (if_change(player)) {
             gold = player.gold;
             ammo = player.ammo;
             health = player.health;
+            lives = player.lives;
             current_face = new_face;
             updateStatusBarTexture();
         }

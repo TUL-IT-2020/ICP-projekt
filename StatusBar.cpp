@@ -80,18 +80,15 @@ void StatusBar::updateStatusBarTexture() {
     cv::Point ammo_pos(202, 13);
 
     // floor number
-    int floor_number = 0;
-    cv::Mat floor_number_img = int_to_img(floor_number, 2);
+    cv::Mat floor_number_img = int_to_img(this->floor_number, 2);
     check_and_copy(floor_number_img, statusBarImg, floor_pos);
 
     // score
-    int score = this->gold;
-    cv::Mat gold_img = int_to_img(score, 5);
+    cv::Mat gold_img = int_to_img(this->gold, 5);
     check_and_copy(gold_img, statusBarImg, gold_pos);
 
     // lives
-    int lives = 0;
-    cv::Mat lives_img = int_to_img(lives, 2);
+    cv::Mat lives_img = int_to_img(this->lives, 2);
     check_and_copy(lives_img, statusBarImg, lives_pos);
 
     // draw face
@@ -99,13 +96,11 @@ void StatusBar::updateStatusBarTexture() {
     check_and_copy(face, statusBarImg, face_pos);
 
     // health 2 digits
-    int health = this->health;
-    cv::Mat health_img = int_to_img(health, 3);
+    cv::Mat health_img = int_to_img(this->health, 3);
     check_and_copy(health_img, statusBarImg, health_pos);
 
     // ammo 2 digits
-    int ammo = this->ammo;
-    cv::Mat ammo_img = int_to_img(ammo, 3);
+    cv::Mat ammo_img = int_to_img(this->ammo, 3);
     check_and_copy(ammo_img, statusBarImg, ammo_pos);
 
     // rotate statusBarImg
