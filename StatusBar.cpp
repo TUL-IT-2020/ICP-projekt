@@ -6,7 +6,7 @@ void StatusBar::loadAssets() {
     statusBarImgBackground = cv::imread("resources/statusBar/background.png", cv::IMREAD_UNCHANGED);
 
     // Load face textures
-    for (int i = 109; i <= 132; ++i) {
+    for (int i = 130; i > 108; --i) {
         std::string path = "resources/statusBar/PIC00" + std::to_string(i) + ".png";
         cv::Mat img = cv::imread(path, cv::IMREAD_UNCHANGED);
         if (img.empty()) {
@@ -33,38 +33,80 @@ void StatusBar::loadAssets() {
     this->texture_id = App::gen_tex(statusBarImgBackground, TextureFilter::TrilinearMipmap);
 }
 
+cv::Mat StatusBar::int_to_img(int number, int positions) {
+    int number_width = digit_textures[0].cols;
+    int number_height = digit_textures[0].rows;
+    int type = digit_textures[0].type();
+
+    cv::Mat img = cv::Mat::zeros(number_height, positions * number_width, type);
+    for (int i = 0; i < positions; ++i) {
+        int digit = (number / static_cast<int>(std::pow(10, positions - i - 1))) % 10;
+        if (digit < 0 || digit >= static_cast<int>(digit_textures.size())) {
+            digit = 0; // fallback to 0 if out of range
+        }
+        cv::Mat digit_img = digit_textures[digit];
+        digit_img.copyTo(img(cv::Rect(i * number_width, 0, digit_img.cols, digit_img.rows)), digit_img.channels() == 4 ? digit_img : cv::noArray());
+    }
+    return img;
+}
+
 void StatusBar::updateStatusBarTexture() {
     int height_px = statusBarImgBackground.rows;
     int width_px = statusBarImgBackground.cols;
-    cv::Mat statusBarImg = cv::Mat(height_px, width_px, CV_8UC4);
-    statusBarImg = statusBarImgBackground.clone();
+    cv::Mat statusBarImg = statusBarImgBackground.clone();
+
+    auto check_and_copy = [&](const cv::Mat& src, cv::Mat& dst, cv::Point pos) {
+        if (src.empty()) {
+            std::cerr << "Warning: source image is empty!" << std::endl;
+            return;
+        }
+        if (pos.x < 0 || pos.y < 0 ||
+            pos.x + src.cols > dst.cols ||
+            pos.y + src.rows > dst.rows) {
+            std::cerr << "Warning: ROI out of bounds! pos=(" << pos.x << "," << pos.y
+                    << "), size=(" << src.cols << "," << src.rows
+                    << "), dst size=(" << dst.cols << "," << dst.rows << ")" << std::endl;
+            return;
+        }
+        src.copyTo(dst(cv::Rect(pos, src.size())), src);
+    };
+
+    // Example positions for each element (adjust as needed)
+    cv::Point floor_pos(10, 13);
+    cv::Point gold_pos(45, 13);
+    cv::Point lives_pos(100, 13);
+    cv::Point face_pos(125, 1);
+    cv::Point health_pos(160, 13);
+    cv::Point ammo_pos(202, 13);
+
     // floor number
     int floor_number = 0;
-    cv::Mat floor_number_img = digit_textures[floor_number];
+    cv::Mat floor_number_img = int_to_img(floor_number, 2);
+    check_and_copy(floor_number_img, statusBarImg, floor_pos);
 
-    // score 2 digits (gold)
+    // score
     int score = this->gold;
+    cv::Mat gold_img = int_to_img(score, 5);
+    check_and_copy(gold_img, statusBarImg, gold_pos);
 
-    // lives 2 digits
+    // lives
+    int lives = 0;
+    cv::Mat lives_img = int_to_img(lives, 2);
+    check_and_copy(lives_img, statusBarImg, lives_pos);
 
     // draw face
     cv::Mat face = face_textures[current_face];
-    // copy face to statusBarImg
+    check_and_copy(face, statusBarImg, face_pos);
 
     // health 2 digits
     int health = this->health;
-
-    int health_tens = health / 10;
-    int health_units = health % 10;
-    cv::Mat health_tens_img = digit_textures[health_tens];
-    cv::Mat health_units_img = digit_textures[health_units];
+    cv::Mat health_img = int_to_img(health, 3);
+    check_and_copy(health_img, statusBarImg, health_pos);
 
     // ammo 2 digits
     int ammo = this->ammo;
-    int ammo_tens = ammo / 10;
-    int ammo_units = ammo % 10;
-    cv::Mat ammo_tens_img = digit_textures[ammo_tens];
-    cv::Mat ammo_units_img = digit_textures[ammo_units];
+    cv::Mat ammo_img = int_to_img(ammo, 3);
+    check_and_copy(ammo_img, statusBarImg, ammo_pos);
 
     // rotate statusBarImg
     cv::Mat flipedImg;

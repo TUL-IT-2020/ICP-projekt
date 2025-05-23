@@ -58,7 +58,7 @@ public:
         }
     }
 
-    // Překresli status bar (např. slož do OpenCV matice a aktualizuj texturu)
+    cv::Mat int_to_img(int number, int positions);
     void updateStatusBarTexture();
 
     //
