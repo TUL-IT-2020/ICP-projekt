@@ -43,6 +43,12 @@ public:
     // for light sources
     bool light_source = false;
 
+    // Material properties (add these)
+    glm::vec3 ambientMaterial = glm::vec3(0.5f); // Default values
+    glm::vec3 diffuseMaterial = glm::vec3(0.8f);
+    glm::vec3 specularMaterial = glm::vec3(0.5f);
+    float shininess = 32.0f;
+
     /* Loads a model from JSON data and updates the model object.
      * @param model_data: JSON data containing model information
      * @param model: Model object to be updated
@@ -188,46 +194,41 @@ public:
     }
     */
 
-    // call draw() on mesh (all meshes)
     virtual void draw(glm::vec3 const & offset = glm::vec3(0.0),
-              glm::vec3 const & rotation = glm::vec3(0.0f),
-              glm::vec3 const & scale_change = glm::vec3(1.0f) ) {
+                  glm::vec3 const & rotation = glm::vec3(0.0f),
+                  glm::vec3 const & scale_change = glm::vec3(1.0f) ) 
+    {
+    // This function's only job is to calculate the final model matrix.
+    // Your existing calculations are here.
+    glm::mat4 t = glm::translate(glm::mat4(1.0f), origin);
+    glm::mat4 rx = glm::rotate(glm::mat4(1.0f), orientation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+    glm::mat4 ry = glm::rotate(glm::mat4(1.0f), orientation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 rz = glm::rotate(glm::mat4(1.0f), orientation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+    glm::mat4 s = glm::scale(glm::mat4(1.0f), scale);
 
-        // compute complete transformation
-		glm::mat4 t = glm::translate(glm::mat4(1.0f), origin);
-		glm::mat4 rx = glm::rotate(glm::mat4(1.0f), orientation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-		glm::mat4 ry = glm::rotate(glm::mat4(1.0f), orientation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-		glm::mat4 rz = glm::rotate(glm::mat4(1.0f), orientation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-		glm::mat4 s = glm::scale(glm::mat4(1.0f), scale);
+    glm::mat4 m_off = glm::translate(glm::mat4(1.0f), offset);
+    glm::mat4 m_rx = glm::rotate(glm::mat4(1.0f), rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+    glm::mat4 m_ry = glm::rotate(glm::mat4(1.0f), rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 m_rz = glm::rotate(glm::mat4(1.0f), rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+    glm::mat4 m_s = glm::scale(glm::mat4(1.0f), scale_change);
 
-		glm::mat4 m_off = glm::translate(glm::mat4(1.0f), offset);
-		glm::mat4 m_rx = glm::rotate(glm::mat4(1.0f), rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-		glm::mat4 m_ry = glm::rotate(glm::mat4(1.0f), rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-		glm::mat4 m_rz = glm::rotate(glm::mat4(1.0f), rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-		glm::mat4 m_s = glm::scale(glm::mat4(1.0f), scale_change);
+    glm::mat4 model_matrix = s * rz * ry * rx * t * m_s * m_rz * m_ry * m_rx * m_off;
 
-		glm::mat4 model_matrix = s * rz * ry * rx * t * m_s * m_rz * m_ry * m_rx * m_off;
-
-        if (texture_id == 0) {
-            std::cerr << "Error: Texture ID is 0! Texture not loaded properly." << std::endl;
-        }
-        // conect texture to shader
-        if (texture_id != 0) {
-            ShaderProgram &shader = meshes[0].shader;
-            shader.activate();
-    
-            int texture_unit = 0;
-            glActiveTexture(GL_TEXTURE0 + texture_unit);
-            glBindTexture(GL_TEXTURE_2D, texture_id);
-    
-            int texUniformLocation = glGetUniformLocation(shader.getID(), "tex0");
-            glUniform1i(texUniformLocation, texture_unit);
-        }
-        draw(model_matrix);
+    // We removed the old texture code from here because it was not in the right place.
+    // Now, we just call the other draw function with the final matrix.
+    draw(model_matrix);
     }
-    
+
+    // This function now does the actual drawing.
     void draw(glm::mat4 const & model_matrix) {
-        for (auto const& mesh : meshes) {
+        // We use "auto &" so we can modify the mesh inside the loop.
+        for (auto & mesh : meshes) {
+            
+            // --- THIS IS THE FINAL FIX ---
+            // Give the Model's texture ID to the Mesh right before drawing.
+            mesh.texture_id = this->texture_id;
+
+            // Now, mesh.draw() will use the correct texture ID we just gave it.
             mesh.draw(local_model_matrix * model_matrix);
         }
     }

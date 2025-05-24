@@ -708,8 +708,37 @@ int App::run(void) {
 			// clear canvas
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			shader.setUniform("uV_m", camera.GetViewMatrix());	
-			shader.setUniform("uP_m", projection_matrix);
+						// --- ADD THIS NEW SECTION ---
+			// Define light properties (you can make these class members or constants)
+			glm::vec3 lightPositionWorld = glm::vec3(10.0f, 15.0f, 10.0f); // Example light position in world space
+			glm::vec3 ambientIntensity   = glm::vec3(0.3f); // A soft, ambient light
+			glm::vec3 diffuseIntensity   = glm::vec3(0.8f); // Bright diffuse light
+			glm::vec3 specularIntensity  = glm::vec3(1.0f); // Bright white highlights
+
+			// Your shader calculates light vectors in VIEW space, so we must transform the light's position
+			// into view space before sending it to the shader.
+			glm::mat4 viewMatrix = camera.GetViewMatrix();
+			glm::vec3 lightPositionView = glm::vec3(viewMatrix * glm::vec4(lightPositionWorld, 1.0f));
+
+			// Activate a shader to set the uniforms. 
+			// Note: This assumes all your models use the same shader program.
+			// If they use different programs, you might need to set this inside the model loop.
+			ShaderProgram& shader = (*models[0]).meshes[0].shader;
+			shader.activate();
+
+			// Set all the lighting uniforms for the shader
+			shader.setUniform("light_position", lightPositionView);
+			shader.setUniform("ambient_intensity", ambientIntensity);
+			shader.setUniform("diffuse_intensity", diffuseIntensity);
+			shader.setUniform("specular_intensity", specularIntensity);
+			// --- END OF NEW SECTION ---
+
+
+			// This is your existing code, now updated with the correct uniform names
+		
+
+			shader.setUniform("v_m", camera.GetViewMatrix()); // <-- CHANGE HERE
+			shader.setUniform("p_m", projection_matrix);     // <-- CHANGE HERE
 			// draw all models			
 			std::vector<Model*> transparent;    // temporary, vector of pointers to transparent objects
             //transparent.reserve(scene.size());  // reserve size for all objects to avoid reallocation
@@ -723,8 +752,8 @@ int App::run(void) {
 					if (model->name == "cube") {
 						for (auto & mesh : model->meshes) {
 							mesh.shader.activate();
-							mesh.shader.setUniform("uV_m", camera.GetViewMatrix());	
-							mesh.shader.setUniform("uP_m", projection_matrix);
+							mesh.shader.setUniform("v_m", camera.GetViewMatrix()); // <-- FIXED
+							mesh.shader.setUniform("p_m", projection_matrix);      // <-- FIXED
 						}
 					} else if (model->isSprite) {
 						// sprite

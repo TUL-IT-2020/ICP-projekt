@@ -173,12 +173,28 @@ public:
         
         shader.activate();
         
-        // Set uniform matrices
-        shader.setUniform("uM_m", model_matrix);
+        // Set uniform matrices (you already fixed this in Step 1)
+        shader.setUniform("m_m", model_matrix);
+        
+        // --- ADD THIS NEW SECTION ---
+        // Set material properties from the mesh's member variables
+        // Note: The shader expects vec3, but your class stores vec4. We cast it by creating a vec3.
+        if (shader.hasUniform("specular_shinines")) { // "specular_shinines" is unique to your lighting shader
+            shader.setUniform("ambient_material", glm::vec3(ambient_material));
+            shader.setUniform("diffuse_material", glm::vec3(diffuse_material));
+            shader.setUniform("specular_material", glm::vec3(specular_material));
+            shader.setUniform("specular_shinines", reflectivity);
+        }
+    
+        // Bind the texture and set the sampler uniform
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture_id);
+        shader.setUniform("tex0", 0); // Tell the shader to use texture unit 0 for the 'tex0' sampler
+        // --- END OF NEW SECTION ---
         
         glBindVertexArray(VAO);
-
-        glDrawElements(primitive_type, indices.size(), GL_UNSIGNED_INT, 0);
+    
+        glDrawElements(primitive_type, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
 

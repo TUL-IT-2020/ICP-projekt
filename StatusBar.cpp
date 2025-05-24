@@ -117,8 +117,8 @@ void StatusBar::draw(glm::vec3 const & offset, glm::vec3 const & rotation, glm::
     ShaderProgram &shader = meshes[0].shader;
     shader.activate();
 
-    shader.setUniform("uP_m", this->ortho);
-    shader.setUniform("uV_m", glm::mat4(1.0f));
+    shader.setUniform("v_m", this->ortho);
+    shader.setUniform("p_m", glm::mat4(1.0f));
 
     float bar_height = this->bar_height;
     glm::vec3 sb_scale = glm::vec3(1.0f, bar_height, 1.0f);
@@ -143,4 +143,19 @@ void StatusBar::draw(glm::vec3 const & offset, glm::vec3 const & rotation, glm::
         glUniform1i(texUniformLocation, texture_unit);
     }
     Model::draw(model_matrix);
+}
+
+bool ShaderProgram::hasUniform(const std::string& name) {
+    // Check if the location is already cached (even if it's -1, meaning not found)
+    if (uniform_location_cache.count(name)) {
+        return uniform_location_cache[name] != -1;
+    }
+
+    // If not in cache, get the location from OpenGL
+    GLint location = glGetUniformLocation(ID, name.c_str());
+
+    // Store the result in the cache (this will store -1 if not found)
+    uniform_location_cache[name] = location;
+
+    return location != -1;
 }

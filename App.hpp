@@ -51,6 +51,7 @@ private:
     // camera related 
     Camera camera;
     Player player;
+    ShaderProgram directionalShader;
     std::shared_ptr<StatusBar> status_bar;
     // remember last cursor position, move relative to that in the next frame
     double cursorLastX{ 0 };

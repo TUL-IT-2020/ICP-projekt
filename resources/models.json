@@ -4,20 +4,20 @@
             "name": "cube",
             "obj_path": "resources/obj/cube_triangles_vnt.obj",
             "texture_path": "resources/textures/box_rgb888.png",
-            "vertex_shader_path": "resources/shaders/tex.vert",
-            "fragment_shader_path": "resources/shaders/tex.frag"
+            "vertex_shader_path": "resources/shaders/directional.vert",
+            "fragment_shader_path": "resources/shaders/directional.frag"
         },
         {
             "name": "triangle",
             "obj_path": "resources/obj/triangle.obj",
-            "vertex_shader_path": "resources/shaders/tex.vert",
-            "fragment_shader_path": "resources/shaders/tex.frag"
+            "vertex_shader_path": "resources/shaders/directional.vert",
+            "fragment_shader_path": "resources/shaders/directional.frag"
         },
         {
             "name": "teapot",
             "obj_path": "resources/obj/teapot_tri_vnt.obj",
-            "vertex_shader_path": "resources/shaders/tex.vert",
-            "fragment_shader_path": "resources/shaders/tex.frag"
+            "vertex_shader_path": "resources/shaders/directional.vert",
+            "fragment_shader_path": "resources/shaders/directional.frag"
         },
         {
             "name": "sprite",
@@ -30,8 +30,8 @@
             "name": "statusbar",
             "obj_path": "resources/obj/rectangle_vnt.obj",
             "texture_path": "resources/statusBar/background.png",
-            "vertex_shader_path": "resources/shaders/tex.vert",
-            "fragment_shader_path": "resources/shaders/tex.frag"
+            "vertex_shader_path": "resources/shaders/directional.vert",
+            "fragment_shader_path": "resources/shaders/directional.frag"
         }
     ]
 }
