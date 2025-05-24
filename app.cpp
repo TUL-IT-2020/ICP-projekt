@@ -536,275 +536,250 @@ bool App::CheckHitboxes(glm::vec3 movement) {
 	return true;
 }
 
+// PASTE THIS ENTIRE FUNCTION INTO APP.CPP, REPLACING YOUR OLD App::run()
+
 int App::run(void) {
-	/*
-	* Typical game loop:
-		// INIT: Initial positions and state
-		while (application_should_not_close)
-		{
-			// UPDATE: Update game state
-			// RENDER: Render content
-			// SWAP: Swap back/front buffer
-			// VSYNC: Wait for vertical retrace (e.g. 1/60 of a second)
-			// POLL: Poll events, dispatch
-		}
-	*/
+    try {
+        double now = glfwGetTime();
+        // FPS related
+        double fps_last_displayed = now;
+        int fps_counter_frames = 0;
+        double FPS = 0.0;
 
-	try {
-		double now = glfwGetTime();
-		// FPS related
-		double fps_last_displayed = now;
-		int fps_counter_frames = 0;
-		double FPS = 0.0;
+        // animation related
+        double frame_begin_timepoint = now;
+        double previous_frame_render_time{};
+        double time_speed{};
 
-		// animation related
-		double frame_begin_timepoint = now;
-		double previous_frame_render_time{};
-		double time_speed{};
+        // Clear color
+        glClearColor(0.2, 0.2, 0.2, 1.0);
 
-		// Clear color saved to OpenGL state machine: no need to set repeatedly in game loop
-		// gray background
-		glClearColor(0.2, 0.2, 0.2, 1.0);
-		// black background
-		//glClearColor(0, 0, 0, 0);
+        // get first position of mouse cursor
+        glfwGetCursorPos(window, &cursorLastX, &cursorLastY);
+        
+        // first update
+        glfwGetFramebufferSize(window, &width, &height);
+        update_projection_matrix();
+        glViewport(0, 0, width, height);
 
-		// get first position of mouse cursor
-		glfwGetCursorPos(window, &cursorLastX, &cursorLastY);
-		
-		// first update = manual (no event for update arrived yet)
-		glfwGetFramebufferSize(window, &width, &height);    // Get GL framebuffer size	
-		update_projection_matrix();
-		glViewport(0, 0, width, height);
+        double last_frame_time = glfwGetTime();
+        
+        // These are no longer needed here, we'll set them inside the loop
+        //ShaderProgram& shader = (*models[0]).meshes[0].shader;
+        //shader.activate();
+        
+        glm::vec3 offset = glm::vec3(0.0);
+        glm::vec3 rotation = glm::vec3(0.0f);   
+        glm::vec3 scale_change = glm::vec3(1.0f);   
 
-		//camera.Position = glm::vec3(0, 0, 10);
-		double last_frame_time = glfwGetTime();
-		
-		ShaderProgram& shader = (*models[0]).meshes[0].shader;
-		shader.activate();
+        while (!glfwWindowShouldClose(window)) {
+            // =================================================================
+            //                          IMGUI & UPDATE
+            // =================================================================
+            // This section remains the same
+            if (show_imgui) {
+                ImGui_ImplOpenGL3_NewFrame();
+                ImGui_ImplGlfw_NewFrame();
+                ImGui::NewFrame();
+                ImGui::SetNextWindowPos(ImVec2(10, 10));
+                ImGui::SetNextWindowSize(ImVec2(350, 190));
+                ImGui::Begin("Info", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
+                ImGui::Text("Camera position: (%.2f, %.2f, %.2f)", camera.Position.x, camera.Position.z, camera.Position.y);
+                ImGui::Text("Camera direction: (%.2f, %.2f, %.2f)", camera.Yaw, camera.Pitch, camera.Roll);
+                ImGui::Text("V-Sync: %s", is_vsync_on ? "ON" : "OFF");
+                ImGui::Text("FPS: %.1f", FPS);
+                ImGui::Text("Player Health: %d, Gold: %d, Ammo: %d", player.health, player.gold, player.ammo);
+                ImGui::Text("(press UP/DOWN to change color)");
+                ImGui::Text("(press RMB to release mouse)");
+                ImGui::Text("(hit C to show/hide info)");
+                ImGui::Text("(hit V to toggle V-Sync)");
+                ImGui::End();
+            }
 
-		
-		glm::vec3 offset = glm::vec3(0.0);
-		glm::vec3 rotation = glm::vec3(0.0f);	
-		glm::vec3 scale_change = glm::vec3(1.0f);   
+            if (show_imgui) {
+                time_speed = 0.0;
+            } else {
+                time_speed = 1.0;
+            }
 
-		while (!glfwWindowShouldClose(window)) {
-			// ImGui prepare render (only if required)
-			if (show_imgui) {
-				ImGui_ImplOpenGL3_NewFrame();
-				ImGui_ImplGlfw_NewFrame();
-				ImGui::NewFrame();
-				//ImGui::ShowDemoWindow(); // Enable mouse when using Demo!
-				ImGui::SetNextWindowPos(ImVec2(10, 10));
-				ImGui::SetNextWindowSize(ImVec2(350, 190));
+            double delta_t = glfwGetTime() - last_frame_time;
+            last_frame_time = glfwGetTime();
+            glm::vec3 movement = camera.ProcessInput(window, delta_t);
+            if (CheckHitboxes(movement) || camera.freeCam) {
+                camera.UpdateCameraPosition(movement);
+            }
 
-				ImGui::Begin("Info", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove);
-				// X, Y, Z,
-				ImGui::Text("Camera position: (%.2f, %.2f, %.2f)", camera.Position.x, camera.Position.z, camera.Position.y);
-				ImGui::Text("Camera direction: (%.2f, %.2f, %.2f)", camera.Yaw, camera.Pitch, camera.Roll);
-				ImGui::Text("V-Sync: %s", is_vsync_on ? "ON" : "OFF");
-				ImGui::Text("FPS: %.1f", FPS);
-				ImGui::Text("Player Health: %d, Gold: %d, Ammo: %d", player.health, player.gold, player.ammo);
-				ImGui::Text("(press UP/DOWN to change color)");
-				ImGui::Text("(press RMB to release mouse)");
-				ImGui::Text("(hit C to show/hide info)");
-				ImGui::Text("(hit V to toggle V-Sync)");
-				ImGui::End();
-			}
+            // --- Your game logic for collectibles, bullets, etc. remains the same ---
+            float radius = 0.7f;
+            for (auto it = models.begin(); it != models.end(); ) {
+                if ((*it)->collectible) {
+                    float dist = glm::distance(camera.Position, (*it)->origin);
+                    if (dist < radius) {
+                        std::cout << "Collected item: " << (*it)->collect_type << std::endl;
+                        if ((*it)->collect_type == "gold") { player.gold += (*it)->value; }
+                        else if ((*it)->collect_type == "health") { player.health += (*it)->value; if (player.health > 100) player.health = 100; }
+                        else if ((*it)->collect_type == "ammo") { player.ammo += (*it)->value; }
+                        else if ((*it)->collect_type == "life") { player.lives += (*it)->value; }
+                        it = models.erase(it);
+                        continue;
+                    }
+                }
+                ++it;
+            }
+            for (auto& bullet : bullets) { if (bullet.active) bullet.position += bullet.direction * bullet.speed * float(delta_t); }
+            for (auto& bullet : bullets) {
+                if (!bullet.active) continue;
+                for (auto it = models.begin(); it != models.end(); ) {
+                    if ((*it)->isEnemy) {
+                        float dist = glm::distance(bullet.position, (*it)->origin);
+                        if (dist < (*it)->radius) {
+                            bullet.active = false;
+                            (*it)->health -= bullet.damage;
+                            if ((*it)->health <= 0) {
+                                Model corpse = map_2_model_dict["d"];
+                                corpse.origin = (*it)->origin;
+                                models.push_back(std::make_unique<Model>(corpse));
+                                std::cout << "Enemy killed: " << (*it)->name << std::endl;
+                                it = models.erase(it);
+                                continue;
+                            }
+                        }
+                    }
+                    if (map.containsSolid(bullet.position.x, bullet.position.z)) { bullet.active = false; }
+                    ++it;
+                }
+            }
+            bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const Bullet& bullet) { return !bullet.active; }), bullets.end());
+            
+            // =================================================================
+            //                          RENDER
+            // =================================================================
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			//
-			// UPDATE: recompute object.position = object.position + object.speed * (previous_frame_render_time * time_speed); // s = s0 + v*delta_t
-			//
-			if (show_imgui) {
-				// pause application
-				time_speed = 0.0;
-			}
-			else {
-				// imgui not displayed, run app at normal speed
-				time_speed = 1.0;
-			}
+            // Get matrices once per frame
+            glm::mat4 viewMatrix = camera.GetViewMatrix();
+            
+            // Define light properties once per frame
+            glm::vec3 lightPositionWorld = glm::vec3(10.0f, 15.0f, 10.0f);
+            glm::vec3 lightPositionView = glm::vec3(viewMatrix * glm::vec4(lightPositionWorld, 1.0f));
+            glm::vec3 ambientIntensity   = glm::vec3(0.3f);
+            glm::vec3 diffuseIntensity   = glm::vec3(0.8f);
+            glm::vec3 specularIntensity  = glm::vec3(1.0f);
 
-			// update camera position
-			double delta_t = glfwGetTime() - last_frame_time;
-			last_frame_time = glfwGetTime();
-        	glm::vec3 movement = camera.ProcessInput(window, delta_t); // process keys etc.
-			// update camera position
-			if (CheckHitboxes(movement) || camera.freeCam) {
-				//std::cout << "movement: " << movement.x << ", " << movement.y << ", " << movement.z << std::endl;
-				camera.UpdateCameraPosition(movement);
-			}
+            // Prepare for transparency
+            std::vector<Model*> transparent;
+            transparent.reserve(models.size());
 
-			float radius = 0.7f;
-			// check for collisions with collectibles
-			for (auto it = models.begin(); it != models.end(); ) {
-				if ((*it)->collectible) {
-					float dist = glm::distance(camera.Position, (*it)->origin);
-					if (dist < radius) {
-						std::cout << "Collected item: " << (*it)->collect_type << std::endl;
-						if ((*it)->collect_type == "gold") {
-							player.gold += (*it)->value;
-						} else if ((*it)->collect_type == "health") {
-							player.health += (*it)->value;
-							if (player.health > 100) player.health = 100;
-						} else if ((*it)->collect_type == "ammo") {
-							player.ammo += (*it)->value;
-						} else if ((*it)->collect_type == "life") {
-							player.lives += (*it)->value;
-						}
-						// Odstraň předmět ze scény
-						it = models.erase(it);
-						continue;
-					}
-				}
-				++it;
-			}
+            // --- OPAQUE OBJECTS RENDER PASS ---
+            for (auto & model : models) {
+                model->update(delta_t);
+                if (!model->transparent) {
+                    // Get the specific shader for THIS model
+                    ShaderProgram &shader = model->meshes[0].shader;
+                    shader.activate();
 
-			// move bullets
-			for (auto& bullet : bullets) {
-				if (bullet.active)
-					bullet.position += bullet.direction * bullet.speed * float(delta_t);
-			}
+                    // Set matrices required by ALL shaders
+                    shader.setUniform("v_m", viewMatrix);
+                    shader.setUniform("p_m", projection_matrix);
 
-			// bullet collision
-			for (auto& bullet : bullets) {
-				if (!bullet.active) continue;
-				// Kolize s nepřáteli
-				for (auto it = models.begin(); it != models.end(); ) {
-					if ((*it)->isEnemy) {
-						float dist = glm::distance(bullet.position, (*it)->origin);
-						if (dist < (*it)->radius) {
-							bullet.active = false;
-							(*it)->health -= bullet.damage;
-							
-							// check if enemy is dead
-							if ((*it)->health <= 0) {
-								Model corpse = map_2_model_dict["d"];
-								corpse.origin = (*it)->origin;
-								models.push_back(std::make_unique<Model>(corpse));
-								std::cout << "Enemy killed: " << (*it)->name << std::endl;
-								// remove enemy from scene
-								it = models.erase(it);
-								continue;
-							}
-						}
-					}
-					// walls
-					if (map.containsSolid(bullet.position.x, bullet.position.z)) {
-						bullet.active = false;
-					}
-					++it;
-				}
-				// Kolize s předměty (většinou ignoruj, pokud nechceš ničit předměty)
-			}
+                    // If it's the lighting shader, set the lighting uniforms
+                    if (shader.hasUniform("light_position")) {
+                        shader.setUniform("light_position", lightPositionView);
+                        shader.setUniform("ambient_intensity", ambientIntensity);
+                        shader.setUniform("diffuse_intensity", diffuseIntensity);
+                        shader.setUniform("specular_intensity", specularIntensity);
+                    }
+                    
+                    rotation = glm::vec3(0.0f);
+                    if (model->isSprite) {
+                        glm::vec3 sprite_position = model->origin;
+                        glm::vec3 camera_position = camera.Position;
+                        glm::vec3 direction = glm::normalize(camera_position - sprite_position);
+                        float angle = atan2(direction.x, direction.z);
+                        rotation = glm::vec3(0.0f, angle, 0.0f);
+                    }
+                    model->draw(offset, rotation, scale_change);
+                } else {
+                    transparent.emplace_back(model.get());
+                }
+            }
 
-			// remove inactive bullets
-			bullets.erase(std::remove_if(bullets.begin(), bullets.end(), [](const Bullet& bullet) {
-				return !bullet.active;
-			}), bullets.end());
+            // Sort transparent objects
+            std::sort(transparent.begin(), transparent.end(), [&](Model const * a, Model const * b) {
+                return glm::distance(camera.Position, a->origin) > glm::distance(camera.Position, b->origin);
+            });
 
-			//
-			// RENDER: GL drawCalls
-			// 
-
-			// clear canvas
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			shader.setUniform("uV_m", camera.GetViewMatrix());	
-			shader.setUniform("uP_m", projection_matrix);
-			// draw all models			
-			std::vector<Model*> transparent;    // temporary, vector of pointers to transparent objects
-            //transparent.reserve(scene.size());  // reserve size for all objects to avoid reallocation
-            transparent.reserve(models.size());  // reserve size for all objects to avoid reallocation
-
-            // FIRST PART - draw all non-transparent in any order
-			for (auto & model : models) {
-				rotation = glm::vec3(0.0f);	
-				model->update(delta_t);
-				if (!model->transparent) {
-					if (model->name == "cube") {
-						for (auto & mesh : model->meshes) {
-							mesh.shader.activate();
-							mesh.shader.setUniform("uV_m", camera.GetViewMatrix());	
-							mesh.shader.setUniform("uP_m", projection_matrix);
-						}
-					} else if (model->isSprite) {
-						// sprite
-						glm::vec3 sprite_position = model->origin;
-						glm::vec3 camera_position = camera.Position;
-						glm::vec3 direction = glm::normalize(camera_position - sprite_position);
-						float angle = atan2(direction.x, direction.z);
-						rotation = glm::vec3(0.0f, angle, 0.0f);
-					}
-					model->draw(offset, rotation, scale_change);
-				} else {
-					transparent.emplace_back(model.get());
-				}
-			}
-
-			// SECOND PART - draw only transparent - painter's algorithm (sort by distance from camera, from far to near)
-			std::sort(transparent.begin(), transparent.end(), [&](Model const * a, Model const * b) {
-				return glm::distance(camera.Position, a->origin) > glm::distance(camera.Position, b->origin);
-			});
-
-            // set GL for transparent objects
+            // Set GL state for transparency
             glEnable(GL_BLEND);
             glDepthMask(GL_FALSE);
             glDisable(GL_CULL_FACE);
 
-            // draw sorted transparent
+            // --- TRANSPARENT OBJECTS RENDER PASS ---
             for (auto model : transparent) {
-				if (model->isSprite) {
-					// sprite
-					glm::vec3 sprite_position = model->origin;
-					glm::vec3 camera_position = camera.Position;
-					glm::vec3 direction = glm::normalize(camera_position - sprite_position);
-					float angle = atan2(direction.x, direction.z);
-					rotation = glm::vec3(0.0f, angle, 0.0f);
-				}
-				model->draw(offset, rotation, scale_change);
+                // Get the specific shader for THIS model
+                ShaderProgram &shader = model->meshes[0].shader;
+                shader.activate();
+
+                // Set matrices required by ALL shaders
+                shader.setUniform("v_m", viewMatrix);
+                shader.setUniform("p_m", projection_matrix);
+
+                // If it's the lighting shader, set the lighting uniforms
+                if (shader.hasUniform("light_position")) {
+                    shader.setUniform("light_position", lightPositionView);
+                    shader.setUniform("ambient_intensity", ambientIntensity);
+                    shader.setUniform("diffuse_intensity", diffuseIntensity);
+                    shader.setUniform("specular_intensity", specularIntensity);
+                }
+
+                rotation = glm::vec3(0.0f);
+                if (model->isSprite) {
+                    glm::vec3 sprite_position = model->origin;
+                    glm::vec3 camera_position = camera.Position;
+                    glm::vec3 direction = glm::normalize(camera_position - sprite_position);
+                    float angle = atan2(direction.x, direction.z);
+                    rotation = glm::vec3(0.0f, angle, 0.0f);
+                }
+                model->draw(offset, rotation, scale_change);
             }
             
-            // restore GL properties
+            // Restore GL state
             glDisable(GL_BLEND);
             glDepthMask(GL_TRUE);
             glEnable(GL_CULL_FACE);
 
-			// draw status bar
-			status_bar->update(player);
-			glm::vec3 default_value = glm::vec3(0.0, 0.0, 0.0);
-			status_bar->draw(default_value, default_value, default_value);
+            // --- UI & FINAL PRESENTATION ---
+            // This section remains the same
+            status_bar->update(player);
+            status_bar->draw(glm::vec3(0.0), glm::vec3(0.0), glm::vec3(0.0));
 
-			// ImGui display
-			if (show_imgui) {
-				ImGui::Render();
-				ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-			}
+            if (show_imgui) {
+                ImGui::Render();
+                ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+            }
 
-			// SWAP + VSYNC
-			glfwSwapBuffers(window);
+            glfwSwapBuffers(window);
+            glfwPollEvents();
 
-			// POLL
-			glfwPollEvents();
+            now = glfwGetTime();
+            previous_frame_render_time = now - frame_begin_timepoint;
+            frame_begin_timepoint = now;
 
-			// Time/FPS measurement
-			now = glfwGetTime();
-			previous_frame_render_time = now - frame_begin_timepoint; //compute delta_t
-			frame_begin_timepoint = now; // set new start
+            fps_counter_frames++;
+            if (now - fps_last_displayed >= 1) {
+                FPS = fps_counter_frames / (now - fps_last_displayed);
+                fps_last_displayed = now;
+                fps_counter_frames = 0;
+                std::cout << "\r[FPS]" << FPS << "      ";
+            }
+        }
+    }
+    catch (std::exception const& e) {
+        std::cerr << "App failed : " << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
 
-			fps_counter_frames++;
-			if (now - fps_last_displayed >= 1) {
-				FPS = fps_counter_frames / (now - fps_last_displayed);
-				fps_last_displayed = now;
-				fps_counter_frames = 0;
-				std::cout << "\r[FPS]" << FPS << "     "; // Compare: FPS with/without ImGUI
-			}
-		}
-	}
-	catch (std::exception const& e) {
-		std::cerr << "App failed : " << e.what() << std::endl;
-		return EXIT_FAILURE;
-	}
-
-	return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }
 
 void App::destroy(void) {

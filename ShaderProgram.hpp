@@ -14,7 +14,7 @@ public:
 	// you can add more constructors for pipeline with GS, TS etc.
 	ShaderProgram(void) = default; //does nothing
 	ShaderProgram(const std::filesystem::path & VS_file, const std::filesystem::path & FS_file);
-
+	bool hasUniform(const std::string& name); // <-- ADD THIS LINE
 	void activate(void) {
         if (ID==currently_used)
             return;
