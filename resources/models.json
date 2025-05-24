@@ -30,8 +30,8 @@
             "name": "statusbar",
             "obj_path": "resources/obj/rectangle_vnt.obj",
             "texture_path": "resources/statusBar/background.png",
-            "vertex_shader_path": "resources/shaders/directional.vert",
-            "fragment_shader_path": "resources/shaders/directional.frag"
+            "vertex_shader_path": "resources/shaders/tex.vert",
+            "fragment_shader_path": "resources/shaders/tex.frag"
         }
     ]
 }
