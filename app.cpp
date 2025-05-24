@@ -32,7 +32,7 @@
 App::App() {
 	// default constructor
 	camera = Camera();
-	player = Player(75, 0, 25, 3);
+	player = Player(25, 0, 25, 3);
 }
 
 void App::init_glew(void) {

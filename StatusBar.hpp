@@ -45,18 +45,17 @@ public:
     }
 
     bool if_change(const Player& player) {
-        return (this->gold != gold || this->ammo != ammo || this->health != health, this->lives != lives);
+        return (this->gold != player.gold || this->ammo != player.ammo || this->health != player.health || this->lives != player.lives);
     }
 
     // Update podle hráče
     void update(const Player& player) {
-        int new_face = face_from_health(player.health);
         if (if_change(player)) {
             gold = player.gold;
             ammo = player.ammo;
             health = player.health;
             lives = player.lives;
-            current_face = new_face;
+            current_face = face_from_health(player.health);
             updateStatusBarTexture();
         }
     }

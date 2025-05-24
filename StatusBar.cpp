@@ -107,6 +107,7 @@ void StatusBar::updateStatusBarTexture() {
     cv::Mat flipedImg;
     cv::flip(statusBarImg, flipedImg, 0);
     this->texture_id = App::gen_tex(flipedImg, TextureFilter::TrilinearMipmap);
+    std::cout << "StatusBar texture updated." << std::endl;
 }
 
 void StatusBar::draw(glm::vec3 const & offset, glm::vec3 const & rotation, glm::vec3 const & scale_change) {
