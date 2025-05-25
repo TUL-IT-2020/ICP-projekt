@@ -757,10 +757,16 @@ int App::run(void) {
 
                     // If it's the lighting shader, set the lighting uniforms
                     if (shader.hasUniform("light_position")) {
+                        // Set the light position in view space
                         shader.setUniform("light_position", lightPositionView);
+                        // Set the light properties
                         shader.setUniform("ambient_intensity", ambientIntensity);
                         shader.setUniform("diffuse_intensity", diffuseIntensity);
                         shader.setUniform("specular_intensity", specularIntensity);
+                        // Set the material properties for the model
+                        shader.setUniform("ambient_material", model->ambientMaterial);
+                        shader.setUniform("diffuse_material", model->diffuseMaterial);
+                        shader.setUniform("specular_material", model->specularMaterial);
                     }
 
                     rotation = glm::vec3(0.0f);
@@ -800,10 +806,16 @@ int App::run(void) {
 
                 // If it's the lighting shader, set the lighting uniforms
                 if (shader.hasUniform("light_position")) {
+                    // Set the light position in view space
                     shader.setUniform("light_position", lightPositionView);
+                    // Set the light properties
                     shader.setUniform("ambient_intensity", ambientIntensity);
                     shader.setUniform("diffuse_intensity", diffuseIntensity);
                     shader.setUniform("specular_intensity", specularIntensity);
+                    // Set the material properties for the model
+                    shader.setUniform("ambient_material", model->ambientMaterial);
+                    shader.setUniform("diffuse_material", model->diffuseMaterial);
+                    shader.setUniform("specular_material", model->specularMaterial);
                 }
 
                 rotation = glm::vec3(0.0f);

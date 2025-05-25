@@ -46,9 +46,9 @@ public:
     bool light_source = false;
 
     // Material properties
-    glm::vec3 ambientMaterial = glm::vec3(0.5f); // Default values
-    glm::vec3 diffuseMaterial = glm::vec3(0.8f);
-    glm::vec3 specularMaterial = glm::vec3(0.5f);
+    glm::vec3 ambientMaterial = glm::vec3(0.1f); // Default values
+    glm::vec3 diffuseMaterial = glm::vec3(0.4f);
+    glm::vec3 specularMaterial = glm::vec3(0.1f);
     float shininess = 32.0f;
 
     /* Loads a model from JSON data and updates the model object.
@@ -169,7 +169,11 @@ public:
         health(other.health),
         isDoor(other.isDoor),
         isSolid(other.isSolid),
-        end_level(other.end_level){
+        end_level(other.end_level),
+        ambientMaterial(other.ambientMaterial),
+        diffuseMaterial(other.diffuseMaterial),
+        specularMaterial(other.specularMaterial),
+        shininess(other.shininess) {
     }
 
     virtual ~Model() = default;

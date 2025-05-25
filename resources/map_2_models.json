@@ -4,7 +4,10 @@
             "token": "floor",
             "solid": true,
             "model_name": "cube",
-            "texture_path": "resources/textures/floor.png"
+            "texture_path": "resources/textures/floor.png",
+            "ambient": [0.2, 0.2, 0.2],
+            "diffuse": [0.7, 0.7, 0.7],
+            "specular": [0.3, 0.3, 0.3]
         },
         {
             "token": "D",
@@ -18,19 +21,28 @@
             "token": "S",
             "solid": true,
             "model_name": "cube",
-            "texture_path": "resources/textures/stone_wall_1.png"
+            "texture_path": "resources/textures/stone_wall_1.png",
+            "ambient": [0.25, 0.25, 0.28],
+            "diffuse": [0.7, 0.7, 0.8],
+            "specular": [0.2, 0.2, 0.25]
         },
         {
             "token": "W",
             "solid": true,
             "model_name": "cube",
-            "texture_path": "resources/textures/wood_wall_1.png"
+            "texture_path": "resources/textures/wood_wall_1.png",
+            "ambient": [0.18, 0.13, 0.08],
+            "diffuse": [0.6, 0.4, 0.2],
+            "specular": [0.05, 0.04, 0.02]
         },
         {
             "token": "B",
             "solid": true,
             "model_name": "cube",
-            "texture_path": "resources/textures/blue_wall_1.png"
+            "texture_path": "resources/textures/blue_wall_1.png",
+            "ambient": [0.15, 0.18, 0.25],
+            "diffuse": [0.3, 0.4, 0.8],
+            "specular": [0.1, 0.15, 0.3]
         },
         {
             "token": "X",
@@ -226,9 +238,9 @@
             "model_name": "sprite",
             "texture_path": "resources/sprites/chandelier_1.png",
             "light_source": true,
-            "ambient_intensity": [0.15, 0.15, 0.1],
-            "diffuse_intensity": [0.9, 0.9, 0.7],
-            "specular_intensity": [1.0, 1.0, 1.0]
+            "ambient": [0.15, 0.15, 0.1],
+            "diffuse": [0.9, 0.9, 0.7],
+            "specular": [1.0, 1.0, 1.0]
         },
         {
             "token": "z",
@@ -236,9 +248,9 @@
             "model_name": "sprite",
             "texture_path": "resources/sprites/chandelier_2.png",
             "light_source": true,
-            "ambient_intensity": [0.15, 0.15, 0.1],
-            "diffuse_intensity": [0.9, 0.9, 0.7],
-            "specular_intensity": [1.0, 1.0, 1.0]
+            "ambient": [0.15, 0.15, 0.1],
+            "diffuse": [0.9, 0.9, 0.7],
+            "specular": [1.0, 1.0, 1.0]
         },
         {
             "token": "C",
@@ -250,7 +262,10 @@
             "token": "E",
             "solid": true,
             "model_name": "cube",
-            "texture_path": "resources/textures/stone_wall_2_dark.png"
+            "texture_path": "resources/textures/stone_wall_2_dark.png",
+            "ambient": [0.12, 0.12, 0.15],
+            "diffuse": [0.4, 0.4, 0.5],
+            "specular": [0.08, 0.08, 0.1]
         },
         {
             "token": "H",
@@ -268,9 +283,9 @@
             "model_name": "sprite",
             "texture_path": "resources/sprites/lamp.png",
             "light_source": true,
-            "ambient_intensity": [0.2, 0.2, 0.0],
-            "diffuse_intensity": [0.8, 0.8, 0.5],
-            "specular_intensity": [1.0, 1.0, 1.0]
+            "ambient": [0.2, 0.2, 0.0],
+            "diffuse": [0.8, 0.8, 0.5],
+            "specular": [1.0, 1.0, 1.0]
         },
         {
             "token": "K",
@@ -304,25 +319,37 @@
             "token": "T",
             "solid": true,
             "model_name": "cube",
-            "texture_path": "resources/textures/stone_wall_2.png"
+            "texture_path": "resources/textures/stone_wall_2.png",
+            "ambient": [0.22, 0.22, 0.25],
+            "diffuse": [0.6, 0.6, 0.7],
+            "specular": [0.15, 0.15, 0.2]
         },
         {
             "token": "U",
             "solid": true,
             "model_name": "cube",
-            "texture_path": "resources/textures/stone_wall_3.png"
+            "texture_path": "resources/textures/stone_wall_3.png",
+            "ambient": [0.23, 0.23, 0.26],
+            "diffuse": [0.65, 0.65, 0.75],
+            "specular": [0.18, 0.18, 0.22]
         },
         {
             "token": "V",
             "solid": true,
             "model_name": "cube",
-            "texture_path": "resources/textures/wood_wall_2.png"
+            "texture_path": "resources/textures/wood_wall_2.png",
+            "ambient": [0.16, 0.12, 0.09],
+            "diffuse": [0.5, 0.35, 0.2],
+            "specular": [0.04, 0.03, 0.02]
         },
         {
             "token": "Y",
             "solid": true,
             "model_name": "cube",
-            "texture_path": "resources/textures/wood_wall_3.png"
+            "texture_path": "resources/textures/wood_wall_3.png",
+            "ambient": [0.17, 0.13, 0.1],
+            "diffuse": [0.55, 0.4, 0.25],
+            "specular": [0.05, 0.04, 0.03]
         }
     ]
 }
