@@ -549,8 +549,7 @@ bool App::CheckHitboxes(glm::vec3 movement) {
 
             // Check for intersection
             if (aabb_intersect(obj_min, obj_max, camera_min, camera_max)) {
-                std::cout << "Collision detected with object: " << obj->name << " "
-                          << obj->collectible << std::endl;
+                //std::cout << "Collision detected with object: " << obj->name << " " << obj->collectible << std::endl;
                 return false;
             }
         }
