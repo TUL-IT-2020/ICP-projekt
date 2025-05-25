@@ -10,6 +10,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <nlohmann/json.hpp>
 #include <opencv2/opencv.hpp>
+#include "Player.hpp"
 
 //vertex description
 struct vertex {
@@ -68,5 +69,7 @@ bool aabb_contains_point(const glm::vec3& min, const glm::vec3& max, const glm::
  */
 bool aabb_intersect(const glm::vec3& minA, const glm::vec3& maxA,
                     const glm::vec3& minB, const glm::vec3& maxB);
+
+weapon_type str_to_enum(const std::string& str);
 
 #endif // ASSETS_HPP

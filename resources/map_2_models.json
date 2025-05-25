@@ -174,7 +174,8 @@
             "model_name": "sprite",
             "texture_path": "resources/sprites/SPR00029.png",
             "type": "collectible",
-            "collect_type": "weapon"
+            "collect_type": "weapon",
+            "value": 1
         },
         {
             "token": "s",
@@ -182,7 +183,8 @@
             "model_name": "sprite",
             "texture_path": "resources/sprites/SPR00030.png",
             "type": "collectible",
-            "collect_type": "weapon"
+            "collect_type": "weapon",
+            "value": 2
         },
         {
             "token": "t",

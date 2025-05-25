@@ -111,8 +111,7 @@ void App::glfw_mouse_button_callback(GLFWwindow* window, int button, int action,
 			}
 			else {
 				// we are inside our game: shoot, click, etc.
-				if (this_inst->player.ammo > 0) {
-					this_inst->player.ammo--;
+				if (this_inst->player.reduceAmmo()) {
 					std::cout << "Bang! Ammo left: " << this_inst->player.ammo << "\n";
 					glm::vec3 pos = this_inst->camera.Position;
 					glm::vec3 dir = this_inst->camera.Front;
