@@ -4,8 +4,8 @@
             "name": "cube",
             "obj_path": "resources/obj/cube_triangles_vnt.obj",
             "texture_path": "resources/textures/box_rgb888.png",
-            "vertex_shader_path": "resources/shaders/directional.vert",
-            "fragment_shader_path": "resources/shaders/directional.frag"
+            "vertex_shader_path": "resources/shaders/lighting.vert",
+            "fragment_shader_path": "resources/shaders/lighting.frag"
         },
         {
             "name": "sprite",
