@@ -286,6 +286,16 @@ void App::init_map_for_level_and_generate_scene(int level) {
 	models.clear();
 
     // place models to the scene
+    int light_source_count = 1;
+    // Define light properties once per frame
+    glm::vec3 lightPositionWorld = glm::vec3(10.0f, 15.0f, 10.0f);
+    glm::vec3 ambientIntensity = glm::vec3(0.3f);
+    glm::vec3 diffuseIntensity = glm::vec3(0.8f);
+    glm::vec3 specularIntensity = glm::vec3(1.0f);
+    Light light = Light(
+        lightPositionWorld, ambientIntensity, diffuseIntensity, specularIntensity);
+    lights.push_back(light); 
+
     for (int j = 0; j < map.getRows(); j++) {
         for (int i = 0; i < map.getCols(); i++) {
             std::string token = std::string(1, map.fetchMapValue(i, j));
@@ -301,8 +311,25 @@ void App::init_map_for_level_and_generate_scene(int level) {
                     model->origin = pos;
                     models.push_back(std::move(model));
                 }
+                if (base.light_source) {
+                    // add light source
+                    Light light = Light(
+                        base.origin,
+                        base.ambientLight,
+                        base.diffuseLight,
+                        base.specularLight);
+                    
+                    //lights.push_back(light);
+                    light_source_count++;
+                }
             }
         }
+    }
+
+    std::cout << "Light source added (" << light_source_count << " total)" << std::endl;
+    if (light_source_count > MAX_LIGHTS) {
+        std::cerr << "Warning: More light sources than supported by MAX_LIGHTS (" << MAX_LIGHTS
+                  << "). Some lights may not be rendered." << std::endl;
     }
 
     // add floor
@@ -730,15 +757,6 @@ int App::run(void) {
 
             // Get matrices once per frame
             glm::mat4 viewMatrix = camera.GetViewMatrix();
-
-            // Define light properties once per frame
-            glm::vec3 lightPositionWorld = glm::vec3(10.0f, 15.0f, 10.0f);
-            glm::vec3 lightPositionView =
-                glm::vec3(viewMatrix * glm::vec4(lightPositionWorld, 1.0f));
-            glm::vec3 ambientIntensity = glm::vec3(0.3f);
-            glm::vec3 diffuseIntensity = glm::vec3(0.8f);
-            glm::vec3 specularIntensity = glm::vec3(1.0f);
-
             // Prepare for transparency
             std::vector<Model*> transparent;
             transparent.reserve(models.size());
@@ -757,16 +775,28 @@ int App::run(void) {
 
                     // If it's the lighting shader, set the lighting uniforms
                     if (shader.hasUniform("light_position")) {
+                        std::cout << "Using one light source." << std::endl;
                         // Set the light position in view space
+                        const Light& light = lights[0];
+                        glm::vec3 lightPositionView = glm::vec3(viewMatrix * glm::vec4(light.position, 1.0f));
                         shader.setUniform("light_position", lightPositionView);
                         // Set the light properties
-                        shader.setUniform("ambient_intensity", ambientIntensity);
-                        shader.setUniform("diffuse_intensity", diffuseIntensity);
-                        shader.setUniform("specular_intensity", specularIntensity);
-                        // Set the material properties for the model
-                        shader.setUniform("ambient_material", model->ambientLight);
-                        shader.setUniform("diffuse_material", model->diffuseLight);
-                        shader.setUniform("specular_material", model->specularLight);
+                        shader.setUniform("ambient_intensity", light.ambient);
+                        shader.setUniform("diffuse_intensity", light.diffuse);
+                        shader.setUniform("specular_intensity", light.specular);
+                    } else {
+                        for (size_t i = 0; i < lights.size() && i < MAX_LIGHTS; ++i) {
+                            const Light& light = lights[i];
+                            shader.setUniform("lights[" + std::to_string(i) + "].isActive", true);
+                            shader.setUniform("lights[" + std::to_string(i) + "].position",
+                                              light.position);
+                            shader.setUniform("lights[" + std::to_string(i) + "].ambient_intensity",
+                                              light.ambient);
+                            shader.setUniform("lights[" + std::to_string(i) + "].diffuse_intensity",
+                                              light.diffuse);
+                            shader.setUniform("lights[" + std::to_string(i) + "].specular_intensity",
+                                                light.specular);
+                        }
                     }
 
                     rotation = glm::vec3(0.0f);
@@ -803,20 +833,6 @@ int App::run(void) {
                 // Set matrices required by ALL shaders
                 shader.setUniform("v_m", viewMatrix);
                 shader.setUniform("p_m", projection_matrix);
-
-                // If it's the lighting shader, set the lighting uniforms
-                if (shader.hasUniform("light_position")) {
-                    // Set the light position in view space
-                    shader.setUniform("light_position", lightPositionView);
-                    // Set the light properties
-                    shader.setUniform("ambient_intensity", ambientIntensity);
-                    shader.setUniform("diffuse_intensity", diffuseIntensity);
-                    shader.setUniform("specular_intensity", specularIntensity);
-                    // Set the material properties for the model
-                    shader.setUniform("ambient_material", model->ambientLight);
-                    shader.setUniform("diffuse_material", model->diffuseLight);
-                    shader.setUniform("specular_material", model->specularLight);
-                }
 
                 rotation = glm::vec3(0.0f);
                 if (model->isSprite) {

@@ -19,6 +19,7 @@
 #include "Door.hpp"
 #include "ShaderProgram.hpp"
 #include "StatusBar.hpp"
+#include "Light.hpp"
 
 enum class TextureFilter {
     Nearest,       // Nearest neighbor - rychlé, ale nekvalitní
@@ -48,7 +49,9 @@ private:
 	std::unordered_map<std::string, Model> map_2_model_dict;
     // list of bullets
     std::vector<Bullet> bullets;
-    bool CheckHitboxes(glm::vec3 movement);
+    // list of lights
+    const int MAX_LIGHTS = 10;
+    std::vector<Light> lights;
 
     // camera related 
     Camera camera;
@@ -72,6 +75,7 @@ private:
     //ShaderProgram shader;
 
     void thread_code(void);
+    bool CheckHitboxes(glm::vec3 movement);
 
     // init
     void init_opencv();
