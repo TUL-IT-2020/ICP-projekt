@@ -34,9 +34,18 @@ public:
      */
     void loadAssets();
 
-    void setGold(int value) { gold = value; }
-    void setAmmo(int value) { ammo = value; }
-    void setHealth(int value) { health = value; }
+    void setGold(int value) { gold = value; updateStatusBarTexture();}
+    void setAmmo(int value) { ammo = value; updateStatusBarTexture();}
+    void setHealth(int value) { 
+        health = value;
+        current_face = face_from_health(value);
+        updateStatusBarTexture();
+    }
+    
+    void setLevel(int value) { 
+        floor_number = value;
+        updateStatusBarTexture();
+    }
 
     /* Convert health to face index
      * @param health: Health value (0-100)

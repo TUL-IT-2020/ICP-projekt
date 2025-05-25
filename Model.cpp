@@ -26,6 +26,12 @@ void load_value_from_json(const nlohmann::json& json, const std::string& key, st
     }
 }
 
+void load_value_from_json(const nlohmann::json& json, const std::string& key, glm::vec3& value) {
+    if (json.find(key) != json.end()) {
+        value = json_to_vec3(json[key]);
+    }
+}
+
 Model Model::parse_json_to_model(const nlohmann::json& model_data, Model& model,
                       std::unordered_map<std::string, Model> model_cache) {
     
@@ -49,6 +55,10 @@ Model Model::parse_json_to_model(const nlohmann::json& model_data, Model& model,
     load_value_from_json(model_data, "radius", model.radius);
     load_value_from_json(model_data, "health", model.health);
 
+    load_value_from_json(model_data, "ambient", model.ambientMaterial);
+    load_value_from_json(model_data, "diffuse", model.diffuseMaterial);
+    load_value_from_json(model_data, "specular", model.specularMaterial);
+
     if (model_data.find("type") != model_data.end()) {
         const std::string type = model_data["type"];
         if (type == "enemy") {
@@ -57,6 +67,8 @@ Model Model::parse_json_to_model(const nlohmann::json& model_data, Model& model,
             model.collectible = true;
         } else if (type == "door") {
             model.isDoor = true;
+        } else if (type == "end_level") {
+            model.end_level = true;
         }
     }
 

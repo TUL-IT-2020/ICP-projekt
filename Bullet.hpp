@@ -8,6 +8,7 @@ public:
     glm::vec3 position;
     glm::vec3 direction;
     float speed = 20.0f;
+    float radius = 0.1f;
     bool active = true;
     int damage = 10;
 
