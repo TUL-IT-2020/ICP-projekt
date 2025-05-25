@@ -14,6 +14,9 @@
             "solid": true,
             "model_name": "cube",
             "texture_path": "resources/textures/door.png",
+            "ambient": [0.2, 0.2, 0.2],
+            "diffuse": [0.7, 0.7, 0.7],
+            "specular": [0.3, 0.3, 0.3],
             "radius": 1.2,
             "type": "door"
         },
@@ -49,6 +52,9 @@
             "solid": true,
             "model_name": "cube",
             "texture_path": "resources/textures/end_game.png",
+            "ambient": [0.2, 0.2, 0.2],
+            "diffuse": [0.7, 0.7, 0.7],
+            "specular": [0.3, 0.3, 0.3],
             "radius": 1.2,
             "type": "end_level"
         },
@@ -240,7 +246,8 @@
             "light_source": true,
             "ambient": [0.15, 0.15, 0.1],
             "diffuse": [0.9, 0.9, 0.7],
-            "specular": [1.0, 1.0, 1.0]
+            "specular": [1.0, 1.0, 1.0],
+            "shininess": 32
         },
         {
             "token": "z",
@@ -250,7 +257,8 @@
             "light_source": true,
             "ambient": [0.15, 0.15, 0.1],
             "diffuse": [0.9, 0.9, 0.7],
-            "specular": [1.0, 1.0, 1.0]
+            "specular": [1.0, 1.0, 1.0],
+            "shininess": 32
         },
         {
             "token": "C",
@@ -285,7 +293,8 @@
             "light_source": true,
             "ambient": [0.2, 0.2, 0.0],
             "diffuse": [0.8, 0.8, 0.5],
-            "specular": [1.0, 1.0, 1.0]
+            "specular": [1.0, 1.0, 1.0],
+            "shininess": 32
         },
         {
             "token": "K",

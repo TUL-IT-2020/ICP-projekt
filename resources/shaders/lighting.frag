@@ -6,7 +6,7 @@ out vec4 FragColor;
 // Struktura pro vlastnosti jednoho světla (dle skript)
 // Upravíme ji, aby obsahovala intenzity přímo
 struct LightProperties {
-    bool active;
+    bool isActive;
     vec3 position_view; // Očekáváme pozici ve view space
     vec3 ambient_intensity;
     vec3 diffuse_intensity;
@@ -42,7 +42,7 @@ void main(void) {
 
     // Smyčka přes všechna potenciální světla (dle skript)
     for (int i = 0; i < MAX_LIGHTS; i++) {
-        if (lights[i].active) { // Pouze pokud je světlo aktivní
+        if (lights[i].isActive) { // Pouze pokud je světlo aktivní
             // Vektor od fragmentu ke světlu (view space)
             vec3 L = normalize(lights[i].position_view - fs_in.FragPos_view); 
             // Vektor odrazu

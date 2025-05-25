@@ -23,10 +23,10 @@ public:
     ShaderProgram &shader;
     
     // mesh material
-    glm::vec4 ambient_material{1.0f}; //white, non-transparent 
-    glm::vec4 diffuse_material{1.0f}; //white, non-transparent 
-    glm::vec4 specular_material{1.0f}; //white, non-transparent
-    float reflectivity{1.0f}; 
+    glm::vec3 ambient_material{0.0f};
+    glm::vec3 diffuse_material{0.0f}; 
+    glm::vec3 specular_material{0.0f};
+    float reflectivity{0.0f}; 
     
     // indirect (indexed) draw 
     Mesh() = delete;
@@ -180,9 +180,9 @@ public:
         // Set material properties from the mesh's member variables
         // Note: The shader expects vec3, but your class stores vec4. We cast it by creating a vec3.
         if (shader.hasUniform("specular_shinines")) { // "specular_shinines" is unique to your lighting shader
-            shader.setUniform("ambient_material", glm::vec3(ambient_material));
-            shader.setUniform("diffuse_material", glm::vec3(diffuse_material));
-            shader.setUniform("specular_material", glm::vec3(specular_material));
+            shader.setUniform("ambient_material", ambient_material);
+            shader.setUniform("diffuse_material", diffuse_material);
+            shader.setUniform("specular_material", specular_material);
             shader.setUniform("specular_shinines", reflectivity);
         }
     

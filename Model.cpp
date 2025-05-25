@@ -51,13 +51,23 @@ Model Model::parse_json_to_model(const nlohmann::json& model_data, Model& model,
     load_value_from_json(model_data, "collectible", model.collectible);
     load_value_from_json(model_data, "collect_type", model.collect_type);
     load_value_from_json(model_data, "value", model.value);
-    load_value_from_json(model_data, "light_source", model.light_source);
     load_value_from_json(model_data, "radius", model.radius);
     load_value_from_json(model_data, "health", model.health);
 
-    load_value_from_json(model_data, "ambient", model.ambientMaterial);
-    load_value_from_json(model_data, "diffuse", model.diffuseMaterial);
-    load_value_from_json(model_data, "specular", model.specularMaterial);
+    load_value_from_json(model_data, "light_source", model.light_source);
+    if (model.light_source) {
+        load_value_from_json(model_data, "ambient", model.ambientLight);
+        load_value_from_json(model_data, "diffuse", model.diffuseLight);
+        load_value_from_json(model_data, "specular", model.specularLight);
+        load_value_from_json(model_data, "shininess", model.shininess);
+    } else {
+        for (auto& mesh : model.meshes) {
+            load_value_from_json(model_data, "ambient", mesh.ambient_material);
+            load_value_from_json(model_data, "diffuse", mesh.diffuse_material);
+            load_value_from_json(model_data, "specular", mesh.specular_material);
+            mesh.reflectivity = 1.0f; // Default reflectivity
+        }
+    }
 
     if (model_data.find("type") != model_data.end()) {
         const std::string type = model_data["type"];

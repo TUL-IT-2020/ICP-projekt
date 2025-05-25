@@ -764,9 +764,9 @@ int App::run(void) {
                         shader.setUniform("diffuse_intensity", diffuseIntensity);
                         shader.setUniform("specular_intensity", specularIntensity);
                         // Set the material properties for the model
-                        shader.setUniform("ambient_material", model->ambientMaterial);
-                        shader.setUniform("diffuse_material", model->diffuseMaterial);
-                        shader.setUniform("specular_material", model->specularMaterial);
+                        shader.setUniform("ambient_material", model->ambientLight);
+                        shader.setUniform("diffuse_material", model->diffuseLight);
+                        shader.setUniform("specular_material", model->specularLight);
                     }
 
                     rotation = glm::vec3(0.0f);
@@ -813,9 +813,9 @@ int App::run(void) {
                     shader.setUniform("diffuse_intensity", diffuseIntensity);
                     shader.setUniform("specular_intensity", specularIntensity);
                     // Set the material properties for the model
-                    shader.setUniform("ambient_material", model->ambientMaterial);
-                    shader.setUniform("diffuse_material", model->diffuseMaterial);
-                    shader.setUniform("specular_material", model->specularMaterial);
+                    shader.setUniform("ambient_material", model->ambientLight);
+                    shader.setUniform("diffuse_material", model->diffuseLight);
+                    shader.setUniform("specular_material", model->specularLight);
                 }
 
                 rotation = glm::vec3(0.0f);
