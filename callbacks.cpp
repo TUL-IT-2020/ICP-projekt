@@ -40,6 +40,12 @@ void App::glfw_key_callback(GLFWwindow* window, int key, int scancode, int actio
 						Door* door = dynamic_cast<Door*>(model.get());
 						if (door) {
 							door->interact();
+						} else if (model->end_level) {
+							model->interact();
+							std::cout << "End of level reached: " << this_inst->level << std::endl;
+							this_inst->load_new_level = true;
+						} else {
+							std::cout << "Object is not interactable: " << model->name << std::endl;
 						}
 					}
 				}

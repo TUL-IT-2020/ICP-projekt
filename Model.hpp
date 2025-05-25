@@ -39,6 +39,8 @@ public:
     // for door objects
     bool isDoor = false;
     bool isSolid = false;
+    // for end level objects
+    bool end_level = false; 
 
     // for light sources
     bool light_source = false;
@@ -166,7 +168,8 @@ public:
         radius(other.radius),
         health(other.health),
         isDoor(other.isDoor),
-        isSolid(other.isSolid) {
+        isSolid(other.isSolid),
+        end_level(other.end_level){
     }
 
     virtual ~Model() = default;

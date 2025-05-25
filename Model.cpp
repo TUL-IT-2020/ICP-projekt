@@ -57,6 +57,8 @@ Model Model::parse_json_to_model(const nlohmann::json& model_data, Model& model,
             model.collectible = true;
         } else if (type == "door") {
             model.isDoor = true;
+        } else if (type == "end_level") {
+            model.end_level = true;
         }
     }
 

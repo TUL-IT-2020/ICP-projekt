@@ -34,9 +34,11 @@
         },
         {
             "token": "X",
-            "model_name": "cube",
             "solid": true,
-            "texture_path": "resources/textures/end_game.png"
+            "model_name": "cube",
+            "texture_path": "resources/textures/end_game.png",
+            "radius": 1.2,
+            "type": "end_level"
         },
         {
             "token": "o",

@@ -266,12 +266,66 @@ GLuint textureInit(const std::filesystem::path& file_name) {
 }
 
 /*
+ * Initialize the map for the given level and generate the scene.
+ * This function reads the level from a file, initializes the map,
+ * and places models in the scene based on the map data.
+ * @param level: The level number to initialize.
+ */
+void App::init_map_for_level_and_generate_scene(int level) {
+	// Initialize the map with a default level
+	// map = Map(10, 25);
+	// path to the level file
+	std::string level_file = "resources/level0" + std::to_string(level) + ".txt";
+    map = Map(level_file);
+    map.printMap();
+
+    // size offset
+    glm::vec3 offset = glm::vec3(1.0, 0.0, 1.0);
+
+	// clear models
+	models.clear();
+
+    // place models to the scene
+    for (int j = 0; j < map.getRows(); j++) {
+        for (int i = 0; i < map.getCols(); i++) {
+            std::string token = std::string(1, map.fetchMapValue(i, j));
+            if (map_2_model_dict.find(token) != map_2_model_dict.end()) {
+                Model& base = map_2_model_dict[token];
+                glm::vec3 pos = glm::vec3(i, 0, j) + offset;
+                if (base.isDoor) {
+                    auto door = std::make_unique<Door>(base);
+                    door->origin = pos;
+                    models.push_back(std::move(door));
+                } else {
+                    auto model = std::make_unique<Model>(base);
+                    model->origin = pos;
+                    models.push_back(std::move(model));
+                }
+            }
+        }
+    }
+
+    // add floor
+    Model floor = map_2_model_dict["floor"];
+    // change scale
+    floor.scale = glm::vec3(map.getCols(), 1.0, map.getRows());
+    // change origin
+    floor.origin = glm::vec3(0.5, -1.0, 0.5);
+    models.push_back(std::make_unique<Model>(floor));
+
+    // set player position in 3D space (transform X-Y in map to XYZ in GL)
+    camera.Position.x = (map.start_position.x) + 1.0 / 2.0f;
+    camera.Position.z = (map.start_position.y) + 1.0 / 2.0f;
+    camera.Position.y = camera.camera_height;
+
+    std::cout << "Scene generated." << std::endl;
+}
+
+/*
  * Initialize pipeline: compile, link and use shaders
  * Create and load data into GPU using OpenGL DSA (Direct State Access)
  */
 void App::init_assets(void) {
-    // Model model("resources/obj/teapot_tri_vnt.obj", shader);
-
     // Load models from JSON file
     std::ifstream models_file("resources/models.json");
     if (!models_file.is_open()) {
@@ -299,14 +353,9 @@ void App::init_assets(void) {
     }
     std::cout << "Models loaded." << std::endl;
 
-    // load level
-    // map = Map(10, 25);
-    map = Map("resources/level00.txt");
-    map.printMap();
-
     /*
      */
-    // load map objects to models in scene
+    // load map objects to model cache
     std::ifstream map_2_models("resources/map_2_models.json");
     if (!map_2_models.is_open()) {
         throw std::runtime_error("Could not open JSON file.");
@@ -316,18 +365,10 @@ void App::init_assets(void) {
 
     for (const auto& model_data : json["map_2_models"]) {
         try {
-            std::string name = model_data["model_name"];
-            std::string token = model_data["token"];
-
             // copy model from cache
-            Model model = model_cache[name];
+            Model model = model_cache[model_data["model_name"]];
 
-            // if solid -> add to solid objects in map
-            if (model_data.find("solid") != model_data.end()) {
-                map.solid_objects.push_back(token[0]);
-            }
-
-            map_2_model_dict[token] = Model::parse_json_to_model(model_data, model, model_cache);
+            map_2_model_dict[model_data["token"]] = Model::parse_json_to_model(model_data, model, model_cache);
         } catch (std::exception const& e) {
             std::cerr << "ERROR loading textured model: " << model_data["model_name"] << ", "
                       << e.what() << std::endl;
@@ -373,43 +414,17 @@ void App::init_assets(void) {
     }
     std::cout << std::endl;
 
-    // size offset
-    glm::vec3 offset = glm::vec3(1.0, 0.0, 1.0);
+	// end level objects
+	std::cout << "End level objects: ";
+	for (const auto& obj : map_2_model_dict) {
+		if (obj.second.end_level) {
+			std::cout << obj.first << " ";
+		}
+	}
+	std::cout << std::endl;
 
-    // place models to the scene
-    for (int j = 0; j < map.getRows(); j++) {
-        for (int i = 0; i < map.getCols(); i++) {
-            std::string token = std::string(1, map.fetchMapValue(i, j));
-            if (map_2_model_dict.find(token) != map_2_model_dict.end()) {
-                Model& base = map_2_model_dict[token];
-                glm::vec3 pos = glm::vec3(i, 0, j) + offset;
-                if (base.isDoor) {
-                    auto door = std::make_unique<Door>(base);
-                    door->origin = pos;
-                    models.push_back(std::move(door));
-                } else {
-                    auto model = std::make_unique<Model>(base);
-                    model->origin = pos;
-                    models.push_back(std::move(model));
-                }
-            }
-        }
-    }
-
-    // add floor
-    Model floor = map_2_model_dict["floor"];
-    // change scale
-    floor.scale = glm::vec3(map.getCols(), 1.0, map.getRows());
-    // change origin
-    floor.origin = glm::vec3(0.5, -1.0, 0.5);
-    models.push_back(std::make_unique<Model>(floor));
-
-    // set player position in 3D space (transform X-Y in map to XYZ in GL)
-    camera.Position.x = (map.start_position.x) + 1.0 / 2.0f;
-    camera.Position.z = (map.start_position.y) + 1.0 / 2.0f;
-    camera.Position.y = camera.camera_height;
-
-    std::cout << "Scene generated." << std::endl;
+    // load level
+	init_map_for_level_and_generate_scene(level);
 
     // load status bar
     status_bar = std::make_shared<StatusBar>(model_cache["statusbar"]);
@@ -581,6 +596,20 @@ int App::run(void) {
         glm::vec3 scale_change = glm::vec3(1.0f);
 
         while (!glfwWindowShouldClose(window)) {
+			// new level?
+			if (load_new_level) {
+				load_new_level = false; // reset flag
+				level++;
+				status_bar->setLevel(level);
+				try {
+					init_map_for_level_and_generate_scene(level);
+					std::cout << "Level " << level << " initialized." << std::endl;
+				} catch (const std::exception& e) {
+					std::cerr << "Error initializing level " << level << ": " << e.what() << std::endl;
+					glfwSetWindowShouldClose(window, GLFW_TRUE); // Exit on error
+				}
+			}
+
             // =================================================================
             //                          IMGUI & UPDATE
             // =================================================================
@@ -665,6 +694,8 @@ int App::run(void) {
                         if (dist < (*it)->radius) {
                             bullet.active = false;
                             (*it)->health -= bullet.damage;
+							std::cout << "Bullet hit enemy: " << (*it)->name
+									  << ", remaining health: " << (*it)->health << std::endl;
                             if ((*it)->health <= 0) {
                                 Model corpse = map_2_model_dict["d"];
                                 corpse.origin = (*it)->origin;
@@ -675,9 +706,17 @@ int App::run(void) {
                             }
                         }
                     }
-                    if (map.containsSolid(bullet.position.x, bullet.position.z)) {
-                        bullet.active = false;
-                    }
+                    if ((*it)->isSolid) {
+						// Check for collision with solid objects
+						glm::vec3 obj_min = (*it)->origin - (*it)->scale / 2.0f;
+						glm::vec3 obj_max = (*it)->origin + (*it)->scale / 2.0f;
+						glm::vec3 bullet_min = bullet.position - glm::vec3(bullet.radius);
+						glm::vec3 bullet_max = bullet.position + glm::vec3(bullet.radius);
+						if (aabb_intersect(obj_min, obj_max, bullet_min, bullet_max)) {
+							bullet.active = false;  // Bullet hit a solid object
+							std::cout << "Bullet hit solid object: " << (*it)->name << std::endl;
+						}
+					}
                     ++it;
                 }
             }

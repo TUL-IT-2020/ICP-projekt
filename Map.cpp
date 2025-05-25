@@ -58,13 +58,6 @@ bool Map::outOfBounds(int x, int y) {
 	return false;
 }
 
-bool Map::containsSolid(int x, int y) {
-	if (std::find(solid_objects.begin(), solid_objects.end(), fetchMapValue(x, y)) != solid_objects.end()) {
-		return true;
-	}
-	return false;
-}
-
 // Print map
 void Map::printMap() {
     for (int j = 0; j < map.rows; j++) {

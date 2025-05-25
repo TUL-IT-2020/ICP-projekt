@@ -43,6 +43,8 @@ public:
 private:
     // Map
     Map map;
+    int level{ 1 }; // level number
+    bool load_new_level{ false };
 	std::unordered_map<std::string, Model> map_2_model_dict;
     // list of bullets
     std::vector<Bullet> bullets;
@@ -50,6 +52,7 @@ private:
 
     // camera related 
     Camera camera;
+    // player related
     Player player;
     ShaderProgram directionalShader;
     std::shared_ptr<StatusBar> status_bar;
@@ -70,12 +73,15 @@ private:
 
     void thread_code(void);
 
+    // init
     void init_opencv();
     void init_glew(void);
     void init_glfw(void);
     void init_gl_debug();
     void init_assets(void);
+    void init_map_for_level_and_generate_scene(int level);
 
+    // print info
     void print_opencv_info();
     void print_glfw_info(void);
     void print_glm_info();

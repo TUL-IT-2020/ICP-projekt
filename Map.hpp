@@ -19,7 +19,6 @@ class Map {
         cv::Mat map = cv::Mat(10, 25, CV_8U); // unsigned char
     public:
         cv::Point2i start_position, end_position;
-        std::vector<uchar> solid_objects = {};
 
         // default constructor
         Map() {}
