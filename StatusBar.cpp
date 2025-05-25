@@ -1,9 +1,42 @@
 #include <numeric>
+#include <filesystem>
+#include <iostream>
 #include "StatusBar.hpp"
 #include "App.hpp"
+#include "Player.hpp"
 
 void StatusBar::loadAssets() {
     statusBarImgBackground = cv::imread("resources/statusBar/background.png", cv::IMREAD_UNCHANGED);
+
+    // load weapon textures
+    std::vector<std::string> weapon_names = {"knife", "pistol", "chainGun", "machineGun"};
+    for (const auto& weapon_name : weapon_names) {
+        std::string path = "resources/statusBar/weapons/" + weapon_name + ".png";
+        cv::Mat img = cv::imread(path, cv::IMREAD_UNCHANGED);
+        if (img.empty()) {
+            std::cerr << "Failed to load weapon texture: " << path << std::endl;
+            continue;
+        }
+        weapon_textures_map[str_to_enum(weapon_name)] = img;
+    }
+
+    // TEST for weapon on player
+    std::unordered_map< weapon_type, std::vector<cv::Mat> > player_weapon_textures_map;
+    std::string base_path = "resources/sprites/weapons/";
+    for (const auto& weapon_name : weapon_names) {
+        std::string weapon_path = base_path + weapon_name + "/";
+        for (const auto& entry : std::filesystem::directory_iterator(weapon_path)) {
+            if (entry.is_regular_file() && entry.path().extension() == ".png") {
+                cv::Mat img = cv::imread(entry.path().string(), cv::IMREAD_UNCHANGED);
+                if (img.empty()) {
+                    std::cerr << "Failed to load weapon texture: " << entry.path() << std::endl;
+                    continue;
+                }
+                player_weapon_textures_map[str_to_enum(weapon_name)].push_back(img);
+            }
+        }
+        std::cout << "Loaded " << player_weapon_textures_map[str_to_enum(weapon_name)].size() << " textures for weapon: " << weapon_name << std::endl;
+    }  
 
     // Load face textures
     for (int i = 130; i > 108; --i) {
@@ -78,6 +111,7 @@ void StatusBar::updateStatusBarTexture() {
     cv::Point face_pos(125, 1);
     cv::Point health_pos(160, 13);
     cv::Point ammo_pos(202, 13);
+    cv::Point weapon_pos(241, 1);
 
     // floor number
     cv::Mat floor_number_img = int_to_img(this->floor_number, 2);
@@ -102,6 +136,14 @@ void StatusBar::updateStatusBarTexture() {
     // ammo 2 digits
     cv::Mat ammo_img = int_to_img(this->ammo, 3);
     check_and_copy(ammo_img, statusBarImg, ammo_pos);
+
+    // weapon
+    cv::Mat weapon_img = weapon_textures_map[this->current_weapon];
+    if (weapon_img.empty()) {
+        std::cerr << "Warning: weapon texture is empty for weapon type: " << this->current_weapon << std::endl;
+    } else {
+        check_and_copy(weapon_img, statusBarImg, weapon_pos);
+    }
 
     // rotate statusBarImg
     cv::Mat flipedImg;

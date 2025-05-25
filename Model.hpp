@@ -43,7 +43,7 @@ public:
     // for light sources
     bool light_source = false;
 
-    // Material properties (add these)
+    // Material properties
     glm::vec3 ambientMaterial = glm::vec3(0.5f); // Default values
     glm::vec3 diffuseMaterial = glm::vec3(0.8f);
     glm::vec3 specularMaterial = glm::vec3(0.5f);
@@ -183,7 +183,7 @@ public:
      * e.g.: s=s0+v*dt
      * @param delta_t: time passed since last update
      */
-    virtual void update(float) {}
+    virtual void update(float delta_t) {}
 
     /*
     void update(const float delta_t) {

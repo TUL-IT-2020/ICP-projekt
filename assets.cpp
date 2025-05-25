@@ -48,3 +48,11 @@ bool aabb_intersect(const glm::vec3& minA, const glm::vec3& maxA,
            (minA.y <= maxB.y && maxA.y >= minB.y) &&
            (minA.z <= maxB.z && maxA.z >= minB.z);
 }
+
+weapon_type str_to_enum(const std::string& str) {
+    if (str == "knife") return KNIFE;
+    if (str == "pistol") return PISTOL;
+    if (str == "chainGun") return CHAINGUN;
+    if (str == "machineGun") return MACHINEGUN;
+    throw std::invalid_argument("Unknown weapon type: " + str);
+}
