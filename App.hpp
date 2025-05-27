@@ -38,6 +38,10 @@ public:
     int run(void);
     void destroy(void);
     
+    cv::Point2f find_face(cv::Mat & frame);
+	void draw_cross_relative(cv::Mat& img, cv::Point2f center_relative, int size);
+	char webcam_to_movement(const cv::Point2f& center);
+    
     static GLuint gen_tex(cv::Mat& image, TextureFilter filter);
 
     ~App(); //default destructor, called on app instance destruction
@@ -74,8 +78,29 @@ private:
     std::vector<std::unique_ptr<Model>> models;
     //ShaderProgram shader;
 
+    // webcam
+    cv::VideoCapture capture;
+    cv::CascadeClassifier face_cascade; // Face cascade classifier
+
+	// thread controll variables
+	std::mutex mtx;
+	bool user_exit = false;
+	bool cam_disconnected = false;
+	bool process_images = true;
+	char movement_from_webcam = 'n'; // 'n' for no movement_from_webcam, 'l' for left, 'r' for right.
+
+	// thread shared variables
+	bool new_coordinates = false;
+	cv::Point2f center = cv::Point2f(0.0f, 0.0f);
+	cv::Mat frame;
+
+	// thread functions
+	void camera_processing_thread();
     void thread_code(void);
+    void UI_thread();
+
     bool CheckHitboxes(glm::vec3 movement);
+    bool webcam_connected = true; // if webcam is not available, use keyboard input
 
     // init
     void init_opencv();
@@ -84,6 +109,8 @@ private:
     void init_gl_debug();
     void init_assets(void);
     void init_map_for_level_and_generate_scene(int level);
+    bool webcam_init();
+    void clasificator_init();
 
     // print info
     void print_opencv_info();

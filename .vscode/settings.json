@@ -76,7 +76,8 @@
         "unordered_set": "cpp",
         "regex": "cpp",
         "ranges": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "text_encoding": "cpp"
     },
     "cmake.sourceDirectory": "/home/pytel/Git/ICP-projekt/include/glm"
 }

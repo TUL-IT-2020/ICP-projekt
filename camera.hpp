@@ -24,6 +24,7 @@ public:
     // Camera options
     GLfloat MovementSpeed;
     GLfloat MouseSensitivity;
+    GLfloat RotationSpeed = 200.0f; // degrees per second
 
     Camera() : Position(0.0f, 0.0f, 0.0f), Front(0.0f, 0.0f, -1.0f), Right(1.0f, 0.0f, 0.0f), Up(0.0f, 1.0f, 0.0f)
     {
@@ -49,6 +50,18 @@ public:
 
     glm::mat4 GetViewMatrix() {
         return glm::lookAt(this->Position, this->Position + this->Front, this->Up);
+    }
+
+    void rotateLeft(GLfloat deltaTime) {
+        // Rotate the camera to the left
+        this->Yaw -= MouseSensitivity * deltaTime * RotationSpeed /2;
+        this->updateCameraVectors();
+    }
+
+    void rotateRight(GLfloat deltaTime) {
+        // Rotate the camera to the right
+        this->Yaw += MouseSensitivity * deltaTime * RotationSpeed /2;
+        this->updateCameraVectors();
     }
 
     glm::vec3 ProcessInput(GLFWwindow* window, GLfloat deltaTime) {
@@ -80,10 +93,10 @@ public:
         }
         
         if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-            this->Yaw -= MouseSensitivity * deltaTime * 125;
+            this->Yaw -= MouseSensitivity * deltaTime * RotationSpeed;
             this->updateCameraVectors();
         if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-            this->Yaw += MouseSensitivity * deltaTime * 125;
+            this->Yaw += MouseSensitivity * deltaTime * RotationSpeed;
             this->updateCameraVectors();
 
         return glm::normalize(direction) * MovementSpeed * deltaTime;
