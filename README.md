@@ -4,6 +4,30 @@
 
 ### Linux
 
+#### Ubuntu
+Na čisté instalaci doinstalujte ovladače:
+```bash
+sudo ubuntu-drivers autoinstall
+```
+
+> [!note] 
+> Pokud používáte grafickou kartu NVIDIA (například 940MX), nastavte v kódu požadovanou verzi OpenGL na 4.5 nebo nižší:
+> ```cpp
+> glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+> glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+> ```
+> Některé ovladače (zejména Mesa) mohou sice v `glxinfo` zobrazit vyšší verzi, ale nativní ovladač NVIDIA podporuje maximálně OpenGL 4.5.
+
+> [!note]
+> Pokud vidíte následující chybu při spuštění programu:
+> ```bash
+> libdecor-gtk-WARNING: Failed to initialize GTK
+> Failed to load plugin 'libdecor-gtk.so': failed to init
+> No plugins found, falling back on no decorations
+> ```
+> Tak je čas opustit Wayland a přepnout se na X11. To lze provést v přihlašovací obrazovce, kde vyberete "Ubuntu on Xorg" místo "Ubuntu".
+
+
 #### GLEW
 `apt-dependencies.txt` obsahuje seznam balíčků, které je potřeba nainstalovat pro správný chod programu. 
 
@@ -54,6 +78,7 @@ sudo apt-get install libxi-dev libxinerama-dev
 
 `export MESA_D3D12_DEFAULT_ADAPTER_NAME=NVIDIA`
 
+`__NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia ./ICP.out`
 #### ImGUI
 
 To add ImGUI to your project:

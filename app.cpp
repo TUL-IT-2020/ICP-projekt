@@ -41,6 +41,7 @@ void App::init_glew(void) {
     // glfwMakeContextCurrent()
     //
     {
+        glewExperimental = GL_TRUE;
         GLenum glew_ret;
         glew_ret = glewInit();
         if (glew_ret != GLEW_OK) {
@@ -74,10 +75,13 @@ void App::init_glfw(void) {
     // try to open OpenGL
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    //glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+    //glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 
     // open window, but hidden - it will be enabled later, after asset initialization
-    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+    //glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(1000, 800, "ICP", nullptr, nullptr);
@@ -89,6 +93,15 @@ void App::init_glfw(void) {
 
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
+
+    // Debug: vypiš skutečnou verzi OpenGL a renderer
+    const GLubyte* version = glGetString(GL_VERSION);
+    const GLubyte* renderer = glGetString(GL_RENDERER);
+    std::cout << "OpenGL version: " << (version ? (const char*)version : "UNKNOWN") << std::endl;
+    std::cout << "OpenGL renderer: " << (renderer ? (const char*)renderer : "UNKNOWN") << std::endl;
+
+    // Workaround for GLEW+Mesa+Core profile bug
+    glGetError();
 
     // disable mouse cursor
     // disable cursor, so that it can not leave window, and we can process movement
