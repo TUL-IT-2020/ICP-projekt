@@ -72,11 +72,24 @@ glxinfo | grep "OpenGL version"
 sudo apt-get install libxi-dev libxinerama-dev
 ```
 
+#### Změna grafiky na NVIDIA
+
+```bash
+export __NV_PRIME_RENDER_OFFLOAD=1
+export __GLX_VENDOR_LIBRARY_NAME=nvidia
+```
+
+Jednorázové spuštění programu s NVIDIA grafikou:
+`__NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia ./ICP.out`
+
 ### Windows
 
 #### Změna grafiky na NVIDIA
 
 `export MESA_D3D12_DEFAULT_ADAPTER_NAME=NVIDIA`
+
+export __NV_PRIME_RENDER_OFFLOAD=1
+export __GLX_VENDOR_LIBRARY_NAME=nvidia
 
 `__NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia ./ICP.out`
 #### ImGUI

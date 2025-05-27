@@ -788,7 +788,6 @@ int App::run(void) {
 
                     // If it's the lighting shader, set the lighting uniforms
                     if (shader.hasUniform("light_position")) {
-                        std::cout << "Using one light source." << std::endl;
                         // Set the light position in view space
                         const Light& light = lights[0];
                         glm::vec3 lightPositionView = glm::vec3(viewMatrix * glm::vec4(light.position, 1.0f));
