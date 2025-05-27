@@ -194,7 +194,7 @@ GLuint App::gen_tex(cv::Mat& image, TextureFilter filter = TextureFilter::Trilin
 }
 
 bool App::webcam_init() {
-        //open capture device
+    //open capture device
     //open first available camera
 #ifdef _WIN32
     // Windows
@@ -246,7 +246,7 @@ bool App::init() {
 
         clasificator_init();
         if (!webcam_init()) {
-            throw std::runtime_error("Webcam initialization failed.");
+            std::cerr << "Webcam not available, using keyboard input instead." << std::endl;
             webcam_connected = false;  // if webcam is not available, use keyboard input
         }
 
