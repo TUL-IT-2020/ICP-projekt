@@ -667,10 +667,6 @@ void App::thread_code(void) {
 
     double last_frame_time = glfwGetTime();
 
-    // These are no longer needed here, we'll set them inside the loop
-    // ShaderProgram& shader = (*models[0]).meshes[0].shader;
-    // shader.activate();
-
     glm::vec3 offset = glm::vec3(0.0);
     glm::vec3 rotation = glm::vec3(0.0f);
     glm::vec3 scale_change = glm::vec3(1.0f);
