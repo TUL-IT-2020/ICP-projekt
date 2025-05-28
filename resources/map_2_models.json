@@ -244,9 +244,9 @@
             "model_name": "sprite",
             "texture_path": "resources/sprites/chandelier_1.png",
             "light_source": true,
-            "ambient": [0.15, 0.15, 0.1],
-            "diffuse": [0.9, 0.9, 0.7],
-            "specular": [1.0, 1.0, 1.0],
+            "ambient": [0.05, 0.02, 0.0], 
+            "diffuse": [0.4, 0.2, 0.05], 
+            "specular": [0.2, 0.2, 0.2],
             "shininess": 32
         },
         {
@@ -255,10 +255,9 @@
             "model_name": "sprite",
             "texture_path": "resources/sprites/chandelier_2.png",
             "light_source": true,
-            "ambient": [0.15, 0.15, 0.1],
-            "diffuse": [0.9, 0.9, 0.7],
-            "specular": [1.0, 1.0, 1.0],
-            "shininess": 32
+            "diffuse": [0.1, 0.4, 0.8],   
+            "specular": [0.8, 0.8, 1.0],  
+            "shininess": 128
         },
         {
             "token": "C",
@@ -291,10 +290,9 @@
             "model_name": "sprite",
             "texture_path": "resources/sprites/lamp.png",
             "light_source": true,
-            "ambient": [0.2, 0.2, 0.0],
-            "diffuse": [0.8, 0.8, 0.5],
-            "specular": [1.0, 1.0, 1.0],
-            "shininess": 32
+            "diffuse": [0.9, 0.7, 0.4],   
+            "specular": [0.5, 0.5, 0.5],
+            "shininess": 64
         },
         {
             "token": "K",

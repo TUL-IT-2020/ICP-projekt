@@ -349,9 +349,9 @@ void App::init_map_for_level_and_generate_scene(int level) {
     glm::vec3 ambientIntensity = glm::vec3(0.3f);
     glm::vec3 diffuseIntensity = glm::vec3(0.8f);
     glm::vec3 specularIntensity = glm::vec3(1.0f);
-    Light light = Light(
+    /*Light light = Light(
         lightPositionWorld, ambientIntensity, diffuseIntensity, specularIntensity);
-    lights.push_back(light); 
+    lights.push_back(light); */
 
     for (int j = 0; j < map.getRows(); j++) {
         for (int i = 0; i < map.getCols(); i++) {
@@ -371,12 +371,13 @@ void App::init_map_for_level_and_generate_scene(int level) {
                 if (base.light_source) {
                     // add light source
                     Light light = Light(
-                        base.origin,
+                        pos,
+                        //base.origin
                         base.ambientLight,
                         base.diffuseLight,
                         base.specularLight);
                     
-                    //lights.push_back(light);
+                    lights.push_back(light);
                     light_source_count++;
                 }
             }

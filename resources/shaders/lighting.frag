@@ -1,67 +1,81 @@
-// Váš Fragment Shader (např. directional.frag)
 #version 460 core
+
+#define MAX_LIGHTS 10 // This MUST match MAX_LIGHTS in App.hpp
 
 out vec4 FragColor;
 
-// Struktura pro vlastnosti jednoho světla (dle skript)
-// Upravíme ji, aby obsahovala intenzity přímo
-struct LightProperties {
+// Struct for light properties, matching the C++ and uniform setup
+struct Light {
     bool isActive;
-    vec3 position_view; // Očekáváme pozici ve view space
+    vec3 position; // NOTE: Received in WORLD space from C++
     vec3 ambient_intensity;
     vec3 diffuse_intensity;
     vec3 specular_intensity;
-    // float spotCutOff; // Pro budoucí rozšíření
 };
 
-#define MAX_LIGHTS 10 // Musí se shodovat s C++
-uniform LightProperties lights[MAX_LIGHTS]; // Pole všech potenciálních světel
+// Uniforms from C++
+uniform Light lights[MAX_LIGHTS];
+uniform mat4 v_m; // View matrix (to transform light positions)
 
-// Vstupy z Vertex Shaderu
-in VS_OUT {
-    vec3 FragPos_view;
-    vec3 N_view;
-    vec2 texCoord;
-} fs_in;
-
-// Vlastnosti materiálu objektu (z C++)
+// Material properties
 uniform vec3 ambient_material;
 uniform vec3 diffuse_material;
 uniform vec3 specular_material;
-uniform float specular_shininess; // Lesklost materiálu
+uniform float specular_shinines;
 
-// Textura
+// Texture
 uniform sampler2D tex0;
 
-void main(void) {
-    vec3 N = normalize(fs_in.N_view);
-    vec3 V = normalize(-fs_in.FragPos_view); // Vektor od fragmentu ke kameře (view space)
-    
-    vec3 texture_color = texture(tex0, fs_in.texCoord).rgb;
-    vec3 accumulator = vec3(0.0); // Výsledná barva světla
+// Input from vertex shader
+in VS_OUT {
+    vec3 FragPos; // Fragment position in View Space
+    vec3 N;       // Normal in View Space
+    vec3 V;       // View vector in View Space
+    vec2 texCoord;
+} fs_in;
 
-    // Smyčka přes všechna potenciální světla (dle skript)
+void main(void) {
+    // Normalize interpolated vectors from the vertex shader
+    vec3 N = normalize(fs_in.N);
+    vec3 V = normalize(fs_in.V);
+
+    // Initialize total lighting components to zero
+    vec3 totalAmbient = vec3(0.0);
+    vec3 totalDiffuse = vec3(0.0);
+    vec3 totalSpecular = vec3(0.0);
+
+    // Loop through all possible lights and accumulate their effect
     for (int i = 0; i < MAX_LIGHTS; i++) {
-        if (lights[i].isActive) { // Pouze pokud je světlo aktivní
-            // Vektor od fragmentu ke světlu (view space)
-            vec3 L = normalize(lights[i].position_view - fs_in.FragPos_view); 
-            // Vektor odrazu
+        if (lights[i].isActive) {
+            // Transform the light's world position to view space
+            vec3 lightPosView = (v_m * vec4(lights[i].position, 1.0)).xyz;
+
+            // Calculate light vector (from fragment to light)
+            vec3 L = normalize(lightPosView - fs_in.FragPos);
+
+            // Calculate reflection vector
             vec3 R = reflect(-L, N);
 
-            // Ambientní složka pro toto světlo
-            vec3 current_ambient = ambient_material * lights[i].ambient_intensity;
+            // --- Accumulate Components ---
 
-            // Difúzní složka pro toto světlo
-            float diff_factor = max(dot(N, L), 0.0);
-            vec3 current_diffuse = diff_factor * diffuse_material * lights[i].diffuse_intensity;
+            // Ambient
+            totalAmbient += ambient_material * lights[i].ambient_intensity;
 
-            // Spekulární složka pro toto světlo
-            float spec_factor = pow(max(dot(R, V), 0.0), specular_shininess);
-            vec3 current_specular = spec_factor * specular_material * lights[i].specular_intensity;
-            
-            accumulator += current_ambient + current_diffuse + current_specular;
+            // Diffuse
+            float diffFactor = max(dot(N, L), 0.0);
+            totalDiffuse += diffFactor * diffuse_material * lights[i].diffuse_intensity;
+
+            // Specular
+            float specFactor = pow(max(dot(R, V), 0.0), specular_shinines);
+            totalSpecular += specFactor * specular_material * lights[i].specular_intensity;
         }
     }
-    
-    FragColor = vec4(accumulator * texture_color, 1.0);
+
+    // Get the base color from the texture
+    vec3 textureColor = texture(tex0, fs_in.texCoord).rgb;
+
+    // Combine lighting with the texture color, like in your original shader
+    vec3 finalColor = (totalAmbient + totalDiffuse) * textureColor + totalSpecular;
+
+    FragColor = vec4(finalColor, 1.0);
 }

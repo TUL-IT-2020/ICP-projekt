@@ -147,4 +147,6 @@ std::string ShaderProgram::textFileRead(const std::filesystem::path& filename) {
     return ss.str();
 }
 
+
+
 GLuint ShaderProgram::currently_used = 0;
