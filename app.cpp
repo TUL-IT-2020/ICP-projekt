@@ -344,14 +344,13 @@ void App::init_map_for_level_and_generate_scene(int level) {
 
     // place models to the scene
     int light_source_count = 1;
-    // Define light properties once per frame
     glm::vec3 lightPositionWorld = glm::vec3(10.0f, 15.0f, 10.0f);
     glm::vec3 ambientIntensity = glm::vec3(0.3f);
-    glm::vec3 diffuseIntensity = glm::vec3(0.8f);
-    glm::vec3 specularIntensity = glm::vec3(1.0f);
-    /*Light light = Light(
+    glm::vec3 diffuseIntensity = glm::vec3(0.1f);
+    glm::vec3 specularIntensity = glm::vec3(0.1f);
+    Light light = Light(
         lightPositionWorld, ambientIntensity, diffuseIntensity, specularIntensity);
-    lights.push_back(light); */
+    lights.push_back(light);
 
     for (int j = 0; j < map.getRows(); j++) {
         for (int i = 0; i < map.getCols(); i++) {
@@ -639,7 +638,6 @@ bool App::CheckHitboxes(glm::vec3 movement) {
             }
         }
     }
-
     return true;
 }
 
@@ -860,7 +858,27 @@ void App::thread_code(void) {
                 } else {
                     for (size_t i = 0; i < lights.size() && i < MAX_LIGHTS; ++i) {
                         const Light& light = lights[i];
-                        shader.setUniform("lights[" + std::to_string(i) + "].isActive", true);
+                        bool visible = true;
+                        /*
+                        // raycasting to check if the light is visible
+                        if (i > 1) {
+                            glm::vec3 from = model->origin;
+                            glm::vec3 to = light.position;
+                            glm::vec3 dir = glm::normalize(to - from);
+                            float distance = glm::distance(from, to);
+                            float step = 0.2f; // krok v mapě
+                            for (float d = step; d < distance; d += step) {
+                                glm::vec3 pos = from + dir * d;
+                                int x = int(pos.x);
+                                int z = int(pos.z);
+                                if (map.containsWall(x, z)) {
+                                    visible = false;
+                                    break;
+                                }
+                            }
+                        }
+                        */
+                        shader.setUniform("lights[" + std::to_string(i) + "].isActive", visible);
                         shader.setUniform("lights[" + std::to_string(i) + "].position",
                                             light.position);
                         shader.setUniform("lights[" + std::to_string(i) + "].ambient_intensity",
