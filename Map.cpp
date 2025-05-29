@@ -136,4 +136,13 @@ void Map::genenerateLabyrinth(int rows, int cols) {
 		end_position.y = uniform_height(e1);
 	} while (start_position == end_position); //check overlap
 	map.at<uchar>(cv::Point(end_position.x, end_position.y)) = 'X';
+
+	
+}
+
+bool Map::containsWall(int x, int y) {
+	if (outOfBounds(x, y)) {
+		return false;
+	}
+	return std::find(std::begin(wall_chars), std::end(wall_chars), fetchMapValue(x, y)) != std::end(wall_chars);
 }

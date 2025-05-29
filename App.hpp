@@ -54,7 +54,7 @@ private:
     // list of bullets
     std::vector<Bullet> bullets;
     // list of lights
-    const int MAX_LIGHTS = 10;
+    const int MAX_LIGHTS = 20;
     std::vector<Light> lights;
 
     // camera related 

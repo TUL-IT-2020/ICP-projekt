@@ -17,6 +17,8 @@
 class Map {
     private:
         cv::Mat map = cv::Mat(10, 25, CV_8U); // unsigned char
+        // list of characters of walls:
+        static constexpr char wall_chars[9] = {'B', 'D', 'E', 'S', 'T', 'U', 'W', 'X', 'Y',}; // walls
     public:
         cv::Point2i start_position, end_position;
 
@@ -41,6 +43,7 @@ class Map {
 
         bool outOfBounds(int x, int y);
         bool containsSolid(int x, int y);
+        bool containsWall(int x, int y);
     };
 
 #endif // MAZE_GEN_CPP

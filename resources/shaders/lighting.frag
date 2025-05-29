@@ -1,6 +1,6 @@
 #version 460 core
 
-#define MAX_LIGHTS 10 // This MUST match MAX_LIGHTS in App.hpp
+#define MAX_LIGHTS 20 // This MUST match MAX_LIGHTS in App.hpp
 
 out vec4 FragColor;
 
@@ -56,25 +56,28 @@ void main(void) {
             // Calculate reflection vector
             vec3 R = reflect(-L, N);
 
-            // --- Accumulate Components ---
+            // Calculate distance and attenuation
+            float distance = length(lightPosView - fs_in.FragPos);
+            float attenuation = 1.0 / (1.0 + 0.09 * distance + 0.032 * (distance * distance));
 
+            // --- Accumulate Components ---
             // Ambient
-            totalAmbient += ambient_material * lights[i].ambient_intensity;
+            totalAmbient += ambient_material * lights[i].ambient_intensity * attenuation;
 
             // Diffuse
             float diffFactor = max(dot(N, L), 0.0);
-            totalDiffuse += diffFactor * diffuse_material * lights[i].diffuse_intensity;
+            totalDiffuse += diffFactor * diffuse_material * lights[i].diffuse_intensity * attenuation;
 
             // Specular
             float specFactor = pow(max(dot(R, V), 0.0), specular_shinines);
-            totalSpecular += specFactor * specular_material * lights[i].specular_intensity;
+            totalSpecular += specFactor * specular_material * lights[i].specular_intensity * attenuation;
         }
     }
 
     // Get the base color from the texture
     vec3 textureColor = texture(tex0, fs_in.texCoord).rgb;
 
-    // Combine lighting with the texture color, like in your original shader
+    // Combine lighting with the texture color
     vec3 finalColor = (totalAmbient + totalDiffuse) * textureColor + totalSpecular;
 
     FragColor = vec4(finalColor, 1.0);
