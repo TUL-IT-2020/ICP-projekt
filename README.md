@@ -1,5 +1,19 @@
 # ICP projekt
 
+![wolfenstein](./wolf.png)
+
+## Ovládání
+
+- **WASD** - pohyb
+- **Q/E** - rotace kamery
+  - pokud je připjená web kamera, tak se hráč otáčí podle pohybu hlavy
+- **R** - interakce s objektem (otevření dveří)
+- **LMB** - střelba
+- **ESC** - ukončení programu
+
+> [!tip]
+> Klávesa **F** přepne do fly módu, kde hráč může volně létat po mapě a procházet objekty.
+
 ## Instalace závislostí
 
 ### Linux
@@ -88,10 +102,6 @@ Jednorázové spuštění programu s NVIDIA grafikou:
 
 `export MESA_D3D12_DEFAULT_ADAPTER_NAME=NVIDIA`
 
-export __NV_PRIME_RENDER_OFFLOAD=1
-export __GLX_VENDOR_LIBRARY_NAME=nvidia
-
-`__NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia ./ICP.out`
 #### ImGUI
 
 To add ImGUI to your project:
@@ -109,13 +119,6 @@ Pro spuštění programu je potřeba zdrojoý kód zkompilovat a spustit.
 ```bash
 make run
 ```
-
-## Zdroje:
-Textury a snipety kódu jsou převzaty z následujících zdrojů:
-- [Fable Wolfenstein](https://github.com/JamesRandall/fsharp-wolfenstein)
-- [Wolfenstein 3D Re-implementation in C++](https://github.com/mhamzaqayyum/wolf3d-reimpl-cpp)
-- [Wolfenstein 3D C++](https://github.com/LeviMooreDev/Wolfenstein-3D-CPlusPlus)
-
 
 ## Tvorba mapy:
 Legenda pro tvorbu mapy:
@@ -179,39 +182,11 @@ Y = wood 3
 Z
 ```
 
-
-
 ## TODO:
-- [ ] Shader program hpp - přidat inline k metodám setUniform
-- [x] Opravit pořadí vykreslování průhledných modelů.
+- [TODO.md](./TODO.md)
 
-```cpp
-// remember:
-// void draw(glm::vec3 const & offset = glm::vec3(0.0), glm::vec3 const & rotation = glm::vec3(0.0f))
-//#######              DRAW             ###############
-// option 1: draw object, no changes in position, rotation, scale, etc.
-    scene.at("model_of_something").draw();
-//#####################################################
-// option 2: pass new position, that is changing in every frame (saving is useless)
-    scene.at("model_of_something").draw(glm::vec3(0.0f),
-                glm::vec3(0.0f, glm::radians(static_cast<float>(360*glfwGetTime())), 0.0f) );
-//#####################################################
-// option 2: compute and save new position, simple transformation
-    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-        scene.at("model_of_something").rotation.y = glm::radians(static_cast<float>(360*glfwGetTime()));
-    }
-    scene.at("model_of_something").draw();
-//#####################################################
-// option 3: - for complex transformations: combine multiple transformations to model matrix  
-// 			 - prepare model transformation locally, stack it with internal position
-//           - see Model-extended.cpp for draw(glm::mat4 const & model_matrix)
-    glm::mat4 m_m = glm::identity<glm::mat4>();
-    m_m = glm::rotate(m_m, glm::radians(static_cast<float>(360*glfwGetTime())), glm::vec3(0.0f, 0.1f, 0.0f));
-    m_m = glm::scale(m_m, glm::vec3(1.0f + glm::sin(glfwGetTime())));
-    scene.at("model_of_something").draw(m_m);
-//#####################################################
-// option 4 (for dymamic object): derive new class - rotatingModel, modify update() method, so that
-//                                it modifies member variable rotation itself
-    scene.at("model_of_something").update(delta_t);
-    scene.at("model_of_something").draw();
-```
+## Zdroje:
+Textury a snipety kódu jsou převzaty z následujících zdrojů:
+- [Fable Wolfenstein](https://github.com/JamesRandall/fsharp-wolfenstein)
+- [Wolfenstein 3D Re-implementation in C++](https://github.com/mhamzaqayyum/wolf3d-reimpl-cpp)
+- [Wolfenstein 3D C++](https://github.com/LeviMooreDev/Wolfenstein-3D-CPlusPlus)
